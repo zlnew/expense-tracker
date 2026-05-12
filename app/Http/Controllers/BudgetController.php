@@ -52,9 +52,9 @@ class BudgetController extends Controller
         return back()->with('success', __('app.updated_data', ['data' => 'app.budget']));
     }
 
-    public function destroy(Budget $category): RedirectResponse
+    public function destroy(Budget $budget): RedirectResponse
     {
-        DeleteBudget::run($category);
+        DeleteBudget::run($budget);
 
         return back()->with('success', __('app.deleted_data', ['data' => 'app.budget']));
     }

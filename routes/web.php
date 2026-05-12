@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetItemController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('budgets', BudgetController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
     Route::post('budgets/{budget}/items', [BudgetItemController::class, 'bulkSave'])->name('budgets.items.bulk-save');
+
+    Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::post('transactions/bulk-store', [TransactionController::class, 'bulkStore'])->name('transactions.bulk-store');
 });
