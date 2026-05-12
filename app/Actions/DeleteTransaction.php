@@ -3,6 +3,8 @@
 namespace App\Actions;
 
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DeleteTransaction extends Action
 {
@@ -12,6 +14,14 @@ class DeleteTransaction extends Action
 
     public function handle(): void
     {
-        $this->transaction->delete();
+        DB::transaction(function () {
+            $userId = Auth::id();
+            $budgetItemId = $this->transaction->budget_item_id;
+
+            $this->transaction->delete();
+
+            SyncBudgetItemAmounts::run($budgetItemId);
+            SyncUserBalance::run($userId);
+        });
     }
 }

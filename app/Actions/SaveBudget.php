@@ -22,7 +22,7 @@ class SaveBudget extends Action
         ]);
 
         if (! $this->budget->user_id) {
-            $this->budget->user()->associate(Auth::user());
+            $this->budget->user()->associate(Auth::id());
         }
 
         $this->budget->save();
