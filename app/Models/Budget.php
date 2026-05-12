@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $incomes_count
  * @property-read Collection<int, BudgetItem> $items
  * @property-read int|null $items_count
+ * @property-read Collection<int, Transaction> $transactions
+ * @property-read int|null $transactions_count
  * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget newModelQuery()
@@ -71,5 +73,10 @@ class Budget extends Model
     public function incomes(): HasMany
     {
         return $this->hasMany(BudgetItem::class)->where('type', CategoryType::INCOME);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

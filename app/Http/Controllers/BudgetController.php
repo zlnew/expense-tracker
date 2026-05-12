@@ -2,4 +2,60 @@
 
 namespace App\Http\Controllers;
 
-class BudgetController extends Controller {}
+use App\Actions\DeleteBudget;
+use App\Actions\SaveBudget;
+use App\DTO\BudgetData;
+use App\Http\Requests\BudgetSaveRequest;
+use App\Models\Budget;
+use App\Queries\BudgetQuery;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+use Spatie\LaravelData\PaginatedDataCollection;
+
+class BudgetController extends Controller
+{
+    public function index(Request $request): Response
+    {
+        $budgets = BudgetQuery::make($request->all())->paginate();
+
+        return Inertia::render('BudgetList', [
+            'budgets' => BudgetData::collect($budgets, PaginatedDataCollection::class),
+        ]);
+    }
+
+    public function show(Budget $budget): Response
+    {
+        $budget->load([
+            'expenses.category',
+            'incomes.category',
+            'transactions.category',
+        ]);
+
+        return Inertia::render('BudgetDetail', [
+            'budget' => BudgetData::from($budget),
+        ]);
+    }
+
+    public function store(BudgetSaveRequest $request): RedirectResponse
+    {
+        SaveBudget::run(new Budget, $request->getData());
+
+        return back()->with('success', __('app.created_data', ['data' => 'app.budget']));
+    }
+
+    public function update(Budget $budget, BudgetSaveRequest $request): RedirectResponse
+    {
+        SaveBudget::run($budget, $request->getData());
+
+        return back()->with('success', __('app.updated_data', ['data' => 'app.budget']));
+    }
+
+    public function destroy(Budget $category): RedirectResponse
+    {
+        DeleteBudget::run($category);
+
+        return back()->with('success', __('app.deleted_data', ['data' => 'app.budget']));
+    }
+}
