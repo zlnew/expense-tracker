@@ -11,7 +11,7 @@ class BudgetItemData extends Data
 {
     public function __construct(
         public ?int $id,
-        public int $budget_id,
+        public ?int $budget_id,
         public int $category_id,
         public CategoryType $type,
         public int $planned_amount,

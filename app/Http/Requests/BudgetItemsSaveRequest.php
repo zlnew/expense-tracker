@@ -24,7 +24,6 @@ class BudgetItemsSaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'items.*.budget_id' => ['required', 'exists:budgets,id'],
             'items.*.category_id' => ['required', 'exists:categories,id'],
             'items.*.type' => ['required', new Enum(CategoryType::class)],
             'items.*.planned_amount' => ['required', 'integer'],

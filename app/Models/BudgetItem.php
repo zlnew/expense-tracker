@@ -40,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['type', 'planned_amount', 'actual_amount', 'diff_amount'])]
+#[Fillable(['category_id', 'type', 'planned_amount'])]
 class BudgetItem extends Model
 {
     protected function casts(): array
