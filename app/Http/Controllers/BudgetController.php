@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\DeleteBudget;
 use App\Actions\SaveBudget;
+use App\Actions\SetActiveBudget;
 use App\DTO\BudgetData;
 use App\Http\Requests\BudgetSaveRequest;
 use App\Models\Budget;
@@ -57,5 +58,12 @@ class BudgetController extends Controller
         DeleteBudget::run($budget);
 
         return back()->with('success', __('app.deleted_data', ['data' => 'app.budget']));
+    }
+
+    public function setActive(Budget $budget): RedirectResponse
+    {
+        SetActiveBudget::run($budget);
+
+        return back()->with('success', __('app.updated_data', ['data' => 'app.budget']));
     }
 }

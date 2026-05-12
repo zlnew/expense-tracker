@@ -13,6 +13,12 @@ class DeleteBudget extends Action
 
     public function handle(): void
     {
+        if ($this->budget->is_active) {
+            throw ValidationException::withMessages([
+                'budget' => 'Cannot delete active budget.',
+            ]);
+        }
+
         $hasItems = $this->budget->items()->exists();
         $hasTransactions = $this->budget->transactions()->exists();
 

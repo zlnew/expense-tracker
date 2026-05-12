@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetItemController;
 use App\Http\Controllers\CategoryController;
@@ -24,10 +25,12 @@ Route::middleware('auth')->group(function () {
 
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 
+    Route::match(['put', 'patch'], 'balances/{balance}', [BalanceController::class, 'update'])->name('balances.update');
+
     Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
 
     Route::resource('budgets', BudgetController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
-
+    Route::post('budgets/{budget}/set-active', [BudgetController::class, 'setActive'])->name('budgets.set-active');
     Route::post('budgets/{budget}/items', [BudgetItemController::class, 'bulkSave'])->name('budgets.items.bulk-save');
 
     Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);
