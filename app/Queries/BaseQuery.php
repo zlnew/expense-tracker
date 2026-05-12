@@ -14,6 +14,8 @@ abstract class BaseQuery
 
     protected Builder $query;
 
+    protected bool $initialized = false;
+
     protected array $with = [];
 
     protected array $allowedWith = [];
@@ -34,24 +36,47 @@ abstract class BaseQuery
 
     protected int $defaultPerPage = 10;
 
-    public static function make(array $filters = []): static
+    public static function with(array $with = []): static
     {
         $instance = new static;
-        $instance->filters = $filters;
-        $instance->init();
-        $instance->apply();
+        $instance->with = $with;
 
         return $instance;
     }
 
-    protected function init(): void
+    public function apply(array $filters = []): static
     {
-        $model = new $this->model;
-        $this->query = $model->newQuery();
-        $this->applyWith();
+        $this->filters = $filters;
+
+        return $this;
     }
 
-    protected function apply(): void
+    public static function make(array $filters = [], array $with = []): static
+    {
+        $instance = new static;
+        $instance->filters = $filters;
+        $instance->with = $with;
+
+        return $instance;
+    }
+
+    protected function boot(): void
+    {
+        if ($this->initialized) {
+            return;
+        }
+
+        $model = new $this->model;
+
+        $this->query = $model->newQuery();
+
+        $this->applyWith();
+        $this->applyFilters();
+
+        $this->initialized = true;
+    }
+
+    protected function applyFilters(): void
     {
         foreach ($this->filters as $key => $value) {
             $method = Str::camel($key);
@@ -135,6 +160,33 @@ abstract class BaseQuery
         $this->query->orderBy($column, $order);
     }
 
+    public function get(): Collection
+    {
+        $this->boot();
+
+        return $this->query
+            ->limit($this->filters['limit'] ?? $this->defaultLimit)
+            ->get();
+    }
+
+    public function paginate(): LengthAwarePaginator
+    {
+        $this->boot();
+
+        return $this->query->paginate(
+            $this->filters['per_page'] ?? $this->defaultPerPage
+        );
+    }
+
+    public function result(): Collection|LengthAwarePaginator
+    {
+        $isPaginate = $this->boolean($this->filters['is_paginate'] ?? false);
+
+        return $isPaginate
+            ? $this->paginate()
+            : $this->get();
+    }
+
     protected function isAllowedRelation(string $relation): bool
     {
         if (in_array($relation, $this->allowedWith)) {
@@ -153,29 +205,6 @@ abstract class BaseQuery
         }
 
         return true;
-    }
-
-    public function get(): Collection
-    {
-        return $this->query
-            ->limit($this->filters['limit'] ?? $this->defaultLimit)
-            ->get();
-    }
-
-    public function paginate(): LengthAwarePaginator
-    {
-        return $this->query->paginate(
-            $this->filters['per_page'] ?? $this->defaultPerPage
-        );
-    }
-
-    public function result(): Collection|LengthAwarePaginator
-    {
-        $isPaginate = $this->boolean($this->filters['is_paginate'] ?? false);
-
-        return $isPaginate
-            ? $this->paginate()
-            : $this->get();
     }
 
     protected function boolean(mixed $value): bool
