@@ -13,6 +13,8 @@ class CategoryData extends Data
         public ?int $id,
         public CategoryType $type,
         public string $name,
+        #[DataCollectionOf(BudgetItemData::class)]
+        public ?DataCollection $budget_items,
         #[DataCollectionOf(TransactionData::class)]
         public ?DataCollection $transactions,
     ) {}

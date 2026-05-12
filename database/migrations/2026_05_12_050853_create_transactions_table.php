@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Budget;
+use App\Models\BudgetItem;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
@@ -16,6 +18,8 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
+            $table->foreignIdFor(Budget::class)->constrained();
+            $table->foreignIdFor(BudgetItem::class)->constrained();
             $table->foreignIdFor(Category::class)->constrained();
             $table->string('type');
             $table->date('date');

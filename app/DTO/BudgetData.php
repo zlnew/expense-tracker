@@ -2,20 +2,26 @@
 
 namespace App\DTO;
 
-use App\Enums\CategoryType;
+use Carbon\CarbonImmutable;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
 class BudgetData extends Data
 {
     public function __construct(
         public ?int $id,
         public ?int $user_id,
-        public int $category_id,
-        public CategoryType $type,
-        public int $planned_amount,
-        public int $actual_amount,
-        public int $diff_amount,
+        public CarbonImmutable $period_start,
+        public CarbonImmutable $period_end,
+        public bool $is_active,
+        public ?string $notes,
         public ?UserData $user,
-        public ?CategoryData $category,
+        #[DataCollectionOf(BudgetItemData::class)]
+        public ?DataCollection $items,
+        #[DataCollectionOf(BudgetItemData::class)]
+        public ?DataCollection $expenses,
+        #[DataCollectionOf(BudgetItemData::class)]
+        public ?DataCollection $incomes,
     ) {}
 }

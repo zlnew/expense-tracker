@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ * @property-read Collection<int, BudgetItem> $budgetItems
+ * @property-read int|null $budget_items_count
  * @property-read Collection<int, Transaction> $transactions
  * @property-read int|null $transactions_count
  *
@@ -37,6 +39,11 @@ class Category extends Model
         return [
             'type' => CategoryType::class,
         ];
+    }
+
+    public function budgetItems(): HasMany
+    {
+        return $this->hasMany(BudgetItem::class);
     }
 
     public function transactions(): HasMany

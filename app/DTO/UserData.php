@@ -12,8 +12,9 @@ class UserData extends Data
         public ?int $id,
         public string $name,
         public string $email,
-        public ?BudgetData $expense_budget,
-        public ?BudgetData $income_budget,
+        public ?BudgetData $active_budget,
+        #[DataCollectionOf(BudgetData::class)]
+        public ?DataCollection $budgets,
         #[DataCollectionOf(TransactionData::class)]
         public ?DataCollection $transactions,
     ) {}

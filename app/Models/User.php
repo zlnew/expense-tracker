@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -27,8 +26,10 @@ use Illuminate\Notifications\Notifiable;
  * @property string|null $remember_token
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
- * @property-read Budget|null $expenseBudget
- * @property-read Budget|null $incomeBudget
+ * @property-read Budget|null $activeBudget
+ * @property-read Balance|null $balance
+ * @property-read Collection<int, Budget> $budgets
+ * @property-read int|null $budgets_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read Collection<int, Transaction> $transactions
@@ -69,14 +70,19 @@ class User extends Authenticatable
         ];
     }
 
-    public function incomeBudget(): HasOne
+    public function balance(): HasOne
     {
-        return $this->hasOne(Budget::class)->where('type', CategoryType::INCOME->value);
+        return $this->hasOne(Balance::class);
     }
 
-    public function expenseBudget(): HasOne
+    public function activeBudget(): HasOne
     {
-        return $this->hasOne(Budget::class)->where('type', CategoryType::EXPENSE->value);
+        return $this->hasOne(Budget::class)->where('is_active', true);
+    }
+
+    public function budgets(): HasMany
+    {
+        return $this->hasMany(Budget::class);
     }
 
     public function transactions(): HasMany
