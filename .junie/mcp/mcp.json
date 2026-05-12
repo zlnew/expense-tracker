@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/srv/phpenv/versions/8.4.16/bin/php",
+            "args": [
+                "/home/zlnew/www/expense-tracker/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
