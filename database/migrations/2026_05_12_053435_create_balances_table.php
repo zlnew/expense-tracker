@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('balances', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
-            $table->decimal('initial_amount')->default(0);
-            $table->decimal('final_amount')->default(0);
+            $table->bigInteger('initial_amount')->default(0);
+            $table->bigInteger('final_amount')->default(0);
             $table->timestamps();
         });
     }

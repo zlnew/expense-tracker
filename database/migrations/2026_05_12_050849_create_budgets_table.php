@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained();
             $table->foreignIdFor(Category::class)->constrained();
             $table->string('type');
-            $table->decimal('planned_amount')->default(0);
-            $table->decimal('actual_amount')->default(0);
-            $table->decimal('diff_amount')->default(0);
+            $table->bigInteger('planned_amount')->default(0);
+            $table->bigInteger('actual_amount')->default(0);
+            $table->bigInteger('diff_amount')->default(0);
             $table->timestamps();
         });
     }

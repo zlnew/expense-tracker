@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $user_id
- * @property numeric $initial_amount
- * @property numeric $final_amount
+ * @property int $initial_amount
+ * @property int $final_amount
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read User $user
@@ -31,6 +31,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['initial_amount', 'final_amount'])]
 class Balance extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            'initial_amount' => 'integer',
+            'final_amount' => 'integer',
+        ];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

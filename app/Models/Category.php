@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
- * @property string $type
+ * @property CategoryType $type
  * @property string $name
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -31,6 +32,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['type', 'name'])]
 class Category extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            'type' => CategoryType::class,
+        ];
+    }
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);

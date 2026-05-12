@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -11,9 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $user_id
  * @property int $category_id
- * @property string $type
- * @property string $date
- * @property numeric $amount
+ * @property CategoryType $type
+ * @property CarbonImmutable $date
+ * @property int $amount
  * @property string|null $description
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -38,6 +39,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['type', 'date', 'amount', 'description'])]
 class Transaction extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            'type' => CategoryType::class,
+            'date' => 'date',
+            'amount' => 'integer',
+        ];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
