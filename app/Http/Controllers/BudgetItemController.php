@@ -13,6 +13,6 @@ class BudgetItemController extends Controller
     {
         SaveBudgetItems::run($budget, $request->getData());
 
-        return back()->with('success', __('app.saved_data', ['data' => 'app.budget_items']));
+        return back()->with('success', __('app.saved_data', ['data' => __('app.budget_items')]));
     }
 }

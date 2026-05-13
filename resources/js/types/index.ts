@@ -27,7 +27,7 @@ export type Meta = {
 export type Paginate<T> = {
   data: T[]
   meta: Meta
-  links: string[]
+  links: LinkType[]
 }
 
 export type Balance = {

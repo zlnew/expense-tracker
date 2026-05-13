@@ -13,8 +13,6 @@ abstract class Action
 
     public static function run(...$arguments)
     {
-        return app()
-            ->make(static::class, $arguments)
-            ->handle();
+        return (new static(...$arguments))->handle();
     }
 }

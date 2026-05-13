@@ -39,27 +39,27 @@ class BalanceController extends Controller
     {
         SaveBalance::run(new Balance, $request->getData());
 
-        return back()->with('success', __('app.created_data', ['data' => ['app.balance']]));
+        return back()->with('success', __('app.created_data', ['data' => __('app.balance')]));
     }
 
     public function update(Balance $balance, BalanceSaveRequest $request): RedirectResponse
     {
         SaveBalance::run($balance, $request->getData());
 
-        return back()->with('success', __('app.updated_data', ['data' => ['app.balance']]));
+        return back()->with('success', __('app.updated_data', ['data' => __('app.balance')]));
     }
 
     public function destroy(Balance $balance): RedirectResponse
     {
         DeleteBalance::run($balance);
 
-        return back()->with('success', __('app.deleted_data', ['data' => ['app.balance']]));
+        return back()->with('success', __('app.deleted_data', ['data' => __('app.balance')]));
     }
 
     public function setPrimary(Balance $balance): RedirectResponse
     {
         SetPrimaryBalance::run($balance);
 
-        return back()->with('success', __('app.updated_data', ['data' => ['app.balance']]));
+        return back()->with('success', __('app.updated_data', ['data' => __('app.balance')]));
     }
 }

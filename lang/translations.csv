@@ -1,5 +1,8 @@
 key,en,id
 action_warning,"Please proceed with caution, this cannot be undone","Harap berhati-hati, tindakan ini tidak dapat dibatalkan."
+actions,Actions,Aksi
+add_data,"Add :data","Tambah :data"
+all_data,"All :data","Semua :data"
 appearance,Appearance,Tampilan
 appearance_settings,"Appearance Settings","Pengaturan Tampilan"
 appearance_settings_description,"Update your account's appearance settings","Perbarui pengaturan tampilan akun Anda"
@@ -10,22 +13,34 @@ budget,Budget,Anggaran
 budgets,Budgets,Aggaran
 cancel,Cancel,Batal
 categories,Categories,Kategori
+categories_description,"Manage income and expense budget categories","Kelola kategori anggaran penghasilan dan pengeluaran"
 category,Category,Kategori
+category_create_description,"Choose type and write name","Pilih jenis dan tulis nama"
+category_update_description,"Update category type and name","Perbarui tipe dan nama kategori"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
+created_data,":data Created",":data Dibuat"
 current_password,"Current Password","Kata Sandi Saat Ini"
 dashboard,Dashboard,Dasbor
+delete,Delete,Hapus
 delete_account,"Delete Account","Hapus Akun"
 delete_account_action_description,"Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.","Setelah akun Anda dihapus, semua sumber daya dan datanya juga akan dihapus secara permanen. Silakan masukkan kata sandi Anda untuk mengkonfirmasi bahwa Anda ingin menghapus akun Anda secara permanen."
 delete_account_action_title,"Are you sure you want to delete your account?","Apakah Anda yakin ingin menghapus akun Anda?"
 delete_account_description,"Delete your account and all of its resources","Hapus akun dan seluruh data yang ada"
 delete_account_title,"Delete Account","Hapus Akun"
+delete_data,"Delete :data","Hapus :data"
+deleted_data,":data Deleted",":data Dihapus"
+deleting,Deleting...,Menghapus...
 detail,Detail,Detail
+edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
+expense,Expense,Pengeluaran
 full_name,"Full Name","Nama Lengkap"
+income,Income,Penghasilan
 list,List,List
 log_out,"Log Out",Keluar
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
+no_data_found,"No :data found",":data tidak ditemukan"
 password,Password,"Kata Sandi"
 password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
 password_update_title,"Update Password","Perbarui Kata Sandi"
@@ -35,11 +50,19 @@ profile_update_description,"Update your name and email address","Perbarui nama d
 profile_update_title,"Profile Information","Informasi Profil"
 save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
+saving,Saving...,Menyimpan...
+search_categories_placeholder,"Search by name...","Cari berdasarkan nama..."
 security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
+select_data,"Select :data","Pilih :data"
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
 transaction,Transaction,Transaksi
 transactions,Transactions,Transaksi
+type,Type,Jenis
+types,Types,Jenis
+update,Update,Perbarui
+updated_data,":data Updated",":data Diperbarui"
+updating,Updating...,Memperbarui...
 warning,Warning,Peringatan

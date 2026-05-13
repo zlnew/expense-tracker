@@ -43,27 +43,27 @@ class BudgetController extends Controller
     {
         SaveBudget::run(new Budget, $request->getData());
 
-        return back()->with('success', __('app.created_data', ['data' => 'app.budget']));
+        return back()->with('success', __('app.created_data', ['data' => __('app.budget')]));
     }
 
     public function update(Budget $budget, BudgetSaveRequest $request): RedirectResponse
     {
         SaveBudget::run($budget, $request->getData());
 
-        return back()->with('success', __('app.updated_data', ['data' => 'app.budget']));
+        return back()->with('success', __('app.updated_data', ['data' => __('app.budget')]));
     }
 
     public function destroy(Budget $budget): RedirectResponse
     {
         DeleteBudget::run($budget);
 
-        return back()->with('success', __('app.deleted_data', ['data' => 'app.budget']));
+        return back()->with('success', __('app.deleted_data', ['data' => __('app.budget')]));
     }
 
     public function setActive(Budget $budget): RedirectResponse
     {
         SetActiveBudget::run($budget);
 
-        return back()->with('success', __('app.updated_data', ['data' => 'app.budget']));
+        return back()->with('success', __('app.updated_data', ['data' => __('app.budget')]));
     }
 }

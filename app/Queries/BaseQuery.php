@@ -173,9 +173,9 @@ abstract class BaseQuery
     {
         $this->boot();
 
-        return $this->query->paginate(
-            $this->filters['per_page'] ?? $this->defaultPerPage
-        );
+        return $this->query
+            ->paginate($this->filters['per_page'] ?? $this->defaultPerPage)
+            ->appends($this->paginationQueryParams());
     }
 
     public function result(): Collection|LengthAwarePaginator
@@ -185,6 +185,14 @@ abstract class BaseQuery
         return $isPaginate
             ? $this->paginate()
             : $this->get();
+    }
+
+    protected function paginationQueryParams(): array
+    {
+        return collect($this->filters)
+            ->except(['is_paginate'])
+            ->filter(fn ($v) => $v !== null && $v !== '')
+            ->toArray();
     }
 
     protected function isAllowedRelation(string $relation): bool

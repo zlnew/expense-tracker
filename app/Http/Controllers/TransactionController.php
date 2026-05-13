@@ -31,27 +31,27 @@ class TransactionController extends Controller
     {
         SaveTransaction::run(new Transaction, $request->getData());
 
-        return back()->with('success', __('app.created_data', ['data' => 'app.transaction']));
+        return back()->with('success', __('app.created_data', ['data' => __('app.transaction')]));
     }
 
     public function update(Transaction $transaction, TransactionSaveRequest $request): RedirectResponse
     {
         SaveTransaction::run($transaction, $request->getData());
 
-        return back()->with('success', __('app.updated_data', ['data' => 'app.transaction']));
+        return back()->with('success', __('app.updated_data', ['data' => __('app.transaction')]));
     }
 
     public function destroy(Transaction $transaction): RedirectResponse
     {
         DeleteTransaction::run($transaction);
 
-        return back()->with('success', __('app.deleted_data', ['data' => 'app.transaction']));
+        return back()->with('success', __('app.deleted_data', ['data' => __('app.transaction')]));
     }
 
     public function bulkStore(TransactionsSaveRequest $request): RedirectResponse
     {
         StoreTransactions::run($request->getData());
 
-        return back()->with('success', __('app.saved_data', ['data' => 'app.transactions']));
+        return back()->with('success', __('app.saved_data', ['data' => __('app.transactions')]));
     }
 }

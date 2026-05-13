@@ -32,20 +32,20 @@ class CategoryController extends Controller
     {
         SaveCategory::run(new Category, $request->getData());
 
-        return back()->with('success', __('app.created_data', ['data' => 'app.category']));
+        return back()->with('success', __('app.created_data', ['data' => __('app.category')]));
     }
 
     public function update(Category $category, CategorySaveRequest $request): RedirectResponse
     {
         SaveCategory::run($category, $request->getData());
 
-        return back()->with('success', __('app.updated_data', ['data' => 'app.category']));
+        return back()->with('success', __('app.updated_data', ['data' => __('app.category')]));
     }
 
     public function destroy(Category $category): RedirectResponse
     {
         DeleteCategory::run($category);
 
-        return back()->with('success', __('app.deleted_data', ['data' => 'app.category']));
+        return back()->with('success', __('app.deleted_data', ['data' => __('app.category')]));
     }
 }
