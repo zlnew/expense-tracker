@@ -3,8 +3,10 @@
 namespace App\Http\Requests;
 
 use App\DTO\BudgetData;
+use App\Enums\CategoryType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 use Spatie\LaravelData\WithData;
 
 class BudgetSaveRequest extends FormRequest
@@ -25,6 +27,9 @@ class BudgetSaveRequest extends FormRequest
             'period_start' => ['required', 'date'],
             'period_end' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
+            'items.*.category_id' => ['required', 'exists:categories,id'],
+            'items.*.type' => ['required', new Enum(CategoryType::class)],
+            'items.*.planned_amount' => ['required', 'integer'],
         ];
     }
 

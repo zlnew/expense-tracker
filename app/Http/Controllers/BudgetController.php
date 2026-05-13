@@ -6,8 +6,10 @@ use App\Actions\DeleteBudget;
 use App\Actions\SaveBudget;
 use App\Actions\SetActiveBudget;
 use App\DTO\BudgetData;
+use App\DTO\CategoryData;
 use App\Http\Requests\BudgetSaveRequest;
 use App\Models\Budget;
+use App\Models\Category;
 use App\Queries\BudgetQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,6 +28,27 @@ class BudgetController extends Controller
         ]);
     }
 
+    public function create(): Response
+    {
+        $categories = Category::all();
+
+        return Inertia::render('BudgetCreate', [
+            'categories' => CategoryData::collect($categories),
+        ]);
+    }
+
+    public function edit(Budget $budget): Response
+    {
+        $budget->load([
+            'expenses.category',
+            'incomes.category',
+        ]);
+
+        return Inertia::render('BudgetEdit', [
+            'budget' => BudgetData::from($budget),
+        ]);
+    }
+
     public function show(Budget $budget): Response
     {
         $budget->load([
@@ -41,9 +64,12 @@ class BudgetController extends Controller
 
     public function store(BudgetSaveRequest $request): RedirectResponse
     {
-        SaveBudget::run(new Budget, $request->getData());
+        /** @var Budget $budget */
+        $budget = SaveBudget::run(new Budget, $request->getData());
 
-        return back()->with('success', __('app.created_data', ['data' => __('app.budget')]));
+        return redirect()
+            ->route('budgets.show', $budget)
+            ->with('success', __('app.created_data', ['data' => __('app.budget')]));
     }
 
     public function update(Budget $budget, BudgetSaveRequest $request): RedirectResponse

@@ -4,7 +4,9 @@ namespace App\Actions;
 
 use App\DTO\BudgetData;
 use App\Models\Budget;
+use App\Models\BudgetItem;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SaveBudget extends Action
 {
@@ -13,18 +15,40 @@ class SaveBudget extends Action
         private readonly BudgetData $data,
     ) {}
 
-    public function handle(): void
+    public function handle(): Budget
     {
-        $this->budget->fill([
-            'period_start' => $this->data->period_start,
-            'period_end' => $this->data->period_end,
-            'notes' => $this->data->notes,
-        ]);
+        return DB::transaction(function () {
+            $this->budget->fill([
+                'period_start' => $this->data->period_start,
+                'period_end' => $this->data->period_end,
+                'notes' => $this->data->notes,
+            ]);
 
-        if (! $this->budget->user_id) {
-            $this->budget->user()->associate(Auth::id());
-        }
+            if (! $this->budget->user_id) {
+                $this->budget->user()->associate(Auth::id());
+            }
 
-        $this->budget->save();
+            $this->budget->save();
+
+            $items = $this->data->items;
+
+            foreach ($items as $item) {
+                $budgetItem = $item->id ? BudgetItem::query()->findOrFail($item->id) : new BudgetItem;
+
+                $budgetItem->fill([
+                    'type' => $item->type,
+                    'planned_amount' => $item->planned_amount,
+                ]);
+
+                $budgetItem->budget()->associate($this->budget);
+                $budgetItem->category()->associate($item->category_id);
+
+                $budgetItem->save();
+
+                SyncBudgetItemAmounts::run($budgetItem);
+            }
+
+            return $this->budget;
+        });
     }
 }

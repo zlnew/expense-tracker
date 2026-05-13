@@ -10,7 +10,7 @@ appearance_settings_title,"Appearance Settings","Pengaturan Tampilan"
 balance,Balance,Saldo
 balances,Balances,Saldo
 budget,Budget,Anggaran
-budgets,Budgets,Aggaran
+budgets,Budgets,Anggaran
 cancel,Cancel,Batal
 categories,Categories,Kategori
 categories_description,"Manage income and expense budget categories","Kelola kategori anggaran penghasilan dan pengeluaran"
@@ -18,6 +18,8 @@ category,Category,Kategori
 category_create_description,"Choose type and write name","Pilih jenis dan tulis nama"
 category_update_description,"Update category type and name","Perbarui tipe dan nama kategori"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
+create,Create,Buat
+create_data,"Create :data","Buat :data"
 created_data,":data Created",":data Dibuat"
 current_password,"Current Password","Kata Sandi Saat Ini"
 dashboard,Dashboard,Dasbor
@@ -31,19 +33,27 @@ delete_data,"Delete :data","Hapus :data"
 deleted_data,":data Deleted",":data Dihapus"
 deleting,Deleting...,Menghapus...
 detail,Detail,Detail
+edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
 expense,Expense,Pengeluaran
+expenses,Expenses,Pengeluaran
 full_name,"Full Name","Nama Lengkap"
 income,Income,Penghasilan
+incomes,Incomes,Pemasukan
 list,List,List
 log_out,"Log Out",Keluar
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
 no_data_found,"No :data found",":data tidak ditemukan"
+notes,Notes,Catatan
+optional,Optional,Opsional
 password,Password,"Kata Sandi"
 password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
 password_update_title,"Update Password","Perbarui Kata Sandi"
+period_end,"Period End","Periode Akhir"
+period_start,"Period Start","Periode Awal"
+planned,Planned,Direncanakan
 profile,Profile,Profil
 profile_settings,"Profile Settings","Pengaturan Profil"
 profile_update_description,"Update your name and email address","Perbarui nama dan alamat email anda"
@@ -58,6 +68,7 @@ select_data,"Select :data","Pilih :data"
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
+status,Status,Status
 transaction,Transaction,Transaksi
 transactions,Transactions,Transaksi
 type,Type,Jenis

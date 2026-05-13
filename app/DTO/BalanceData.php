@@ -13,11 +13,11 @@ class BalanceData extends Data
         public ?int $user_id,
         public string $name,
         public ?string $description,
-        public int $initial_amount,
-        public int $final_amount,
-        public bool $is_primary,
-        public ?UserData $user,
+        public int $initial_amount = 0,
+        public int $final_amount = 0,
+        public bool $is_primary = false,
+        public ?UserData $user = null,
         #[DataCollectionOf(TransactionData::class)]
-        public ?DataCollection $transactions,
+        public ?DataCollection $transactions = null,
     ) {}
 }
