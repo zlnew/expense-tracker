@@ -5,28 +5,27 @@ namespace App\Actions;
 use App\Enums\CategoryType;
 use App\Models\Balance;
 use App\Models\Transaction;
-use App\Models\User;
 
-class SyncUserBalance extends Action
+class SyncBalance extends Action
 {
-    public readonly User $user;
+    public readonly Balance $balance;
 
-    public function __construct(User|int $user)
+    public function __construct(Balance|int $balance)
     {
-        $this->user = $user instanceof User
-            ? $user
-            : User::query()->findOrFail($user);
+        $this->balance = $balance instanceof Balance
+            ? $balance
+            : Balance::query()->findOrFail($balance);
     }
 
     public function handle(): void
     {
         $incomes = Transaction::query()
-            ->where('user_id', $this->user->id)
+            ->where('balance_id', $this->balance->id)
             ->where('type', CategoryType::INCOME)
             ->get();
 
         $expenses = Transaction::query()
-            ->where('user_id', $this->user->id)
+            ->where('balance_id', $this->balance->id)
             ->where('type', CategoryType::EXPENSE)
             ->get();
 
@@ -34,8 +33,7 @@ class SyncUserBalance extends Action
         $incomesAmount = (int) $incomes->sum('amount');
         $expensesAmount = (int) $expenses->sum('amount');
 
-        $balance = Balance::query()->where('user_id', $this->user->id)->firstOrFail();
-        $balance->final_amount = $initialAmount + $incomesAmount - $expensesAmount;
-        $balance->save();
+        $this->balance->final_amount = $initialAmount + $incomesAmount - $expensesAmount;
+        $this->balance->save();
     }
 }

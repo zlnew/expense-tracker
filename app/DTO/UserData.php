@@ -15,6 +15,8 @@ class UserData extends Data
         public ?BudgetData $active_budget,
         #[DataCollectionOf(BudgetData::class)]
         public ?DataCollection $budgets,
+        #[DataCollectionOf(BalanceData::class)]
+        public ?DataCollection $balances,
         #[DataCollectionOf(TransactionData::class)]
         public ?DataCollection $transactions,
     ) {}

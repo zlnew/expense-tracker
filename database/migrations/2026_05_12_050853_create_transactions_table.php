@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Balance;
 use App\Models\Budget;
 use App\Models\BudgetItem;
 use App\Models\Category;
@@ -18,6 +19,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
+            $table->foreignIdFor(Balance::class)->constrained();
             $table->foreignIdFor(Budget::class)->constrained();
             $table->foreignIdFor(BudgetItem::class)->constrained();
             $table->foreignIdFor(Category::class)->constrained();

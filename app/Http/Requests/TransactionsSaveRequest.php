@@ -24,6 +24,7 @@ class TransactionsSaveRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'items.*.balance_id' => ['required', 'exists:balances,id'],
             'items.*.budget_id' => ['required', 'exists:budgets,id'],
             'items.*.budget_item_id' => ['required', 'exists:budget_items,id'],
             'items.*.category_id' => ['required', 'exists:categories,id'],

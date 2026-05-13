@@ -27,7 +27,8 @@ use Illuminate\Notifications\Notifiable;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Budget|null $activeBudget
- * @property-read Balance|null $balance
+ * @property-read Collection<int, Balance> $balances
+ * @property-read int|null $balances_count
  * @property-read Collection<int, Budget> $budgets
  * @property-read int|null $budgets_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
@@ -70,11 +71,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function balance(): HasOne
-    {
-        return $this->hasOne(Balance::class);
-    }
-
     public function activeBudget(): HasOne
     {
         return $this->hasOne(Budget::class)->where('is_active', true);
@@ -83,6 +79,11 @@ class User extends Authenticatable
     public function budgets(): HasMany
     {
         return $this->hasMany(Budget::class);
+    }
+
+    public function balances(): HasMany
+    {
+        return $this->hasMany(Balance::class);
     }
 
     public function transactions(): HasMany
