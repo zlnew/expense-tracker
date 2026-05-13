@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import UserInfo from '@/components/UserInfo.vue'
+import { useLang } from '@/composables/useLang'
 import { logout } from '@/routes'
 import { edit } from '@/routes/profile'
 import type { User } from '@/types'
@@ -16,11 +17,13 @@ type Props = {
   user: User
 }
 
+defineProps<Props>()
+
+const { __ } = useLang()
+
 const handleLogout = () => {
   router.flushAll()
 }
-
-defineProps<Props>()
 </script>
 
 <template>
@@ -34,7 +37,7 @@ defineProps<Props>()
     <DropdownMenuItem :as-child="true">
       <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
         <Settings class="mr-2 h-4 w-4" />
-        Settings
+        {{ __('settings') }}
       </Link>
     </DropdownMenuItem>
   </DropdownMenuGroup>
@@ -48,7 +51,7 @@ defineProps<Props>()
       data-test="logout-button"
     >
       <LogOut class="mr-2 h-4 w-4" />
-      Log out
+      {{ __('log_out') }}
     </Link>
   </DropdownMenuItem>
 </template>

@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3'
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-vue-next'
+import {
+  ArrowLeftRight,
+  CircleDollarSign,
+  LayoutGrid,
+  Wallet,
+} from 'lucide-vue-next'
 import AppLogo from '@/components/AppLogo.vue'
 import NavFooter from '@/components/NavFooter.vue'
-import NavMain from '@/components/NavMain.vue'
+import NavMainWithSub from '@/components/NavMainWithSub.vue'
 import NavUser from '@/components/NavUser.vue'
 import {
   Sidebar,
@@ -14,27 +19,49 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { useLang } from '@/composables/useLang'
 import { dashboard } from '@/routes'
-import type { NavItem } from '@/types'
+import balances from '@/routes/balances'
+import budgets from '@/routes/budgets'
+import categories from '@/routes/categories'
+import transactions from '@/routes/transactions'
+import type { NavGroup, NavItem } from '@/types'
 
-const mainNavItems: NavItem[] = [
+const { __ } = useLang()
+
+const mainNavItems: NavGroup[] = [
   {
-    title: 'Dashboard',
+    title: __('dashboard'),
     href: dashboard(),
     icon: LayoutGrid,
+  },
+  {
+    title: __('transactions'),
+    href: transactions.index(),
+    icon: ArrowLeftRight,
+  },
+  {
+    title: __('budgets'),
+    href: budgets.index(),
+    icon: CircleDollarSign,
+    children: [
+      {
+        title: __('list'),
+        href: budgets.index(),
+      },
+      {
+        title: __('categories'),
+        href: categories.index(),
+      },
+    ],
   },
 ]
 
 const footerNavItems: NavItem[] = [
   {
-    title: 'Repository',
-    href: 'https://github.com/laravel/vue-starter-kit',
-    icon: FolderGit2,
-  },
-  {
-    title: 'Documentation',
-    href: 'https://laravel.com/docs/starter-kits#vue',
-    icon: BookOpen,
+    title: __('balances'),
+    href: balances.index(),
+    icon: Wallet,
   },
 ]
 </script>
@@ -54,7 +81,7 @@ const footerNavItems: NavItem[] = [
     </SidebarHeader>
 
     <SidebarContent>
-      <NavMain :items="mainNavItems" />
+      <NavMainWithSub :items="mainNavItems" />
     </SidebarContent>
 
     <SidebarFooter>

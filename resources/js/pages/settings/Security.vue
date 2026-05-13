@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3'
+import { Form, Head, setLayoutProps } from '@inertiajs/vue3'
 import { ShieldCheck } from 'lucide-vue-next'
 import { onUnmounted, ref } from 'vue'
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController'
@@ -10,6 +10,7 @@ import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue'
 import TwoFactorSetupModal from '@/components/TwoFactorSetupModal.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { useLang } from '@/composables/useLang'
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth'
 import { edit } from '@/routes/security'
 import { disable, enable } from '@/routes/two-factor'
@@ -26,15 +27,18 @@ withDefaults(defineProps<Props>(), {
   twoFactorEnabled: false,
 })
 
-defineOptions({
-  layout: {
-    breadcrumbs: [
-      {
-        title: 'Security settings',
-        href: edit(),
-      },
-    ],
-  },
+const { __ } = useLang()
+
+setLayoutProps({
+  breadcrumbs: [
+    {
+      title: __('settings'),
+    },
+    {
+      title: __('security'),
+      href: edit(),
+    },
+  ],
 })
 
 const { hasSetupData, clearTwoFactorAuthData } = useTwoFactorAuth()
@@ -44,15 +48,15 @@ onUnmounted(() => clearTwoFactorAuthData())
 </script>
 
 <template>
-  <Head title="Security settings" />
+  <Head :title="__('security_settings')" />
 
-  <h1 class="sr-only">Security settings</h1>
+  <h1 class="sr-only">{{ __('security_settings') }}</h1>
 
   <div class="space-y-6">
     <Heading
       variant="small"
-      title="Update password"
-      description="Ensure your account is using a long, random password to stay secure"
+      :title="__('password_update_title')"
+      :description="__('password_update_description')"
     />
 
     <Form
@@ -70,44 +74,44 @@ onUnmounted(() => clearTwoFactorAuthData())
       v-slot="{ errors, processing }"
     >
       <div class="grid gap-2">
-        <Label for="current_password">Current password</Label>
+        <Label for="current_password">{{ __('current_password') }}</Label>
         <PasswordInput
           id="current_password"
           name="current_password"
           class="mt-1 block w-full"
           autocomplete="current-password"
-          placeholder="Current password"
+          :placeholder="__('current_password')"
         />
         <InputError :message="errors.current_password" />
       </div>
 
       <div class="grid gap-2">
-        <Label for="password">New password</Label>
+        <Label for="password">{{ __('new_password') }}</Label>
         <PasswordInput
           id="password"
           name="password"
           class="mt-1 block w-full"
           autocomplete="new-password"
-          placeholder="New password"
+          :placeholder="__('new_password')"
         />
         <InputError :message="errors.password" />
       </div>
 
       <div class="grid gap-2">
-        <Label for="password_confirmation">Confirm password</Label>
+        <Label for="password_confirmation">{{ __('confirm_password') }}</Label>
         <PasswordInput
           id="password_confirmation"
           name="password_confirmation"
           class="mt-1 block w-full"
           autocomplete="new-password"
-          placeholder="Confirm password"
+          :placeholder="__('confirm_password')"
         />
         <InputError :message="errors.password_confirmation" />
       </div>
 
       <div class="flex items-center gap-4">
         <Button :disabled="processing" data-test="update-password-button">
-          Save password
+          {{ __('save_password') }}
         </Button>
       </div>
     </Form>

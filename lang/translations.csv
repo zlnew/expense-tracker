@@ -1,2 +1,45 @@
 key,en,id
+action_warning,"Please proceed with caution, this cannot be undone","Harap berhati-hati, tindakan ini tidak dapat dibatalkan."
+appearance,Appearance,Tampilan
+appearance_settings,"Appearance Settings","Pengaturan Tampilan"
+appearance_settings_description,"Update your account's appearance settings","Perbarui pengaturan tampilan akun Anda"
+appearance_settings_title,"Appearance Settings","Pengaturan Tampilan"
 balance,Balance,Saldo
+balances,Balances,Saldo
+budget,Budget,Anggaran
+budgets,Budgets,Aggaran
+cancel,Cancel,Batal
+categories,Categories,Kategori
+category,Category,Kategori
+confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
+current_password,"Current Password","Kata Sandi Saat Ini"
+dashboard,Dashboard,Dasbor
+delete_account,"Delete Account","Hapus Akun"
+delete_account_action_description,"Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.","Setelah akun Anda dihapus, semua sumber daya dan datanya juga akan dihapus secara permanen. Silakan masukkan kata sandi Anda untuk mengkonfirmasi bahwa Anda ingin menghapus akun Anda secara permanen."
+delete_account_action_title,"Are you sure you want to delete your account?","Apakah Anda yakin ingin menghapus akun Anda?"
+delete_account_description,"Delete your account and all of its resources","Hapus akun dan seluruh data yang ada"
+delete_account_title,"Delete Account","Hapus Akun"
+detail,Detail,Detail
+email_address,"Email Address","Alamat Email"
+full_name,"Full Name","Nama Lengkap"
+list,List,List
+log_out,"Log Out",Keluar
+name,Name,Nama
+new_password,"New Password","Kata Sandi Baru"
+password,Password,"Kata Sandi"
+password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
+password_update_title,"Update Password","Perbarui Kata Sandi"
+profile,Profile,Profil
+profile_settings,"Profile Settings","Pengaturan Profil"
+profile_update_description,"Update your name and email address","Perbarui nama dan alamat email anda"
+profile_update_title,"Profile Information","Informasi Profil"
+save,Save,Simpan
+save_password,"Save Password","Simpan Kata Sandi"
+security,Security,Keamanan
+security_settings,"Security Settings","Pengaturan Keamanan"
+settings,Settings,Pengaturan
+settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
+settings_title,Settings,Pengaturan
+transaction,Transaction,Transaksi
+transactions,Transactions,Transaksi
+warning,Warning,Peringatan
