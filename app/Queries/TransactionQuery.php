@@ -10,7 +10,7 @@ class TransactionQuery extends BaseQuery
 
     protected array $allowedWith = ['budget', 'category'];
 
-    protected array $allowedFilters = ['user', 'budget', 'type', 'category'];
+    protected array $allowedFilters = ['user', 'balance', 'budget', 'type', 'category', 'dateFrom', 'dateTo'];
 
     protected array $searchable = ['category.name'];
 
@@ -23,6 +23,13 @@ class TransactionQuery extends BaseQuery
     public function user(mixed $value): static
     {
         $this->query->where('user_id', $value);
+
+        return $this;
+    }
+
+    public function balance(mixed $value): static
+    {
+        $this->query->where('balance_id', $value);
 
         return $this;
     }
@@ -44,6 +51,28 @@ class TransactionQuery extends BaseQuery
     public function category(mixed $value): static
     {
         $this->query->where('category_id', $value);
+
+        return $this;
+    }
+
+    public function dateFrom(mixed $value): static
+    {
+        if (! $this->isValidDate($value)) {
+            return $this;
+        }
+
+        $this->query->whereDate('date', '>=', $value);
+
+        return $this;
+    }
+
+    public function dateTo(mixed $value): static
+    {
+        if (! $this->isValidDate($value)) {
+            return $this;
+        }
+
+        $this->query->whereDate('date', '<=', $value);
 
         return $this;
     }
