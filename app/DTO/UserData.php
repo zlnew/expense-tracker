@@ -12,6 +12,8 @@ class UserData extends Data
         public ?int $id,
         public string $name,
         public string $email,
+        public ?string $email_verified_at,
+        public ?string $two_factor_confirmed_at,
         public ?BudgetData $active_budget,
         #[DataCollectionOf(BudgetData::class)]
         public ?DataCollection $budgets,

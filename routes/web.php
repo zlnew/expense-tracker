@@ -1,29 +1,19 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetItemController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Features;
 
-Route::get('/', function (Request $request) {
-    return $request->user()
-        ? to_route('dashboard')
-        : to_route('login');
-})->name('home');
+Route::inertia('/', 'Welcome', [
+    'canRegister' => Features::enabled(Features::registration()),
+])->name('home');
 
-Route::middleware('guest')->group(function () {
-    Route::inertia('login', 'auth/Login')->name('login');
-    Route::post('login', [AuthController::class, 'login'])->name('auth.login');
-});
-
-Route::middleware('auth')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');
-
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::resource('balances', BalanceController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
@@ -38,3 +28,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::post('transactions/bulk-store', [TransactionController::class, 'bulkStore'])->name('transactions.bulk-store');
 });
+
+require __DIR__.'/settings.php';
