@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import UserInfo from '@/components/UserInfo.vue'
 import { useLang } from '@/composables/useLang'
-import { logout } from '@/routes'
 import categories from '@/routes/categories'
 import { edit } from '@/routes/profile'
 import type { User } from '@/types'
@@ -23,6 +22,7 @@ defineProps<Props>()
 const { __ } = useLang()
 
 const handleLogout = () => {
+  router.post('logout')
   router.flushAll()
 }
 </script>
@@ -56,7 +56,6 @@ const handleLogout = () => {
   <DropdownMenuItem :as-child="true">
     <Link
       class="block w-full cursor-pointer"
-      :href="logout.url()"
       @click="handleLogout"
       as="button"
       data-test="logout-button"
