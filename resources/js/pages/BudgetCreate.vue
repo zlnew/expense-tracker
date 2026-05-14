@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, setLayoutProps, useForm } from '@inertiajs/vue3'
-import { Check } from 'lucide-vue-next'
+import { Check, X } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
@@ -57,19 +57,12 @@ setLayoutProps({
   ],
 })
 
-type Form = {
-  period_start: string
-  period_end: string
-  notes?: string
-  items: any[]
-}
-
 const form = useForm({
   period_start: '',
   period_end: '',
-  notes: undefined,
+  notes: null as string | null,
   items: [] as any[],
-} satisfies Form)
+})
 
 const expenseBudgetItems = ref<Partial<BudgetItem>[]>([])
 const incomeBudgetItems = ref<Partial<BudgetItem>[]>([])
@@ -130,6 +123,10 @@ const submit = () => {
     },
   })
 }
+
+const goBack = () => {
+  window.history.back()
+}
 </script>
 
 <template>
@@ -143,7 +140,7 @@ const submit = () => {
       />
 
       <form @submit.prevent="submit">
-        <div class="mb-12 space-y-4">
+        <div class="mb-16 space-y-4">
           <AlertError
             v-if="Object.keys(form.errors).length > 0"
             :errors="Object.values(form.errors)"
@@ -192,7 +189,7 @@ const submit = () => {
           <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
             <Card>
               <CardHeader>
-                <CardTitle>{{ __('expenses') }}</CardTitle>
+                <CardTitle>{{ __('monthly_expenses') }}</CardTitle>
                 <CardAction>
                   <span class="font-bold text-destructive">
                     Rp {{ formatNumber(expenseTotal) }}
@@ -245,7 +242,7 @@ const submit = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>{{ __('incomes') }}</CardTitle>
+                <CardTitle>{{ __('monthly_incomes') }}</CardTitle>
                 <CardAction>
                   <span class="font-bold text-destructive">
                     Rp {{ formatNumber(incomeTotal) }}
@@ -299,10 +296,22 @@ const submit = () => {
         </div>
 
         <div class="fixed right-4 bottom-4 z-50 md:right-8 md:bottom-8">
-          <Button type="submit" size="lg" class="rounded-full shadow-xl">
-            <Check />
-            <span>{{ __('save') }}</span>
-          </Button>
+          <div class="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              class="rounded-full shadow-xl"
+              @click="goBack"
+            >
+              <X />
+              <span>{{ __('cancel') }}</span>
+            </Button>
+            <Button type="submit" size="lg" class="rounded-full shadow-xl">
+              <Check />
+              <span>{{ __('save') }}</span>
+            </Button>
+          </div>
         </div>
       </form>
     </div>

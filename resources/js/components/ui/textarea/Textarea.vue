@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 const props = defineProps<{
   class?: HTMLAttributes["class"]
   defaultValue?: string | number
-  modelValue?: string | number
+  modelValue?: string | number | null
 }>()
 
 const emits = defineEmits<{

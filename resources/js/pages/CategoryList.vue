@@ -105,7 +105,7 @@ const openDeleteDialog = (data: Data) => {
       >
         <Heading
           :title="__('categories')"
-          :description="__('categories_description')"
+          :description="__('category_list_description')"
           class="mb-0"
         />
         <Button @click="createDialogOpen = true">

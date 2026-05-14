@@ -54,7 +54,6 @@ class BudgetController extends Controller
         $budget->load([
             'expenses.category',
             'incomes.category',
-            'transactions.category',
         ]);
 
         return Inertia::render('BudgetDetail', [
@@ -74,9 +73,12 @@ class BudgetController extends Controller
 
     public function update(Budget $budget, BudgetSaveRequest $request): RedirectResponse
     {
-        SaveBudget::run($budget, $request->getData());
+        /** @var Budget $budget */
+        $budget = SaveBudget::run($budget, $request->getData());
 
-        return back()->with('success', __('app.updated_data', ['data' => __('app.budget')]));
+        return redirect()
+            ->route('budgets.show', $budget)
+            ->with('success', __('app.updated_data', ['data' => __('app.budget')]));
     }
 
     public function destroy(Budget $budget): RedirectResponse

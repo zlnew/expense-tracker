@@ -1,28 +1,38 @@
 key,en,id
 action_warning,"Please proceed with caution, this cannot be undone","Harap berhati-hati, tindakan ini tidak dapat dibatalkan."
 actions,Actions,Aksi
+actual,Actual,Aktual
 add_data,"Add :data","Tambah :data"
 all_data,"All :data","Semua :data"
 appearance,Appearance,Tampilan
 appearance_settings,"Appearance Settings","Pengaturan Tampilan"
 appearance_settings_description,"Update your account's appearance settings","Perbarui pengaturan tampilan akun Anda"
 appearance_settings_title,"Appearance Settings","Pengaturan Tampilan"
+april,April,April
+august,August,Agustus
 balance,Balance,Saldo
 balances,Balances,Saldo
 budget,Budget,Anggaran
+budget_create_description,"Create a new budget to manage your monthly finances","Buat anggaran baru untuk mengelola keuangan bulanan Anda"
+budget_delete_description,"Are you sure you want to delete this budget permanently?","Apakah Anda yakin ingin menghapus anggaran ini secara permanen?"
+budget_detail_description,"View detailed information about monthly expenses and incomes","Lihat informasi detail tentang pengeluaran dan pemasukan bulanan"
+budget_list_description,"Manage and monitor your budgets","Kelola dan pantau anggaran Anda"
+budget_update_description,"Update and adjust your monthly budget plans","Perbarui dan sesuaikan perencanaan anggaran bulanan Anda"
 budgets,Budgets,Anggaran
 cancel,Cancel,Batal
 categories,Categories,Kategori
-categories_description,"Manage income and expense budget categories","Kelola kategori anggaran penghasilan dan pengeluaran"
 category,Category,Kategori
-category_create_description,"Choose type and write name","Pilih jenis dan tulis nama"
-category_update_description,"Update category type and name","Perbarui tipe dan nama kategori"
+category_create_description,"Create a new budget category","Buat kategori anggaran baru"
+category_delete_description,"Are you sure you want to delete this budget category permanently?","Apakah Anda yakin ingin menghapus kategori anggaran ini secara permanen?"
+category_list_description,"Manage your buget categories","Kelola kategori anggaran Anda"
+category_update_description,"Update budget category","Perbarui kategori anggaran"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
 create,Create,Buat
 create_data,"Create :data","Buat :data"
 created_data,":data Created",":data Dibuat"
 current_password,"Current Password","Kata Sandi Saat Ini"
 dashboard,Dashboard,Dasbor
+december,December,Desember
 delete,Delete,Hapus
 delete_account,"Delete Account","Hapus Akun"
 delete_account_action_description,"Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.","Setelah akun Anda dihapus, semua sumber daya dan datanya juga akan dihapus secara permanen. Silakan masukkan kata sandi Anda untuk mengkonfirmasi bahwa Anda ingin menghapus akun Anda secara permanen."
@@ -33,26 +43,41 @@ delete_data,"Delete :data","Hapus :data"
 deleted_data,":data Deleted",":data Dihapus"
 deleting,Deleting...,Menghapus...
 detail,Detail,Detail
+detail_data,":data Detail","Detail :data"
+diff,Diff,Diff
 edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
 expense,Expense,Pengeluaran
 expenses,Expenses,Pengeluaran
+february,February,Februari
 full_name,"Full Name","Nama Lengkap"
 income,Income,Penghasilan
 incomes,Incomes,Pemasukan
+january,January,Januari
+july,July,Juli
+june,June,Juni
 list,List,List
 log_out,"Log Out",Keluar
+march,March,Maret
+may,May,Mei
+month,Month,Bulan
+monthly_expenses,"Monthly Expenses","Pengeluaran Bulanan"
+monthly_incomes,"Monthly Incomes","Pendapatan Bulanan"
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
 no_data_found,"No :data found",":data tidak ditemukan"
 notes,Notes,Catatan
+november,November,November
+october,October,Oktober
 optional,Optional,Opsional
 password,Password,"Kata Sandi"
 password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
 password_update_title,"Update Password","Perbarui Kata Sandi"
+period,Period,Periode
 period_end,"Period End","Periode Akhir"
 period_start,"Period Start","Periode Awal"
+periods,Periods,Periode
 planned,Planned,Direncanakan
 profile,Profile,Profil
 profile_settings,"Profile Settings","Pengaturan Profil"
@@ -65,10 +90,12 @@ search_categories_placeholder,"Search by name...","Cari berdasarkan nama..."
 security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
 select_data,"Select :data","Pilih :data"
+september,September,September
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
 status,Status,Status
+total,Total,Total
 transaction,Transaction,Transaksi
 transactions,Transactions,Transaksi
 type,Type,Jenis
@@ -76,4 +103,6 @@ types,Types,Jenis
 update,Update,Perbarui
 updated_data,":data Updated",":data Diperbarui"
 updating,Updating...,Memperbarui...
+view_detail,"View Detail","Lihat Detail"
 warning,Warning,Peringatan
+year,Year,Tahun

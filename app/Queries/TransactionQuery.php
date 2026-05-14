@@ -10,7 +10,7 @@ class TransactionQuery extends BaseQuery
 
     protected array $allowedWith = ['budget', 'category'];
 
-    protected array $allowedFilters = ['user', 'balance', 'budget', 'type', 'category', 'dateFrom', 'dateTo'];
+    protected array $allowedFilters = ['user', 'balance', 'budget', 'type', 'category', 'dateFrom', 'dateTo', 'month', 'year'];
 
     protected array $searchable = ['category.name'];
 
@@ -73,6 +73,20 @@ class TransactionQuery extends BaseQuery
         }
 
         $this->query->whereDate('date', '<=', $value);
+
+        return $this;
+    }
+
+    public function month(mixed $value): static
+    {
+        $this->query->whereMonth('date', $value);
+
+        return $this;
+    }
+
+    public function year(mixed $value): static
+    {
+        $this->query->whereYear('date', $value);
 
         return $this;
     }

@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
-import { useDebounceFn } from '@vueuse/core'
-import { Plus, Search, SquarePen, Trash2 } from 'lucide-vue-next'
-import { ref, watch } from 'vue'
+import { Head, Link, setLayoutProps } from '@inertiajs/vue3'
+import { Info, Plus, SquarePen, Trash2 } from 'lucide-vue-next'
+import { ref } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import BudgetDeleteDialog from '@/components/dialogs/BudgetDeleteDialog.vue'
 import Heading from '@/components/Heading.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -18,12 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
-import { useParam } from '@/composables/useParam'
 import {
-  index as budgetsIndex,
   create as budgetCreate,
   edit as budgetEdit,
+  show as budgetShow,
 } from '@/routes/budgets'
 import type { Budget, Paginate } from '@/types'
 
@@ -34,6 +32,7 @@ defineProps<{
 }>()
 
 const { __ } = useLang()
+const { formatDate } = useDate()
 
 setLayoutProps({
   breadcrumbs: [
@@ -46,30 +45,8 @@ setLayoutProps({
   ],
 })
 
-const param = useParam()
-
 const deleteDialogOpen = ref(false)
 const targetData = ref<Data | null>(null)
-
-const search = ref(param.get('search') || '')
-
-watch([search], () => {
-  fetchData()
-})
-
-const fetchData = useDebounceFn(() => {
-  const params: Record<string, any> = {}
-
-  if (search.value) {
-    params.search = search.value
-  }
-
-  router.get(budgetsIndex.url(), params, {
-    preserveState: true,
-    preserveScroll: true,
-    replace: true,
-  })
-}, 300)
 
 const openDeleteDialog = (data: Data) => {
   targetData.value = data
@@ -87,7 +64,7 @@ const openDeleteDialog = (data: Data) => {
       >
         <Heading
           :title="__('budgets')"
-          :description="__('budgets_description')"
+          :description="__('budget_list_description')"
           class="mb-0"
         />
         <Button asChild>
@@ -96,21 +73,6 @@ const openDeleteDialog = (data: Data) => {
             {{ __('add_data', { data: __('budget') }) }}
           </Link>
         </Button>
-      </div>
-
-      <div class="flex flex-col items-center gap-4 lg:flex-row">
-        <div class="flex w-full items-center gap-2 lg:max-w-md">
-          <div class="relative w-full">
-            <Search
-              class="absolute top-2.5 left-2.5 size-4 text-muted-foreground"
-            />
-            <Input
-              v-model="search"
-              :placeholder="__('search_budgets_placeholder')"
-              class="w-full bg-background pl-8"
-            />
-          </div>
-        </div>
       </div>
 
       <div class="overflow-hidden rounded-md border bg-background">
@@ -143,13 +105,15 @@ const openDeleteDialog = (data: Data) => {
                   }}.
                 </TableCell>
                 <TableCell class="font-medium">
-                  {{ b.period_start }}
+                  {{ formatDate(b.period_start, 'DD MMM YYYY') }}
                 </TableCell>
                 <TableCell class="font-medium">
-                  {{ b.period_end }}
+                  {{ formatDate(b.period_end, 'DD MMM YYYY') }}
                 </TableCell>
                 <TableCell class="text-sm text-muted-foreground">
-                  {{ b.notes ?? '-' }}
+                  <div class="max-w-md truncate wrap-anywhere">
+                    {{ b.notes ?? '-' }}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Badge v-if="b.is_active">{{ __('active') }}</Badge>
@@ -157,6 +121,16 @@ const openDeleteDialog = (data: Data) => {
 
                 <TableCell class="text-right">
                   <div class="flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      :title="__('view_detail')"
+                      asChild
+                    >
+                      <Link :href="budgetShow.url({ budget: b })">
+                        <Info class="size-4" />
+                      </Link>
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"

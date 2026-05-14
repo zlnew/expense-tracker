@@ -1,1 +1,300 @@
-<template><div></div></template>
+<script setup lang="ts">
+import { Head, setLayoutProps, useForm } from '@inertiajs/vue3'
+import { Check, X } from 'lucide-vue-next'
+import { computed, onMounted, ref } from 'vue'
+import { toast } from 'vue-sonner'
+import AlertError from '@/components/AlertError.vue'
+import AppContent from '@/components/AppContent.vue'
+import Heading from '@/components/Heading.vue'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  NumberField,
+  NumberFieldContent,
+  NumberFieldDecrement,
+  NumberFieldIncrement,
+  NumberFieldInput,
+} from '@/components/ui/number-field'
+import { Separator } from '@/components/ui/separator'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
+import { useLang } from '@/composables/useLang'
+import { useNumber } from '@/composables/useNumber'
+import { index as budgetIndex, update as budgetUpdate } from '@/routes/budgets'
+import type { Budget, BudgetItem } from '@/types'
+
+const props = defineProps<{
+  budget: Budget
+}>()
+
+const { __ } = useLang()
+const { formatNumber } = useNumber()
+
+setLayoutProps({
+  breadcrumbs: [
+    {
+      title: __('budgets'),
+      href: budgetIndex.url(),
+    },
+    {
+      title: __('edit'),
+    },
+  ],
+})
+
+const form = useForm({
+  period_start: '',
+  period_end: '',
+  notes: null as string | null,
+  items: [] as any[],
+})
+
+const expenseBudgetItems = ref<Partial<BudgetItem>[]>([])
+const incomeBudgetItems = ref<Partial<BudgetItem>[]>([])
+
+const expenseTotal = computed(() =>
+  expenseBudgetItems.value.reduce(
+    (acc, curr) => acc + (curr.planned_amount ?? 0),
+    0,
+  ),
+)
+
+const incomeTotal = computed(() =>
+  incomeBudgetItems.value.reduce(
+    (acc, curr) => acc + (curr.planned_amount ?? 0),
+    0,
+  ),
+)
+
+onMounted(() => {
+  form.period_start = props.budget.period_start
+  form.period_end = props.budget.period_end
+  form.notes = props.budget.notes
+
+  initBudgetItems()
+})
+
+const initBudgetItems = () => {
+  expenseBudgetItems.value = props.budget.expenses ?? []
+  incomeBudgetItems.value = props.budget.incomes ?? []
+}
+
+const submit = () => {
+  form.items = [...expenseBudgetItems.value, ...incomeBudgetItems.value]
+
+  form.put(budgetUpdate.url({ budget: props.budget }), {
+    onSuccess: (res) => {
+      form.reset()
+      toast.success(res.props.success as string)
+    },
+  })
+}
+
+const goBack = () => {
+  window.history.back()
+}
+</script>
+
+<template>
+  <Head :title="__('edit_data', { data: __('budget') })" />
+
+  <AppContent>
+    <div class="space-y-6 px-4 py-6 md:px-8">
+      <Heading
+        :title="__('edit_data', { data: __('budget') })"
+        :description="__('budget_update_description')"
+      />
+
+      <form @submit.prevent="submit">
+        <div class="mb-16 space-y-4">
+          <AlertError
+            v-if="Object.keys(form.errors).length > 0"
+            :errors="Object.values(form.errors)"
+          />
+
+          <div class="grid max-w-md grid-cols-2 gap-4">
+            <div class="grid gap-2">
+              <Label for="period_start">
+                {{ __('period_start') }} <span class="text-destructive">*</span>
+              </Label>
+              <Input
+                id="period_start"
+                type="date"
+                v-model="form.period_start"
+                required
+              />
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="period_end">
+                {{ __('period_end') }} <span class="text-destructive">*</span>
+              </Label>
+              <Input
+                id="period_end"
+                type="date"
+                v-model="form.period_end"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="grid max-w-md gap-2">
+            <Label for="notes">
+              {{ __('notes') }}
+              <span class="text-muted-foreground">({{ __('optional') }})</span>
+            </Label>
+            <Textarea
+              id="notes"
+              v-model="form.notes"
+              :placeholder="__('notes')"
+            />
+          </div>
+
+          <Separator />
+
+          <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
+            <Card>
+              <CardHeader>
+                <CardTitle>{{ __('monthly_expenses') }}</CardTitle>
+                <CardAction>
+                  <span class="font-bold text-destructive">
+                    Rp {{ formatNumber(expenseTotal) }}
+                  </span>
+                </CardAction>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader class="bg-accent">
+                    <TableRow>
+                      <TableHead>
+                        {{ __('category') }}
+                      </TableHead>
+                      <TableHead class="w-[300px] text-end">
+                        {{ __('planned') }}
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow
+                      v-for="(exp, index) in expenseBudgetItems"
+                      :key="index"
+                    >
+                      <TableCell>{{ exp.category?.name }}</TableCell>
+                      <TableCell class="text-end">
+                        <NumberField
+                          v-model="exp.planned_amount"
+                          :min="0"
+                          :step="1000"
+                          :stepSnapping="false"
+                          :format-options="{
+                            style: 'currency',
+                            currency: 'IDR',
+                            currencyDisplay: 'narrowSymbol',
+                            currencySign: 'standard',
+                          }"
+                        >
+                          <NumberFieldContent>
+                            <NumberFieldDecrement />
+                            <NumberFieldInput />
+                            <NumberFieldIncrement />
+                          </NumberFieldContent>
+                        </NumberField>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{{ __('monthly_incomes') }}</CardTitle>
+                <CardAction>
+                  <span class="font-bold text-destructive">
+                    Rp {{ formatNumber(incomeTotal) }}
+                  </span>
+                </CardAction>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader class="bg-accent">
+                    <TableRow>
+                      <TableHead>
+                        {{ __('category') }}
+                      </TableHead>
+                      <TableHead class="w-[300px] text-end">
+                        {{ __('planned') }}
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow
+                      v-for="(inc, index) in incomeBudgetItems"
+                      :key="index"
+                    >
+                      <TableCell>{{ inc.category?.name }}</TableCell>
+                      <TableCell>
+                        <NumberField
+                          v-model="inc.planned_amount"
+                          :min="0"
+                          :step="1000"
+                          :stepSnapping="false"
+                          :format-options="{
+                            style: 'currency',
+                            currency: 'IDR',
+                            currencyDisplay: 'narrowSymbol',
+                            currencySign: 'standard',
+                          }"
+                        >
+                          <NumberFieldContent>
+                            <NumberFieldDecrement />
+                            <NumberFieldInput />
+                            <NumberFieldIncrement />
+                          </NumberFieldContent>
+                        </NumberField>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div class="fixed right-4 bottom-4 z-50 md:right-8 md:bottom-8">
+          <div class="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              class="rounded-full shadow-xl"
+              @click="goBack"
+            >
+              <X />
+              <span>{{ __('cancel') }}</span>
+            </Button>
+            <Button type="submit" size="lg" class="rounded-full shadow-xl">
+              <Check />
+              <span>{{ __('save') }}</span>
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </AppContent>
+</template>
