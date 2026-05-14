@@ -3,6 +3,7 @@
 return [
     'action_warning' => 'Please proceed with caution, this cannot be undone',
     'actions' => 'Actions',
+    'active' => 'Active',
     'actual' => 'Actual',
     'add_data' => 'Add :data',
     'all_data' => 'All :data',
@@ -102,6 +103,7 @@ return [
     'security_settings' => 'Security Settings',
     'select_data' => 'Select :data',
     'september' => 'September',
+    'set_as_active' => 'Set as Active',
     'set_as_primary' => 'Set as Primary',
     'settings' => 'Settings',
     'settings_description' => 'Manage your profile and account settings',

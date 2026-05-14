@@ -3,6 +3,7 @@
 return [
     'action_warning' => 'Harap berhati-hati, tindakan ini tidak dapat dibatalkan.',
     'actions' => 'Aksi',
+    'active' => 'Aktif',
     'actual' => 'Aktual',
     'add_data' => 'Tambah :data',
     'all_data' => 'Semua :data',
@@ -102,6 +103,7 @@ return [
     'security_settings' => 'Pengaturan Keamanan',
     'select_data' => 'Pilih :data',
     'september' => 'September',
+    'set_as_active' => 'Jadikan Aktif',
     'set_as_primary' => 'Jadikan Utama',
     'settings' => 'Pengaturan',
     'settings_description' => 'Kelola profil dan pengaturan akun Anda',

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Head, Link, setLayoutProps, useHttp } from '@inertiajs/vue3'
-import { CalendarDays, SquarePen } from 'lucide-vue-next'
+import { Head, Link, router, setLayoutProps, useHttp } from '@inertiajs/vue3'
+import { CheckCircle2, CalendarDays, SquarePen } from 'lucide-vue-next'
 import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -27,7 +28,11 @@ import {
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
-import { index as budgetIndex, edit as budgetEdit } from '@/routes/budgets'
+import {
+  index as budgetIndex,
+  edit as budgetEdit,
+  setActive as budgetSetActive,
+} from '@/routes/budgets'
 import type { Budget, Transaction } from '@/types'
 
 const props = defineProps<{
@@ -240,6 +245,22 @@ const fetchTransactions = async () => {
     toast.error(apiError.message)
   }
 }
+
+const setActive = () => {
+  router.post(
+    budgetSetActive.url({ budget: props.budget }),
+    {},
+    {
+      preserveScroll: true,
+      onSuccess: (res) => {
+        toast.success(
+          (res.props.flash as any)?.success ??
+            __('updated_data', { data: __('budget') }),
+        )
+      },
+    },
+  )
+}
 </script>
 
 <template>
@@ -247,10 +268,13 @@ const fetchTransactions = async () => {
 
   <AppContent>
     <div class="space-y-6 px-4 pt-6 pb-22 md:px-8">
-      <Heading
-        :title="__('detail_data', { data: __('budget') })"
-        :description="__('budget_detail_description')"
-      />
+      <div class="flex items-start justify-between">
+        <Heading
+          :title="__('detail_data', { data: __('budget') })"
+          :description="__('budget_detail_description')"
+        />
+        <Badge v-if="budget.is_active">{{ __('active') }}</Badge>
+      </div>
 
       <div class="space-y-4">
         <div class="flex flex-col gap-1">
@@ -445,7 +469,18 @@ const fetchTransactions = async () => {
     </div>
   </AppContent>
 
-  <div class="fixed right-4 bottom-4 z-50 md:right-8 md:bottom-8">
+  <div class="fixed right-4 bottom-4 z-50 flex gap-2 md:right-8 md:bottom-8">
+    <Button
+      v-if="!budget.is_active"
+      type="button"
+      size="lg"
+      variant="secondary"
+      class="rounded-full shadow-xl"
+      @click="setActive"
+    >
+      <CheckCircle2 class="mr-2 size-4" />
+      <span>{{ __('set_as_active') }}</span>
+    </Button>
     <Button type="submit" size="lg" class="rounded-full shadow-xl" asChild>
       <Link :href="budgetEdit.url({ budget: budget })">
         <SquarePen />

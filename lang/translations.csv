@@ -1,6 +1,7 @@
 key,en,id
 action_warning,"Please proceed with caution, this cannot be undone","Harap berhati-hati, tindakan ini tidak dapat dibatalkan."
 actions,Actions,Aksi
+active,Active,Aktif
 actual,Actual,Aktual
 add_data,"Add :data","Tambah :data"
 all_data,"All :data","Semua :data"
@@ -100,6 +101,7 @@ security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
 select_data,"Select :data","Pilih :data"
 september,September,September
+set_as_active,"Set as Active","Jadikan Aktif"
 set_as_primary,"Set as Primary","Jadikan Utama"
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"

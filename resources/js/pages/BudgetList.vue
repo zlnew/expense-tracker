@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Head, Link, setLayoutProps } from '@inertiajs/vue3'
-import { Info, Plus, SquarePen, Trash2 } from 'lucide-vue-next'
+import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
+import { CheckCircle2, Info, Plus, SquarePen, Trash2 } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import BudgetDeleteDialog from '@/components/dialogs/BudgetDeleteDialog.vue'
@@ -22,6 +23,7 @@ import {
   create as budgetCreate,
   edit as budgetEdit,
   show as budgetShow,
+  setActive as budgetSetActive,
 } from '@/routes/budgets'
 import type { Budget, Paginate } from '@/types'
 
@@ -51,6 +53,22 @@ const targetData = ref<Data | null>(null)
 const openDeleteDialog = (data: Data) => {
   targetData.value = data
   deleteDialogOpen.value = true
+}
+
+const setActive = (budget: Budget) => {
+  router.post(
+    budgetSetActive.url({ budget }),
+    {},
+    {
+      preserveScroll: true,
+      onSuccess: (res) => {
+        toast.success(
+          (res.props.flash as any)?.success ??
+            __('updated_data', { data: __('budget') }),
+        )
+      },
+    },
+  )
 }
 </script>
 
@@ -130,6 +148,15 @@ const openDeleteDialog = (data: Data) => {
                       <Link :href="budgetShow.url({ budget: b })">
                         <Info class="size-4" />
                       </Link>
+                    </Button>
+                    <Button
+                      v-if="!b.is_active"
+                      variant="ghost"
+                      size="icon"
+                      @click="setActive(b)"
+                      :title="__('set_as_active')"
+                    >
+                      <CheckCircle2 class="size-4" />
                     </Button>
                     <Button
                       variant="ghost"
