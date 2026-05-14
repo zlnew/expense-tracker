@@ -34,7 +34,7 @@ export default defineConfig({
         VitePWA({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'robots.txt'],
-            base: '/build/',
+            base: '/',
             scope: '/',
             manifest: {
                 name: 'Expense Tracker',
@@ -65,7 +65,6 @@ export default defineConfig({
                 ],
             },
             workbox: {
-                navigateFallback: '/',
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
             },
         }),
