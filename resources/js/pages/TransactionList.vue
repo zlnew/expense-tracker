@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
-import { ChevronDown, Plus, Search, SquarePen, Trash2 } from 'lucide-vue-next'
+import {
+  ChevronDown,
+  ListPlus,
+  Plus,
+  Search,
+  SquarePen,
+  Trash2,
+} from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
@@ -182,7 +189,7 @@ const openBulkCreateDialog = () => {
                 {{ __('single_transaction') }}
               </DropdownMenuItem>
               <DropdownMenuItem @click="openBulkCreateDialog">
-                <Plus class="mr-2 size-4" />
+                <ListPlus class="mr-2 size-4" />
                 {{ __('multiple_transactions') }}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -318,7 +325,7 @@ const openBulkCreateDialog = () => {
           <div class="flex items-start justify-between gap-4">
             <div>
               <h3 class="text-lg font-bold">{{ t.category?.name }}</h3>
-              <p class="text-sm text-muted-foreground">{{ t.balance?.name }}</p>
+              <p class="text-xs text-muted-foreground">{{ t.balance?.name }}</p>
               <p
                 v-if="t.description"
                 class="mt-1 max-w-[200px] truncate text-sm text-muted-foreground"

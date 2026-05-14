@@ -163,7 +163,7 @@ watch(
           budget_id: props.activeBudgetId || '',
           budget_item_id: '',
           category_id: '',
-          type: 'expense',
+          type: '',
           date: new Date().toISOString().split('T')[0],
           amount: 0,
           description: '',
@@ -205,7 +205,7 @@ watch(
             <Trash2 class="size-4" />
           </Button>
 
-          <div class="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <div class="grid grid-cols-1 gap-4 lg:grid-cols-1">
             <div class="space-y-2">
               <Label>{{ __('balance') }}</Label>
               <Select v-model="item.balance_id">
@@ -241,7 +241,7 @@ watch(
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <div class="grid grid-cols-1 gap-4">
             <div class="space-y-2">
               <Label>{{ __('category') }}</Label>
               <Select
@@ -312,7 +312,7 @@ watch(
       </div>
 
       <div
-        class="flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
+        class="flex flex-col gap-4 border-t pt-4 lg:flex-row lg:items-center lg:justify-between"
       >
         <Button
           variant="outline"
