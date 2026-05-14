@@ -4,18 +4,23 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <meta name="theme-color" content="#ffffff">
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {
                 const appearance = '{{ $appearance ?? "system" }}';
+                let isDark = appearance === 'dark';
 
                 if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
-                    }
+                    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 }
+
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                }
+
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#0a0a0a' : '#ffffff');
             })();
         </script>
 
@@ -34,7 +39,6 @@
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <link rel="manifest" href="/build/manifest.webmanifest">
-        <meta name="theme-color" content="#ffffff">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <meta name="apple-mobile-web-app-title" content="Expense Tracker">

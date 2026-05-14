@@ -609,7 +609,7 @@ const setActive = () => {
     </div>
   </AppContent>
 
-  <div class="fixed right-4 bottom-4 z-50 flex gap-2 md:right-8 md:bottom-8">
+  <div class="fixed right-4 bottom-20 z-50 flex gap-2 md:right-8 md:bottom-8">
     <Button
       v-if="!budget.is_active"
       type="button"

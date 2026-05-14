@@ -15,13 +15,18 @@ export function updateTheme(value: Appearance): void {
     return
   }
 
-  if (value === 'system') {
-    const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
-    const systemTheme = mediaQueryList.matches ? 'dark' : 'light'
+  const isDark =
+    value === 'system'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : value === 'dark'
 
-    document.documentElement.classList.toggle('dark', systemTheme === 'dark')
-  } else {
-    document.documentElement.classList.toggle('dark', value === 'dark')
+  document.documentElement.classList.toggle('dark', isDark)
+
+  // Update PWA theme-color meta tag
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', isDark ? '#0a0a0a' : '#ffffff')
   }
 }
 

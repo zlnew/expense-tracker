@@ -359,7 +359,7 @@ const goBack = () => {
           </div>
         </div>
 
-        <div class="fixed right-4 bottom-4 z-50 md:right-8 md:bottom-8">
+        <div class="fixed right-4 bottom-20 z-50 md:right-8 md:bottom-8">
           <div class="flex items-center gap-2">
             <Button
               type="button"
