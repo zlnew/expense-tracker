@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
-import { Plus, Search, SquarePen, Trash2 } from 'lucide-vue-next'
+import { ChevronDown, Plus, Search, SquarePen, Trash2 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
+import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
 import TransactionCreateDialog from '@/components/dialogs/TransactionCreateDialog.vue'
 import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialog.vue'
 import TransactionUpdateDialog from '@/components/dialogs/TransactionUpdateDialog.vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -60,6 +67,7 @@ setLayoutProps({
 
 const createDialogOpen = ref(false)
 const updateDialogOpen = ref(false)
+const bulkCreateDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
 const targetData = ref<Transaction | null>(null)
 
@@ -140,6 +148,10 @@ const openDeleteDialog = (data: Transaction) => {
   targetData.value = data
   deleteDialogOpen.value = true
 }
+
+const openBulkCreateDialog = () => {
+  bulkCreateDialogOpen.value = true
+}
 </script>
 
 <template>
@@ -156,10 +168,25 @@ const openDeleteDialog = (data: Transaction) => {
           class="mb-0"
         />
         <div class="flex items-center gap-2">
-          <Button @click="openCreateDialog">
-            <Plus class="mr-2 size-4" />
-            {{ __('add_data', { data: __('transaction') }) }}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <Button>
+                <Plus class="mr-2 size-4" />
+                {{ __('add_data', { data: __('transaction') }) }}
+                <ChevronDown class="ml-2 size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem @click="openCreateDialog">
+                <Plus class="mr-2 size-4" />
+                {{ __('single_transaction') }}
+              </DropdownMenuItem>
+              <DropdownMenuItem @click="openBulkCreateDialog">
+                <Plus class="mr-2 size-4" />
+                {{ __('multiple_transactions') }}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -369,6 +396,14 @@ const openDeleteDialog = (data: Transaction) => {
     :balances="balances"
     :budgets="budgets"
     :categories="categories"
+  />
+  <TransactionBulkCreateDialog
+    v-model:open="bulkCreateDialogOpen"
+    :balances="balances"
+    :budgets="budgets"
+    :categories="categories"
+    :primaryBalanceId="primaryBalanceId"
+    :activeBudgetId="activeBudgetId"
   />
   <TransactionDeleteDialog
     v-model:open="deleteDialogOpen"

@@ -65,10 +65,11 @@ filter_by_balance,"Filter by Balance","Filter berdasarkan Saldo"
 filter_by_category,"Filter by Category","Filter berdasarkan Kategori"
 final_amount,"Final Amount","Saldo Akhir"
 full_name,"Full Name","Nama Lengkap"
-income,Income,Penghasilan
-incomes,Incomes,Penghasilan
+income,Income,Pemasukan
+incomes,Incomes,Pemasukan
 initial_amount,"Initial Amount","Saldo Awal"
 is_primary,"Primary Balance","Saldo Utama"
+item,Item,Item
 january,January,Januari
 july,July,Juli
 june,June,Juni
@@ -79,6 +80,7 @@ may,May,Mei
 month,Month,Bulan
 monthly_expenses,"Monthly Expenses","Pengeluaran Bulanan"
 monthly_incomes,"Monthly Incomes","Pendapatan Bulanan"
+multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
 no_data_found,"No :data found",":data tidak ditemukan"
@@ -113,8 +115,13 @@ set_as_primary,"Set as Primary","Jadikan Utama"
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
+single_transaction,"Single Transaction","Satu Transaksi"
 status,Status,Status
+te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 total,Total,Total
+total_expense,"Total Expense","Total Pengeluaran"
+total_income,"Total Income","Total Pemasukan"
+total_items,"Total Items","Total Item"
 transaction,Transaction,Transaksi
 transaction_bulk_create_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 transaction_create_description,"Create a new transaction record.","Buat catatan transaksi baru."
