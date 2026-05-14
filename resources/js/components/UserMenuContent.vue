@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3'
-import { LogOut, Settings } from 'lucide-vue-next'
+import { LogOut, Settings, Tags } from 'lucide-vue-next'
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -10,6 +10,7 @@ import {
 import UserInfo from '@/components/UserInfo.vue'
 import { useLang } from '@/composables/useLang'
 import { logout } from '@/routes'
+import categories from '@/routes/categories'
 import { edit } from '@/routes/profile'
 import type { User } from '@/types'
 
@@ -35,9 +36,19 @@ const handleLogout = () => {
   <DropdownMenuSeparator />
   <DropdownMenuGroup>
     <DropdownMenuItem :as-child="true">
-      <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
+      <Link class="block w-full cursor-pointer" :href="edit.url()" prefetch>
         <Settings class="mr-2 h-4 w-4" />
         {{ __('settings') }}
+      </Link>
+    </DropdownMenuItem>
+    <DropdownMenuItem :as-child="true">
+      <Link
+        class="block w-full cursor-pointer"
+        :href="categories.index.url()"
+        prefetch
+      >
+        <Tags class="mr-2 h-4 w-4" />
+        {{ __('categories') }}
       </Link>
     </DropdownMenuItem>
   </DropdownMenuGroup>
@@ -45,7 +56,7 @@ const handleLogout = () => {
   <DropdownMenuItem :as-child="true">
     <Link
       class="block w-full cursor-pointer"
-      :href="logout()"
+      :href="logout.url()"
       @click="handleLogout"
       as="button"
       data-test="logout-button"

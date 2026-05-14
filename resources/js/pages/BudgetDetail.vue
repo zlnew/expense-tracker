@@ -325,58 +325,59 @@ const setActive = () => {
             <CardTitle>{{ __('monthly_expenses') }}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader class="bg-accent">
-                <TableRow>
-                  <TableHead>
-                    {{ __('category') }}
-                  </TableHead>
-                  <TableHead class="w-[300px] text-end">
-                    {{ __('planned') }}
-                  </TableHead>
-                  <TableHead class="w-[300px] text-end">
-                    {{ __('actual') }}
-                  </TableHead>
-                  <TableHead class="w-[300px] text-end">
-                    {{ __('diff') }}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow
-                  v-for="(exp, index) in expenseBudgetItems"
-                  :key="index"
+            <!-- Mobile view for expenses -->
+            <div class="space-y-4 md:hidden">
+              <div
+                v-if="expenseBudgetItems.length === 0"
+                class="py-8 text-center text-muted-foreground"
+              >
+                {{ __('no_data_found', { data: __('category') }) }}
+              </div>
+              <div
+                v-for="(exp, index) in expenseBudgetItems"
+                :key="index"
+                class="border-b pb-4 last:border-0"
+              >
+                <div class="flex items-center justify-between font-bold">
+                  <span>{{ exp.category?.name }}</span>
+                  <span
+                    :class="
+                      exp.diff_amount < 0
+                        ? 'text-destructive'
+                        : 'text-muted-foreground'
+                    "
+                  >
+                    Rp {{ formatNumber(exp.diff_amount) }}
+                  </span>
+                </div>
+                <div
+                  class="mt-1 flex items-center justify-between text-sm text-muted-foreground"
                 >
-                  <TableCell>{{ exp.category?.name }}</TableCell>
-                  <TableCell class="text-end">
-                    Rp {{ formatNumber(exp.planned_amount) }}
-                  </TableCell>
-                  <TableCell class="text-end">
-                    Rp {{ formatNumber(exp.actual_amount) }}
-                  </TableCell>
-                  <TableCell class="text-end">
-                    <span
-                      :class="
-                        exp.diff_amount < 0
-                          ? 'text-destructive'
-                          : 'text-muted-foreground'
-                      "
-                    >
-                      Rp {{ formatNumber(exp.diff_amount) }}
+                  <span
+                    >{{ __('planned') }}: Rp
+                    {{ formatNumber(exp.planned_amount) }}</span
+                  >
+                  <span
+                    >{{ __('actual') }}: Rp
+                    {{ formatNumber(exp.actual_amount) }}</span
+                  >
+                </div>
+              </div>
+              <div
+                v-if="expenseBudgetItems.length > 0"
+                class="flex flex-col gap-1 border-t pt-4 text-sm font-bold"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="text-muted-foreground">{{ __('total') }}</span>
+                  <div class="flex flex-col items-end">
+                    <span>
+                      {{ __('planned') }}: Rp
+                      {{ formatNumber(plannedExpenseTotal) }}
                     </span>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell>{{ __('total') }}</TableCell>
-                  <TableCell class="text-right">
-                    Rp {{ formatNumber(plannedExpenseTotal) }}
-                  </TableCell>
-                  <TableCell class="text-right">
-                    Rp {{ formatNumber(actualExpenseTotal) }}
-                  </TableCell>
-                  <TableCell class="text-right">
+                    <span>
+                      {{ __('actual') }}: Rp
+                      {{ formatNumber(actualExpenseTotal) }}
+                    </span>
                     <span
                       :class="
                         diffExpenseTotal < 0
@@ -384,12 +385,81 @@ const setActive = () => {
                           : 'text-muted-foreground'
                       "
                     >
-                      Rp {{ formatNumber(diffExpenseTotal) }}
+                      {{ __('diff') }}: Rp {{ formatNumber(diffExpenseTotal) }}
                     </span>
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop View: Table -->
+            <div class="hidden md:block">
+              <Table>
+                <TableHeader class="bg-accent">
+                  <TableRow>
+                    <TableHead>
+                      {{ __('category') }}
+                    </TableHead>
+                    <TableHead class="w-[300px] text-end">
+                      {{ __('planned') }}
+                    </TableHead>
+                    <TableHead class="w-[300px] text-end">
+                      {{ __('actual') }}
+                    </TableHead>
+                    <TableHead class="w-[300px] text-end">
+                      {{ __('diff') }}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow
+                    v-for="(exp, index) in expenseBudgetItems"
+                    :key="index"
+                  >
+                    <TableCell>{{ exp.category?.name }}</TableCell>
+                    <TableCell class="text-end">
+                      Rp {{ formatNumber(exp.planned_amount) }}
+                    </TableCell>
+                    <TableCell class="text-end">
+                      Rp {{ formatNumber(exp.actual_amount) }}
+                    </TableCell>
+                    <TableCell class="text-end">
+                      <span
+                        :class="
+                          exp.diff_amount < 0
+                            ? 'text-destructive'
+                            : 'text-muted-foreground'
+                        "
+                      >
+                        Rp {{ formatNumber(exp.diff_amount) }}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>{{ __('total') }}</TableCell>
+                    <TableCell class="text-right">
+                      Rp {{ formatNumber(plannedExpenseTotal) }}
+                    </TableCell>
+                    <TableCell class="text-right">
+                      Rp {{ formatNumber(actualExpenseTotal) }}
+                    </TableCell>
+                    <TableCell class="text-right">
+                      <span
+                        :class="
+                          diffExpenseTotal < 0
+                            ? 'text-destructive'
+                            : 'text-muted-foreground'
+                        "
+                      >
+                        Rp {{ formatNumber(diffExpenseTotal) }}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
@@ -398,58 +468,59 @@ const setActive = () => {
             <CardTitle>{{ __('monthly_incomes') }}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader class="bg-accent">
-                <TableRow>
-                  <TableHead>
-                    {{ __('category') }}
-                  </TableHead>
-                  <TableHead class="w-[300px] text-end">
-                    {{ __('planned') }}
-                  </TableHead>
-                  <TableHead class="w-[300px] text-end">
-                    {{ __('actual') }}
-                  </TableHead>
-                  <TableHead class="w-[300px] text-end">
-                    {{ __('diff') }}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow
-                  v-for="(inc, index) in incomeBudgetItems"
-                  :key="index"
+            <!-- Mobile view for incomes -->
+            <div class="space-y-4 md:hidden">
+              <div
+                v-if="incomeBudgetItems.length === 0"
+                class="py-8 text-center text-muted-foreground"
+              >
+                {{ __('no_data_found', { data: __('category') }) }}
+              </div>
+              <div
+                v-for="(inc, index) in incomeBudgetItems"
+                :key="index"
+                class="border-b pb-4 last:border-0"
+              >
+                <div class="flex items-center justify-between font-bold">
+                  <span>{{ inc.category?.name }}</span>
+                  <span
+                    :class="
+                      inc.diff_amount < 0
+                        ? 'text-destructive'
+                        : 'text-muted-foreground'
+                    "
+                  >
+                    Rp {{ formatNumber(inc.diff_amount) }}
+                  </span>
+                </div>
+                <div
+                  class="mt-1 flex items-center justify-between text-sm text-muted-foreground"
                 >
-                  <TableCell>{{ inc.category?.name }}</TableCell>
-                  <TableCell class="text-end">
-                    Rp {{ formatNumber(inc.planned_amount) }}
-                  </TableCell>
-                  <TableCell class="text-end">
-                    Rp {{ formatNumber(inc.actual_amount) }}
-                  </TableCell>
-                  <TableCell class="text-end">
-                    <span
-                      :class="
-                        inc.diff_amount < 0
-                          ? 'text-destructive'
-                          : 'text-muted-foreground'
-                      "
-                    >
-                      Rp {{ formatNumber(inc.diff_amount) }}
+                  <span
+                    >{{ __('planned') }}: Rp
+                    {{ formatNumber(inc.planned_amount) }}</span
+                  >
+                  <span
+                    >{{ __('actual') }}: Rp
+                    {{ formatNumber(inc.actual_amount) }}</span
+                  >
+                </div>
+              </div>
+              <div
+                v-if="incomeBudgetItems.length > 0"
+                class="flex flex-col gap-1 border-t pt-4 text-sm font-bold"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="text-muted-foreground">{{ __('total') }}</span>
+                  <div class="flex flex-col items-end">
+                    <span>
+                      {{ __('planned') }}: Rp
+                      {{ formatNumber(plannedIncomeTotal) }}
                     </span>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell>{{ __('total') }}</TableCell>
-                  <TableCell class="text-right">
-                    Rp {{ formatNumber(plannedIncomeTotal) }}
-                  </TableCell>
-                  <TableCell class="text-right">
-                    Rp {{ formatNumber(actualIncomeTotal) }}
-                  </TableCell>
-                  <TableCell class="text-right">
+                    <span>
+                      {{ __('actual') }}: Rp
+                      {{ formatNumber(actualIncomeTotal) }}
+                    </span>
                     <span
                       :class="
                         diffIncomeTotal < 0
@@ -457,12 +528,81 @@ const setActive = () => {
                           : 'text-muted-foreground'
                       "
                     >
-                      Rp {{ formatNumber(diffIncomeTotal) }}
+                      {{ __('diff') }}: Rp {{ formatNumber(diffIncomeTotal) }}
                     </span>
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop View: Table -->
+            <div class="hidden md:block">
+              <Table>
+                <TableHeader class="bg-accent">
+                  <TableRow>
+                    <TableHead>
+                      {{ __('category') }}
+                    </TableHead>
+                    <TableHead class="w-[300px] text-end">
+                      {{ __('planned') }}
+                    </TableHead>
+                    <TableHead class="w-[300px] text-end">
+                      {{ __('actual') }}
+                    </TableHead>
+                    <TableHead class="w-[300px] text-end">
+                      {{ __('diff') }}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow
+                    v-for="(inc, index) in incomeBudgetItems"
+                    :key="index"
+                  >
+                    <TableCell>{{ inc.category?.name }}</TableCell>
+                    <TableCell class="text-end">
+                      Rp {{ formatNumber(inc.planned_amount) }}
+                    </TableCell>
+                    <TableCell class="text-end">
+                      Rp {{ formatNumber(inc.actual_amount) }}
+                    </TableCell>
+                    <TableCell class="text-end">
+                      <span
+                        :class="
+                          inc.diff_amount < 0
+                            ? 'text-destructive'
+                            : 'text-muted-foreground'
+                        "
+                      >
+                        Rp {{ formatNumber(inc.diff_amount) }}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>{{ __('total') }}</TableCell>
+                    <TableCell class="text-right">
+                      Rp {{ formatNumber(plannedIncomeTotal) }}
+                    </TableCell>
+                    <TableCell class="text-right">
+                      Rp {{ formatNumber(actualIncomeTotal) }}
+                    </TableCell>
+                    <TableCell class="text-right">
+                      <span
+                        :class="
+                          diffIncomeTotal < 0
+                            ? 'text-destructive'
+                            : 'text-muted-foreground'
+                        "
+                      >
+                        Rp {{ formatNumber(diffIncomeTotal) }}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

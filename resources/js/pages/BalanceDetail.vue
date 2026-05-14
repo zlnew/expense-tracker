@@ -129,7 +129,53 @@ setLayoutProps({
 
       <div class="space-y-4">
         <h3 class="text-lg font-semibold">{{ __('transactions') }}</h3>
-        <div class="overflow-hidden rounded-md border bg-background">
+        <!-- Mobile view for transactions -->
+        <div class="space-y-4 md:hidden">
+          <div
+            v-if="!balance.transactions || balance.transactions.length === 0"
+            class="py-8 text-center text-muted-foreground"
+          >
+            {{ __('no_data_found', { data: __('transactions') }) }}
+          </div>
+          <div
+            v-for="t in balance.transactions"
+            :key="t.id"
+            class="rounded-lg border bg-background p-4"
+          >
+            <div class="mb-2 flex items-center justify-between">
+              <span class="text-sm text-muted-foreground">{{
+                formatDate(t.date, 'DD MMM YYYY')
+              }}</span>
+              <Badge :variant="t.type === 'income' ? 'secondary' : 'outline'">
+                {{ __(t.type) }}
+              </Badge>
+            </div>
+            <div class="flex items-center justify-between font-bold">
+              <span>{{ t.category?.name || '-' }}</span>
+              <span
+                :class="
+                  t.type === 'income'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                "
+              >
+                {{ t.type === 'income' ? '+' : '-' }}
+                {{ formatNumber(t.amount) }}
+              </span>
+            </div>
+            <div
+              v-if="t.description"
+              class="mt-2 text-sm text-muted-foreground"
+            >
+              {{ t.description }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop View: Table -->
+        <div
+          class="hidden overflow-hidden rounded-md border bg-background md:block"
+        >
           <Table>
             <TableHeader>
               <TableRow>

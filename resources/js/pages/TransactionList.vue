@@ -204,7 +204,7 @@ const openBulkCreateDialog = () => {
           </div>
         </div>
 
-        <div class="flex w-full gap-2 sm:w-auto">
+        <div class="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto">
           <div class="space-y-2">
             <Label>{{ __('balance') }}</Label>
             <Select v-model="balanceFilter">
@@ -287,7 +287,83 @@ const openBulkCreateDialog = () => {
         </div>
       </div>
 
-      <div class="overflow-hidden rounded-md border bg-background">
+      <!-- Mobile View: Cards -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        <div
+          v-if="transactions.data.length === 0"
+          class="h-24 content-center text-center text-muted-foreground"
+        >
+          {{ __('no_data_found', { data: __('transactions') }) }}
+        </div>
+        <div
+          v-for="t in transactions.data"
+          :key="t.id"
+          class="rounded-lg border bg-background p-4 shadow-sm"
+        >
+          <div class="mb-2 flex items-center justify-between">
+            <span class="text-xs font-medium text-muted-foreground">{{
+              formatDate(t.date)
+            }}</span>
+            <div
+              class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase"
+              :class="
+                t.type === 'income'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+              "
+            >
+              {{ __(t.type) }}
+            </div>
+          </div>
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 class="text-lg font-bold">{{ t.category?.name }}</h3>
+              <p class="text-sm text-muted-foreground">{{ t.balance?.name }}</p>
+              <p
+                v-if="t.description"
+                class="mt-1 max-w-[200px] truncate text-sm text-muted-foreground"
+              >
+                {{ t.description }}
+              </p>
+            </div>
+            <div class="text-right">
+              <p
+                class="font-bold"
+                :class="
+                  t.type === 'income'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                "
+              >
+                Rp {{ t.type === 'income' ? '+' : '-' }}
+                {{ formatNumber(t.amount) }}
+              </p>
+              <div class="mt-2 flex items-center justify-end gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  @click="openUpdateDialog(t)"
+                >
+                  <SquarePen class="size-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  class="text-destructive"
+                  @click="openDeleteDialog(t)"
+                >
+                  <Trash2 class="size-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop View: Table -->
+      <div
+        class="hidden overflow-hidden rounded-md border bg-background md:block"
+      >
         <Table>
           <TableHeader>
             <TableRow>

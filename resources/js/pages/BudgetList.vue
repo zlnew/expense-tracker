@@ -93,7 +93,100 @@ const setActive = (budget: Budget) => {
         </Button>
       </div>
 
-      <div class="overflow-hidden rounded-md border bg-background">
+      <!-- Mobile View: Cards -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        <div
+          v-if="budgets.data.length === 0"
+          class="h-24 content-center text-center text-muted-foreground"
+        >
+          {{ __('no_data_found', { data: __('budgets') }) }}
+        </div>
+        <div
+          v-for="b in budgets.data"
+          :key="b.id"
+          class="rounded-lg border bg-background p-4 shadow-sm"
+        >
+          <div class="mb-3 flex items-center justify-between border-b pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold">{{
+                formatDate(b.period_start, 'MMM YYYY')
+              }}</span>
+              <Badge v-if="b.is_active" variant="default" class="text-[10px]">{{
+                __('active')
+              }}</Badge>
+            </div>
+            <div class="flex items-center gap-0.5">
+              <Button
+                variant="ghost"
+                size="icon"
+                :title="__('view_detail')"
+                asChild
+              >
+                <Link :href="budgetShow.url({ budget: b })">
+                  <Info class="size-4" />
+                </Link>
+              </Button>
+              <Button
+                v-if="!b.is_active"
+                variant="ghost"
+                size="icon"
+                @click="setActive(b)"
+                :title="__('set_as_active')"
+              >
+                <CheckCircle2 class="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                :title="__('edit_data', { data: __('budget') })"
+                asChild
+              >
+                <Link :href="budgetEdit.url({ budget: b })">
+                  <SquarePen class="size-4" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                class="text-destructive"
+                @click="openDeleteDialog(b)"
+                :title="__('delete_data', { data: __('budget') })"
+              >
+                <Trash2 class="size-4" />
+              </Button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-xs text-muted-foreground">
+                {{ __('period_start') }}
+              </p>
+              <p class="font-medium">
+                {{ formatDate(b.period_start, 'DD MMM YYYY') }}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground">
+                {{ __('period_end') }}
+              </p>
+              <p class="font-medium">
+                {{ formatDate(b.period_end, 'DD MMM YYYY') }}
+              </p>
+            </div>
+          </div>
+          <p
+            v-if="b.notes"
+            class="mt-3 line-clamp-2 text-sm text-muted-foreground italic"
+          >
+            "{{ b.notes }}"
+          </p>
+        </div>
+      </div>
+
+      <!-- Desktop View: Table -->
+      <div
+        class="hidden overflow-hidden rounded-md border bg-background md:block"
+      >
         <Table>
           <TableHeader>
             <TableRow>

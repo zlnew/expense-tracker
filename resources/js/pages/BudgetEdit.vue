@@ -178,46 +178,78 @@ const goBack = () => {
                 </CardAction>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader class="bg-accent">
-                    <TableRow>
-                      <TableHead>
-                        {{ __('category') }}
-                      </TableHead>
-                      <TableHead class="w-[300px] text-end">
-                        {{ __('planned') }}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow
-                      v-for="(exp, index) in expenseBudgetItems"
-                      :key="index"
+                <!-- Mobile View -->
+                <div class="space-y-4 md:hidden">
+                  <div
+                    v-for="(exp, index) in expenseBudgetItems"
+                    :key="index"
+                    class="rounded-lg border p-4"
+                  >
+                    <Label class="mb-2 block">{{ exp.category?.name }}</Label>
+                    <NumberField
+                      v-model="exp.planned_amount"
+                      :min="0"
+                      :step="1000"
+                      :stepSnapping="false"
+                      :format-options="{
+                        style: 'currency',
+                        currency: 'IDR',
+                        currencyDisplay: 'narrowSymbol',
+                        currencySign: 'standard',
+                      }"
                     >
-                      <TableCell>{{ exp.category?.name }}</TableCell>
-                      <TableCell class="text-end">
-                        <NumberField
-                          v-model="exp.planned_amount"
-                          :min="0"
-                          :step="1000"
-                          :stepSnapping="false"
-                          :format-options="{
-                            style: 'currency',
-                            currency: 'IDR',
-                            currencyDisplay: 'narrowSymbol',
-                            currencySign: 'standard',
-                          }"
-                        >
-                          <NumberFieldContent>
-                            <NumberFieldDecrement />
-                            <NumberFieldInput />
-                            <NumberFieldIncrement />
-                          </NumberFieldContent>
-                        </NumberField>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                      <NumberFieldContent>
+                        <NumberFieldDecrement />
+                        <NumberFieldInput />
+                        <NumberFieldIncrement />
+                      </NumberFieldContent>
+                    </NumberField>
+                  </div>
+                </div>
+
+                <!-- Desktop View -->
+                <div class="hidden md:block">
+                  <Table>
+                    <TableHeader class="bg-accent">
+                      <TableRow>
+                        <TableHead>
+                          {{ __('category') }}
+                        </TableHead>
+                        <TableHead class="w-[300px] text-end">
+                          {{ __('planned') }}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow
+                        v-for="(exp, index) in expenseBudgetItems"
+                        :key="index"
+                      >
+                        <TableCell>{{ exp.category?.name }}</TableCell>
+                        <TableCell class="text-end">
+                          <NumberField
+                            v-model="exp.planned_amount"
+                            :min="0"
+                            :step="1000"
+                            :stepSnapping="false"
+                            :format-options="{
+                              style: 'currency',
+                              currency: 'IDR',
+                              currencyDisplay: 'narrowSymbol',
+                              currencySign: 'standard',
+                            }"
+                          >
+                            <NumberFieldContent>
+                              <NumberFieldDecrement />
+                              <NumberFieldInput />
+                              <NumberFieldIncrement />
+                            </NumberFieldContent>
+                          </NumberField>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
 
@@ -231,46 +263,78 @@ const goBack = () => {
                 </CardAction>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader class="bg-accent">
-                    <TableRow>
-                      <TableHead>
-                        {{ __('category') }}
-                      </TableHead>
-                      <TableHead class="w-[300px] text-end">
-                        {{ __('planned') }}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow
-                      v-for="(inc, index) in incomeBudgetItems"
-                      :key="index"
+                <!-- Mobile View -->
+                <div class="space-y-4 md:hidden">
+                  <div
+                    v-for="(inc, index) in incomeBudgetItems"
+                    :key="index"
+                    class="rounded-lg border p-4"
+                  >
+                    <Label class="mb-2 block">{{ inc.category?.name }}</Label>
+                    <NumberField
+                      v-model="inc.planned_amount"
+                      :min="0"
+                      :step="1000"
+                      :stepSnapping="false"
+                      :format-options="{
+                        style: 'currency',
+                        currency: 'IDR',
+                        currencyDisplay: 'narrowSymbol',
+                        currencySign: 'standard',
+                      }"
                     >
-                      <TableCell>{{ inc.category?.name }}</TableCell>
-                      <TableCell>
-                        <NumberField
-                          v-model="inc.planned_amount"
-                          :min="0"
-                          :step="1000"
-                          :stepSnapping="false"
-                          :format-options="{
-                            style: 'currency',
-                            currency: 'IDR',
-                            currencyDisplay: 'narrowSymbol',
-                            currencySign: 'standard',
-                          }"
-                        >
-                          <NumberFieldContent>
-                            <NumberFieldDecrement />
-                            <NumberFieldInput />
-                            <NumberFieldIncrement />
-                          </NumberFieldContent>
-                        </NumberField>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                      <NumberFieldContent>
+                        <NumberFieldDecrement />
+                        <NumberFieldInput />
+                        <NumberFieldIncrement />
+                      </NumberFieldContent>
+                    </NumberField>
+                  </div>
+                </div>
+
+                <!-- Desktop View -->
+                <div class="hidden md:block">
+                  <Table>
+                    <TableHeader class="bg-accent">
+                      <TableRow>
+                        <TableHead>
+                          {{ __('category') }}
+                        </TableHead>
+                        <TableHead class="w-[300px] text-end">
+                          {{ __('planned') }}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow
+                        v-for="(inc, index) in incomeBudgetItems"
+                        :key="index"
+                      >
+                        <TableCell>{{ inc.category?.name }}</TableCell>
+                        <TableCell>
+                          <NumberField
+                            v-model="inc.planned_amount"
+                            :min="0"
+                            :step="1000"
+                            :stepSnapping="false"
+                            :format-options="{
+                              style: 'currency',
+                              currency: 'IDR',
+                              currencyDisplay: 'narrowSymbol',
+                              currencySign: 'standard',
+                            }"
+                          >
+                            <NumberFieldContent>
+                              <NumberFieldDecrement />
+                              <NumberFieldInput />
+                              <NumberFieldIncrement />
+                            </NumberFieldContent>
+                          </NumberField>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>

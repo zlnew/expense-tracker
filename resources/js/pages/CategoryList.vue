@@ -155,7 +155,55 @@ const openDeleteDialog = (data: Data) => {
         </div>
       </div>
 
-      <div class="overflow-hidden rounded-md border bg-background">
+      <!-- Mobile View: Cards -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        <div
+          v-if="categories.data.length === 0"
+          class="h-24 content-center text-center text-muted-foreground"
+        >
+          {{ __('no_data_found', { data: __('categories') }) }}
+        </div>
+        <div
+          v-for="c in categories.data"
+          :key="c.id"
+          class="rounded-lg border bg-background p-4 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p
+                class="mb-1 text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
+              >
+                {{ __(c.type) }}
+              </p>
+              <h3 class="text-lg font-bold">{{ c.name }}</h3>
+            </div>
+            <div class="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                @click="openEditDialog(c)"
+                :title="__('edit_data', { data: __('category') })"
+              >
+                <SquarePen class="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                class="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                @click="openDeleteDialog(c)"
+                :title="__('delete_data', { data: __('category') })"
+              >
+                <Trash2 class="size-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop View: Table -->
+      <div
+        class="hidden overflow-hidden rounded-md border bg-background md:block"
+      >
         <Table>
           <TableHeader>
             <TableRow>
