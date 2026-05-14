@@ -38,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['initial_amount', 'final_amount', 'is_primary'])]
+#[Fillable(['name', 'description', 'initial_amount', 'final_amount', 'is_primary'])]
 class Balance extends Model
 {
     protected function casts(): array

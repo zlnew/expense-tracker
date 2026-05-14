@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\DTO\BalanceData;
 use App\Models\Balance;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SaveBalance extends Action
 {
@@ -15,13 +16,20 @@ class SaveBalance extends Action
 
     public function handle()
     {
-        $userId = Auth::id();
+        DB::transaction(function () {
 
-        if (! $this->balance->user_id) {
-            $this->balance->user()->associate($userId);
-        }
+            $userId = Auth::id();
 
-        $this->balance->initial_amount = $this->data->initial_amount;
-        $this->balance->save();
+            if (! $this->balance->user_id) {
+                $this->balance->user()->associate($userId);
+            }
+
+            $this->balance->name = $this->data->name;
+            $this->balance->description = $this->data->description;
+            $this->balance->initial_amount = $this->data->initial_amount;
+            $this->balance->save();
+
+            SyncBalance::run($this->balance->id);
+        });
     }
 }

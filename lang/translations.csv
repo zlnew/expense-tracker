@@ -11,6 +11,10 @@ appearance_settings_title,"Appearance Settings","Pengaturan Tampilan"
 april,April,April
 august,August,Agustus
 balance,Balance,Saldo
+balance_create_description,"Create a new balance or account to track your money","Buat saldo atau akun baru untuk melacak uang Anda"
+balance_delete_description,"Are you sure you want to delete this balance? All transactions related to this balance will also be deleted.","Apakah Anda yakin ingin menghapus saldo ini? Semua transaksi yang terkait dengan saldo ini juga akan dihapus."
+balance_list_description,"Manage your balances and accounts","Kelola saldo dan akun Anda"
+balance_update_description,"Update balance or account information","Perbarui informasi saldo atau akun"
 balances,Balances,Saldo
 budget,Budget,Anggaran
 budget_create_description,"Create a new budget to manage your monthly finances","Buat anggaran baru untuk mengelola keuangan bulanan Anda"
@@ -42,6 +46,7 @@ delete_account_title,"Delete Account","Hapus Akun"
 delete_data,"Delete :data","Hapus :data"
 deleted_data,":data Deleted",":data Dihapus"
 deleting,Deleting...,Menghapus...
+description,Description,Deskripsi
 detail,Detail,Detail
 detail_data,":data Detail","Detail :data"
 diff,Diff,Diff
@@ -51,9 +56,12 @@ email_address,"Email Address","Alamat Email"
 expense,Expense,Pengeluaran
 expenses,Expenses,Pengeluaran
 february,February,Februari
+final_amount,"Final Amount","Saldo Akhir"
 full_name,"Full Name","Nama Lengkap"
 income,Income,Penghasilan
 incomes,Incomes,Pemasukan
+initial_amount,"Initial Amount","Saldo Awal"
+is_primary,"Primary Balance","Saldo Utama"
 january,January,Januari
 july,July,Juli
 june,June,Juni
@@ -79,6 +87,7 @@ period_end,"Period End","Periode Akhir"
 period_start,"Period Start","Periode Awal"
 periods,Periods,Periode
 planned,Planned,Direncanakan
+primary,Primary,Utama
 profile,Profile,Profil
 profile_settings,"Profile Settings","Pengaturan Profil"
 profile_update_description,"Update your name and email address","Perbarui nama dan alamat email anda"
@@ -91,6 +100,7 @@ security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
 select_data,"Select :data","Pilih :data"
 september,September,September
+set_as_primary,"Set as Primary","Jadikan Utama"
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
