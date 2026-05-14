@@ -8,11 +8,11 @@ class TransactionQuery extends BaseQuery
 {
     protected string $model = Transaction::class;
 
-    protected array $allowedWith = ['budget', 'category'];
+    protected array $allowedWith = ['balance', 'budget', 'category'];
 
     protected array $allowedFilters = ['user', 'balance', 'budget', 'type', 'category', 'dateFrom', 'dateTo', 'month', 'year'];
 
-    protected array $searchable = ['category.name'];
+    protected array $searchable = ['description', 'category.name'];
 
     protected array $sortable = ['date'];
 

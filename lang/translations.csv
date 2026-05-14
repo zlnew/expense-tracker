@@ -5,6 +5,7 @@ active,Active,Aktif
 actual,Actual,Aktual
 add_data,"Add :data","Tambah :data"
 all_data,"All :data","Semua :data"
+amount,Amount,Jumlah
 appearance,Appearance,Tampilan
 appearance_settings,"Appearance Settings","Pengaturan Tampilan"
 appearance_settings_description,"Update your account's appearance settings","Perbarui pengaturan tampilan akun Anda"
@@ -37,6 +38,9 @@ create_data,"Create :data","Buat :data"
 created_data,":data Created",":data Dibuat"
 current_password,"Current Password","Kata Sandi Saat Ini"
 dashboard,Dashboard,Dasbor
+date,Date,Tanggal
+date_from,"Date From","Tanggal Mulai"
+date_to,"Date To","Tanggal Selesai"
 december,December,Desember
 delete,Delete,Hapus
 delete_account,"Delete Account","Hapus Akun"
@@ -57,10 +61,12 @@ email_address,"Email Address","Alamat Email"
 expense,Expense,Pengeluaran
 expenses,Expenses,Pengeluaran
 february,February,Februari
+filter_by_balance,"Filter by Balance","Filter berdasarkan Saldo"
+filter_by_category,"Filter by Category","Filter berdasarkan Kategori"
 final_amount,"Final Amount","Saldo Akhir"
 full_name,"Full Name","Nama Lengkap"
 income,Income,Penghasilan
-incomes,Incomes,Pemasukan
+incomes,Incomes,Penghasilan
 initial_amount,"Initial Amount","Saldo Awal"
 is_primary,"Primary Balance","Saldo Utama"
 january,January,Januari
@@ -97,6 +103,7 @@ save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
 saving,Saving...,Menyimpan...
 search_categories_placeholder,"Search by name...","Cari berdasarkan nama..."
+search_transactions_placeholder,"Search by category name or description...","Cari berdasarkan nama kategori atau deskripsi..."
 security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
 select_data,"Select :data","Pilih :data"
@@ -109,6 +116,11 @@ settings_title,Settings,Pengaturan
 status,Status,Status
 total,Total,Total
 transaction,Transaction,Transaksi
+transaction_bulk_create_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
+transaction_create_description,"Create a new transaction record.","Buat catatan transaksi baru."
+transaction_delete_description,"Are you sure you want to delete this transaction?","Apakah Anda yakin ingin menghapus transaksi ini?"
+transaction_list_description,"View and manage your transaction history.","Lihat dan kelola riwayat transaksi Anda."
+transaction_update_description,"Update the selected transaction details.","Perbarui detail transaksi yang dipilih."
 transactions,Transactions,Transaksi
 type,Type,Jenis
 types,Types,Jenis
