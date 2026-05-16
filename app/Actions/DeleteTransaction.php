@@ -19,7 +19,10 @@ class DeleteTransaction extends Action
 
             $this->transaction->delete();
 
-            SyncBudgetItemAmounts::run($budgetItemId);
+            if ($budgetItemId) {
+                SyncBudgetItemAmounts::run($budgetItemId);
+            }
+
             SyncBalance::run($balanceId);
         });
     }

@@ -80,9 +80,9 @@ export type Transaction = {
   id: number
   user_id: number
   balance_id: number
-  budget_id: number
-  budget_item_id: number
-  category_id: number
+  budget_id: number | null
+  budget_item_id: number | null
+  category_id: number | null
   type: string
   date: string
   amount: number

@@ -3,11 +3,13 @@ import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 import {
   ChevronDown,
+  ArrowRightLeft,
   ListPlus,
   Plus,
   Search,
   SquarePen,
   Trash2,
+  Filter,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
@@ -15,6 +17,7 @@ import AppPagination from '@/components/AppPagination.vue'
 import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
 import TransactionCreateDialog from '@/components/dialogs/TransactionCreateDialog.vue'
 import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialog.vue'
+import TransactionTransferDialog from '@/components/dialogs/TransactionTransferDialog.vue'
 import TransactionUpdateDialog from '@/components/dialogs/TransactionUpdateDialog.vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
@@ -75,6 +78,7 @@ setLayoutProps({
 const createDialogOpen = ref(false)
 const updateDialogOpen = ref(false)
 const bulkCreateDialogOpen = ref(false)
+const transferDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
 const targetData = ref<Transaction | null>(null)
 
@@ -83,6 +87,8 @@ const balanceFilter = ref(param.get('balance') || 'all')
 const categoryFilter = ref(param.get('category') || 'all')
 const dateFromFilter = ref(param.get('dateFrom') || '')
 const dateToFilter = ref(param.get('dateTo') || '')
+
+const showFilters = ref(false)
 
 const groupedCategories = computed(() => {
   const items = props.categories
@@ -159,6 +165,10 @@ const openDeleteDialog = (data: Transaction) => {
 const openBulkCreateDialog = () => {
   bulkCreateDialogOpen.value = true
 }
+
+const openTransferDialog = () => {
+  transferDialogOpen.value = true
+}
 </script>
 
 <template>
@@ -192,6 +202,10 @@ const openBulkCreateDialog = () => {
                 <ListPlus class="mr-2 size-4" />
                 {{ __('multiple_transactions') }}
               </DropdownMenuItem>
+              <DropdownMenuItem @click="openTransferDialog">
+                <ArrowRightLeft class="mr-2 size-4" />
+                {{ __('transfer') }}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -209,9 +223,21 @@ const openBulkCreateDialog = () => {
               class="w-full bg-background pl-8"
             />
           </div>
+          <Button
+            variant="outline"
+            size="icon"
+            class="shrink-0 lg:hidden"
+            @click="showFilters = !showFilters"
+            :class="{ 'bg-secondary': showFilters }"
+          >
+            <Filter class="size-4" />
+          </Button>
         </div>
 
-        <div class="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto">
+        <div
+          class="w-full gap-4 lg:flex lg:w-auto"
+          :class="showFilters ? 'grid grid-cols-1' : 'hidden'"
+        >
           <div class="space-y-2">
             <Label>{{ __('balance') }}</Label>
             <Select v-model="balanceFilter">
@@ -487,6 +513,10 @@ const openBulkCreateDialog = () => {
     :categories="categories"
     :primaryBalanceId="primaryBalanceId"
     :activeBudgetId="activeBudgetId"
+  />
+  <TransactionTransferDialog
+    v-model:open="transferDialogOpen"
+    :balances="balances"
   />
   <TransactionDeleteDialog
     v-model:open="deleteDialogOpen"

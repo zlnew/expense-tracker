@@ -16,9 +16,9 @@ class TransactionData extends Data
         public ?int $id,
         public ?int $user_id,
         public int $balance_id,
-        public int $budget_id,
-        public int $budget_item_id,
-        public int $category_id,
+        public ?int $budget_id,
+        public ?int $budget_item_id,
+        public ?int $category_id,
         public CategoryType $type,
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]

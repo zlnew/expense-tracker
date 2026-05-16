@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $user_id
  * @property int $balance_id
- * @property int $budget_id
- * @property int $budget_item_id
- * @property int $category_id
+ * @property int|null $budget_id
+ * @property int|null $budget_item_id
+ * @property int|null $category_id
  * @property CategoryType $type
  * @property CarbonImmutable $date
  * @property int $amount
@@ -22,9 +22,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Balance $balance
- * @property-read Budget $budget
- * @property-read BudgetItem $budgetItem
- * @property-read Category $category
+ * @property-read Budget|null $budget
+ * @property-read BudgetItem|null $budgetItem
+ * @property-read Category|null $category
  * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newModelQuery()

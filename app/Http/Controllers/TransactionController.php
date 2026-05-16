@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Actions\DeleteTransaction;
 use App\Actions\SaveTransaction;
 use App\Actions\StoreTransactions;
+use App\Actions\TransferBetweenAccounts;
 use App\DTO\BalanceData;
 use App\DTO\BudgetData;
 use App\DTO\CategoryData;
 use App\DTO\TransactionData;
 use App\Http\Requests\TransactionSaveRequest;
 use App\Http\Requests\TransactionsSaveRequest;
+use App\Http\Requests\TransferBetweenAccountsRequest;
 use App\Models\Balance;
 use App\Models\Budget;
 use App\Models\Category;
@@ -70,6 +72,13 @@ class TransactionController extends Controller
     public function bulkStore(TransactionsSaveRequest $request): RedirectResponse
     {
         StoreTransactions::run($request->getData());
+
+        return back()->with('success', __('app.saved_data', ['data' => __('app.transactions')]));
+    }
+
+    public function transferBetweenAccounts(TransferBetweenAccountsRequest $request): RedirectResponse
+    {
+        TransferBetweenAccounts::run($request->getData());
 
         return back()->with('success', __('app.saved_data', ['data' => __('app.transactions')]));
     }

@@ -29,7 +29,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property CarbonImmutable|null $updated_at
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
- * @property string|null $two_factor_confirmed_at
+ * @property CarbonImmutable|null $two_factor_confirmed_at
  * @property-read Budget|null $activeBudget
  * @property-read Collection<int, Balance> $balances
  * @property-read int|null $balances_count

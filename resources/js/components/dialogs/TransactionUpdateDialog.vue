@@ -46,9 +46,9 @@ const { formatDate } = useDate()
 
 const form = useForm({
   balance_id: 0,
-  budget_id: 0,
-  budget_item_id: 0,
-  category_id: 0,
+  budget_id: undefined as number | undefined,
+  budget_item_id: undefined as number | undefined,
+  category_id: undefined as number | undefined,
   type: '',
   date: '',
   amount: 0,
@@ -91,9 +91,19 @@ const groupedCategories = computed(() => {
 watch([() => props.transaction, () => props.open], ([val, isOpen]) => {
   if (isOpen && val) {
     form.balance_id = val.balance_id
-    form.budget_id = val.budget_id
-    form.budget_item_id = val.budget_item_id
-    form.category_id = val.category_id
+
+    if (val.budget_id) {
+      form.budget_id = val.budget_id
+    }
+
+    if (val.budget_item_id) {
+      form.budget_item_id = val.budget_item_id
+    }
+
+    if (val.category_id) {
+      form.category_id = val.category_id
+    }
+
     form.type = val.type
     form.date = val.date
     form.amount = val.amount
@@ -168,7 +178,7 @@ const submit = () => {
           </Select>
         </div>
 
-        <div class="grid gap-2">
+        <div v-if="form.budget_id" class="grid gap-2">
           <Label>
             {{ __('budget') }}
             <span class="text-destructive">*</span>
@@ -188,7 +198,7 @@ const submit = () => {
           </Select>
         </div>
 
-        <div class="grid gap-2">
+        <div v-if="form.category_id" class="grid gap-2">
           <Label>
             {{ __('category') }}
             <span class="text-destructive">*</span>

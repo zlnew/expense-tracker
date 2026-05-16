@@ -34,7 +34,7 @@ class SaveTransaction extends Action
                 $this->transaction->balance()->associate($this->data->balance_id);
             }
 
-            if (! $this->transaction->budget_id && $this->data->budget_id) {
+            if ($this->data->budget_id) {
                 $this->transaction->budget()->associate($this->data->budget_id);
             }
 
@@ -48,7 +48,10 @@ class SaveTransaction extends Action
 
             $this->transaction->save();
 
-            SyncBudgetItemAmounts::run($this->transaction->budget_item_id);
+            if ($this->transaction->budget_item_id) {
+                SyncBudgetItemAmounts::run($this->transaction->budget_item_id);
+            }
+
             SyncBalance::run($this->transaction->balance_id);
         });
     }

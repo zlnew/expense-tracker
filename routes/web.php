@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::post('transactions/bulk-store', [TransactionController::class, 'bulkStore'])->name('transactions.bulk-store');
+    Route::post('transactions/transfer-between-accounts', [TransactionController::class, 'transferBetweenAccounts'])->name('transactions.transfer-between-accounts');
 });
 
 require __DIR__.'/settings.php';

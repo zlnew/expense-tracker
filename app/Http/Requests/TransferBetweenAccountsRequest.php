@@ -2,17 +2,15 @@
 
 namespace App\Http\Requests;
 
-use App\DTO\TransactionData;
-use App\Enums\CategoryType;
+use App\DTO\TransferBetweenAccountsData;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Enum;
 use Spatie\LaravelData\WithData;
 
-class TransactionSaveRequest extends FormRequest
+class TransferBetweenAccountsRequest extends FormRequest
 {
     /**
-     * @use WithData<TransactionData>
+     * @use WithData<TransferBetweenAccountsData>
      */
     use WithData;
 
@@ -24,11 +22,8 @@ class TransactionSaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'balance_id' => ['required', 'exists:balances,id'],
-            'budget_id' => ['nullable', 'exists:budgets,id'],
-            'budget_item_id' => ['nullable', 'exists:budget_items,id'],
-            'category_id' => ['nullable', 'exists:categories,id'],
-            'type' => ['required', new Enum(CategoryType::class)],
+            'from_account_id' => ['required', 'exists:balances,id'],
+            'to_account_id' => ['required', 'exists:balances,id'],
             'date' => ['required', 'date'],
             'amount' => ['required', 'integer'],
             'description' => ['nullable', 'string'],
@@ -37,6 +32,6 @@ class TransactionSaveRequest extends FormRequest
 
     protected function dataClass(): string
     {
-        return TransactionData::class;
+        return TransferBetweenAccountsData::class;
     }
 }
