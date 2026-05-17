@@ -291,6 +291,17 @@ const setActive = () => {
             {{ budget.notes ?? '-' }}
           </div>
         </div>
+
+        <div class="flex flex-col gap-1">
+          <div class="text-sm font-semibold">{{ __('last_updated_at') }}</div>
+          <div>
+            {{
+              budget.updated_at
+                ? formatDate(budget.updated_at, 'DD MMM YYYY HH:mm')
+                : '-'
+            }}
+          </div>
+        </div>
       </div>
 
       <Separator />

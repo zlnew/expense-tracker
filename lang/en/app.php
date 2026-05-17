@@ -76,6 +76,7 @@ return [
     'january' => 'January',
     'july' => 'July',
     'june' => 'June',
+    'last_updated_at' => 'Last Updated At',
     'list' => 'List',
     'log_out' => 'Log Out',
     'march' => 'March',

@@ -28,7 +28,7 @@ abstract class BaseQuery
 
     protected array $sortable = ['created_at'];
 
-    protected array $defaultSorts = ['created_at'];
+    protected array $defaultSorts = ['-created_at'];
 
     protected int $defaultLimit = 10;
 

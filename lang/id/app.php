@@ -76,6 +76,7 @@ return [
     'january' => 'Januari',
     'july' => 'Juli',
     'june' => 'Juni',
+    'last_updated_at' => 'Terakhir Diperbarui',
     'list' => 'List',
     'log_out' => 'Keluar',
     'march' => 'Maret',

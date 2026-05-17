@@ -12,5 +12,5 @@ class BalanceQuery extends BaseQuery
 
     protected array $sortable = ['name', 'is_primary'];
 
-    protected array $defaultSorts = ['-is_primary', '-name'];
+    protected array $defaultSorts = ['-is_primary', 'name'];
 }

@@ -49,6 +49,7 @@ export type Budget = {
   period_end: string
   is_active: boolean
   notes: string | null
+  updated_at: string | null
   user: User | null
   items: BudgetItem[] | null
   expenses: BudgetItem[] | null

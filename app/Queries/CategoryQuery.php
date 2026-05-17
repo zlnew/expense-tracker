@@ -12,9 +12,9 @@ class CategoryQuery extends BaseQuery
 
     protected array $searchable = ['name'];
 
-    protected array $sortable = ['name'];
+    protected array $sortable = ['type', 'name'];
 
-    protected array $defaultSorts = ['name'];
+    protected array $defaultSorts = ['type', 'name'];
 
     public function type(mixed $value): static
     {
