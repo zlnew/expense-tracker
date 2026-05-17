@@ -10,9 +10,7 @@ class BalanceQuery extends BaseQuery
 
     protected array $searchable = ['name'];
 
-    protected array $sortable = ['name'];
+    protected array $sortable = ['name', 'is_primary'];
 
-    protected string $defaultSortColumn = 'name';
-
-    protected string $defaultSortOrder = 'desc';
+    protected array $defaultSorts = ['-is_primary', '-name'];
 }

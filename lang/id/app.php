@@ -106,6 +106,7 @@ return [
     'profile_update_title' => 'Informasi Profil',
     'save' => 'Simpan',
     'save_password' => 'Simpan Kata Sandi',
+    'saved_data' => ':data Disimpan',
     'saving' => 'Menyimpan...',
     'search_categories_placeholder' => 'Cari berdasarkan nama...',
     'search_transactions_placeholder' => 'Cari...',

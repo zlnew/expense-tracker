@@ -104,6 +104,7 @@ profile_update_description,"Update your name and email address","Perbarui nama d
 profile_update_title,"Profile Information","Informasi Profil"
 save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
+saved_data,":data Saved",":data Disimpan"
 saving,Saving...,Menyimpan...
 search_categories_placeholder,"Search by name...","Cari berdasarkan nama..."
 search_transactions_placeholder,Search...,Cari...

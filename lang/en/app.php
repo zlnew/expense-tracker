@@ -106,6 +106,7 @@ return [
     'profile_update_title' => 'Profile Information',
     'save' => 'Save',
     'save_password' => 'Save Password',
+    'saved_data' => ':data Saved',
     'saving' => 'Saving...',
     'search_categories_placeholder' => 'Search by name...',
     'search_transactions_placeholder' => 'Search...',

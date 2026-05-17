@@ -14,11 +14,9 @@ class TransactionQuery extends BaseQuery
 
     protected array $searchable = ['description', 'category.name'];
 
-    protected array $sortable = ['date'];
+    protected array $sortable = ['date', 'created_at'];
 
-    protected string $defaultSortColumn = 'date';
-
-    protected string $defaultSortOrder = 'desc';
+    protected array $defaultSorts = ['-date', '-created_at'];
 
     public function user(mixed $value): static
     {

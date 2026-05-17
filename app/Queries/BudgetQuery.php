@@ -8,9 +8,7 @@ class BudgetQuery extends BaseQuery
 {
     protected string $model = Budget::class;
 
-    protected array $sortable = ['period_start', 'period_end'];
+    protected array $sortable = ['period_start', 'period_end', 'is_active'];
 
-    protected string $defaultSortColumn = 'period_start';
-
-    protected string $defaultSortOrder = 'desc';
+    protected array $defaultSorts = ['-is_active', '-period_start'];
 }

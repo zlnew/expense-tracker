@@ -14,9 +14,7 @@ class CategoryQuery extends BaseQuery
 
     protected array $sortable = ['name'];
 
-    protected string $defaultSortColumn = 'name';
-
-    protected string $defaultSortOrder = 'asc';
+    protected array $defaultSorts = ['name'];
 
     public function type(mixed $value): static
     {

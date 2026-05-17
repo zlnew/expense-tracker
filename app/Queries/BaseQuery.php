@@ -28,9 +28,7 @@ abstract class BaseQuery
 
     protected array $sortable = ['created_at'];
 
-    protected string $defaultSortColumn = 'created_at';
-
-    protected string $defaultSortOrder = 'desc';
+    protected array $defaultSorts = ['created_at'];
 
     protected int $defaultLimit = 10;
 
@@ -148,16 +146,23 @@ abstract class BaseQuery
 
     protected function applySort(): void
     {
-        $column = $this->filters['sort_column'] ?? $this->defaultSortColumn;
-        $order = strtolower($this->filters['sort_order'] ?? $this->defaultSortOrder);
+        $sorts = $this->filters['sort'] ?? $this->defaultSorts;
 
-        if (! in_array($column, $this->sortable)) {
-            $column = $this->defaultSortColumn;
+        if (is_string($sorts)) {
+            $sorts = explode(',', $sorts);
         }
 
-        $order = $order === 'asc' ? 'asc' : 'desc';
+        foreach ($sorts as $sort) {
+            $order = str_starts_with($sort, '-') ? 'desc' : 'asc';
 
-        $this->query->orderBy($column, $order);
+            $column = ltrim($sort, '-');
+
+            if (! in_array($column, $this->sortable)) {
+                continue;
+            }
+
+            $this->query->orderBy($column, $order);
+        }
     }
 
     public function get(): Collection
