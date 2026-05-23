@@ -51,7 +51,7 @@ class SaveTransaction extends Action
 
             SyncBalance::run($this->transaction->balance_id);
 
-            if ($oldBalanceId !== $this->transaction->balance_id) {
+            if ($oldBalanceId && $oldBalanceId !== $this->transaction->balance_id) {
                 SyncBalance::run($oldBalanceId);
             }
         });
