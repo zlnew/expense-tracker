@@ -44,8 +44,6 @@ class SaveBudget extends Action
                 $budgetItem->category()->associate($item->category_id);
 
                 $budgetItem->save();
-
-                SyncBudgetItemAmounts::run($budgetItem);
             }
 
             return $this->budget;

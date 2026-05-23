@@ -30,7 +30,7 @@ abstract class BaseQuery
 
     protected array $defaultSorts = ['-created_at'];
 
-    protected int $defaultLimit = 10;
+    protected int $defaultLimit = 1000;
 
     protected int $defaultPerPage = 10;
 

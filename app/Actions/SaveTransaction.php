@@ -18,6 +18,7 @@ class SaveTransaction extends Action
     {
         DB::transaction(function () {
             $userId = Auth::id();
+            $oldBalanceId = $this->transaction->balance_id;
 
             $this->transaction->fill([
                 'type' => $this->data->type,
@@ -48,11 +49,11 @@ class SaveTransaction extends Action
 
             $this->transaction->save();
 
-            if ($this->transaction->budget_item_id) {
-                SyncBudgetItemAmounts::run($this->transaction->budget_item_id);
-            }
-
             SyncBalance::run($this->transaction->balance_id);
+
+            if ($oldBalanceId !== $this->transaction->balance_id) {
+                SyncBalance::run($oldBalanceId);
+            }
         });
     }
 }

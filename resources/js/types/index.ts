@@ -62,8 +62,8 @@ export type BudgetItem = {
   category_id: number
   type: string
   planned_amount: number
-  actual_amount: number
-  diff_amount: number
+  actual_amount?: number
+  diff_amount?: number
   budget: Budget | null
   category: Category | null
   transactions: Transaction[] | null

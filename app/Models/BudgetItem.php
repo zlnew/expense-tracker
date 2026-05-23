@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $category_id
  * @property CategoryType $type
  * @property int $planned_amount
- * @property int $actual_amount
- * @property int $diff_amount
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Budget $budget
@@ -28,11 +26,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem whereActualAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem whereBudgetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem whereCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem whereDiffAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem wherePlannedAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BudgetItem whereType($value)
@@ -48,8 +44,6 @@ class BudgetItem extends Model
         return [
             'type' => CategoryType::class,
             'planned_amount' => 'integer',
-            'actual_amount' => 'integer',
-            'diff_amount' => 'integer',
         ];
     }
 

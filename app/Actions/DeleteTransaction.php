@@ -15,13 +15,8 @@ class DeleteTransaction extends Action
     {
         DB::transaction(function () {
             $balanceId = $this->transaction->balance_id;
-            $budgetItemId = $this->transaction->budget_item_id;
 
             $this->transaction->delete();
-
-            if ($budgetItemId) {
-                SyncBudgetItemAmounts::run($budgetItemId);
-            }
 
             SyncBalance::run($balanceId);
         });
