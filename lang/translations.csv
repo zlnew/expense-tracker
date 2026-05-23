@@ -2,6 +2,8 @@ key,en,id
 action_warning,"Please proceed with caution, this cannot be undone","Harap berhati-hati, tindakan ini tidak dapat dibatalkan."
 actions,Actions,Aksi
 active,Active,Aktif
+active_expense,"Active Expense","Pengeluaran Aktif"
+active_income,"Active Income","Pemasukan Aktif"
 actual,Actual,Aktual
 add_data,"Add :data","Tambah :data"
 all_data,"All :data","Semua :data"
@@ -15,6 +17,7 @@ august,August,Agustus
 balance,Balance,Saldo
 balance_create_description,"Create a new balance or account to track your money","Buat saldo atau akun baru untuk melacak uang Anda"
 balance_delete_description,"Are you sure you want to delete this balance? All transactions related to this balance will also be deleted.","Apakah Anda yakin ingin menghapus saldo ini? Semua transaksi yang terkait dengan saldo ini juga akan dihapus."
+balance_list,"Balance List","List Balance"
 balance_list_description,"Manage your balances and accounts","Kelola saldo dan akun Anda"
 balance_update_description,"Update balance or account information","Perbarui informasi saldo atau akun"
 balances,Balances,Saldo
@@ -22,7 +25,10 @@ budget,Budget,Anggaran
 budget_create_description,"Create a new budget to manage your monthly finances","Buat anggaran baru untuk mengelola keuangan bulanan Anda"
 budget_delete_description,"Are you sure you want to delete this budget permanently?","Apakah Anda yakin ingin menghapus anggaran ini secara permanen?"
 budget_detail_description,"View detailed information about monthly expenses and incomes","Lihat informasi detail tentang pengeluaran dan pemasukan bulanan"
+budget_list,"Budget List","List Budget"
 budget_list_description,"Manage and monitor your budgets","Kelola dan pantau anggaran Anda"
+budget_progress,"Budget Progress","Progress Anggaran Pengeluaran"
+budget_progress_description,"Track how much of your budget has been used and how much remains.","Pantau seberapa banyak anggaran yang sudah digunakan dan yang masih tersisa."
 budget_update_description,"Update and adjust your monthly budget plans","Perbarui dan sesuaikan perencanaan anggaran bulanan Anda"
 budgets,Budgets,Anggaran
 cancel,Cancel,Batal
@@ -36,8 +42,11 @@ confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
 create,Create,Buat
 create_data,"Create :data","Buat :data"
 created_data,":data Created",":data Dibuat"
+current_month_expenses,"Current Month Expenses","Pengeluaran Bulan Ini"
+current_month_incomes,"Current Month Incomes","Pendapatan Bulan Ini"
 current_password,"Current Password","Kata Sandi Saat Ini"
 dashboard,Dashboard,Dasbor
+dashboard_description,"Track your financial activity, monitor spending habits, and stay on top of your budgets in one place.","Pantau aktivitas keuangan, kebiasaan pengeluaran, dan progres anggaran Anda dalam satu dashboard."
 date,Date,Tanggal
 date_from,"Date From","Tanggal Mulai"
 date_to,"Date To","Tanggal Selesai"
@@ -59,6 +68,8 @@ edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
 expense,Expense,Pengeluaran
+expense_breakdown,"Expense Breakdown","Proporsi Pengeluaran"
+expense_breakdown_description,"Analyze which categories contribute the most to your expenses.","Analisis kategori yang paling banyak menyumbang pengeluaran Anda."
 expenses,Expenses,Pengeluaran
 february,February,Februari
 filter_by_balance,"Filter by Balance","Filter berdasarkan Saldo"
@@ -82,6 +93,8 @@ may,May,Mei
 month,Month,Bulan
 monthly_expenses,"Monthly Expenses","Pengeluaran Bulanan"
 monthly_incomes,"Monthly Incomes","Pendapatan Bulanan"
+monthly_spending_trend,"Monthly Spending Trend","Tren Pengeluaran & Pemasukan Bulanan"
+monthly_spending_trend_description,"See how your income and expenses change over time each month.","Lihat perubahan pemasukan dan pengeluaran Anda setiap bulan."
 multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
@@ -103,6 +116,9 @@ profile,Profile,Profil
 profile_settings,"Profile Settings","Pengaturan Profil"
 profile_update_description,"Update your name and email address","Perbarui nama dan alamat email anda"
 profile_update_title,"Profile Information","Informasi Profil"
+recent_transactions,"Recent Transactions","Transaksi Terakhir"
+recent_transactions_description,"Quickly review your latest financial activities and transactions.","Lihat aktivitas dan transaksi keuangan terbaru Anda dengan cepat."
+remaining_budget,"Remaining Budget","Sisa Anggaran"
 save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
 saved_data,":data Saved",":data Disimpan"
@@ -123,6 +139,7 @@ status,Status,Status
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
 total,Total,Total
+total_balance,"Total Balance","Total Saldo"
 total_expense,"Total Expense","Total Pengeluaran"
 total_income,"Total Income","Total Pemasukan"
 total_items,"Total Items","Total Item"

@@ -15,6 +15,8 @@ class BudgetItemData extends Data
         public int $category_id,
         public CategoryType $type,
         public int $planned_amount,
+        public int $actual_amount = 0,
+        public int $diff_amount = 0,
         public ?BudgetData $budget = null,
         public ?CategoryData $category = null,
         #[DataCollectionOf(TransactionData::class)]

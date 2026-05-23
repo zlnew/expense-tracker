@@ -94,3 +94,26 @@ export type Transaction = {
   budget_item: BudgetItem | null
   category: Category | null
 }
+
+export type SummaryCards = {
+  total_balance: number
+  current_month_expenses: number
+  current_month_incomes: number
+  budget_remaining: number
+}
+
+export type BudgetProgress = BudgetItem[]
+
+export type ExpenseBreakdown = {
+  category: string
+  amount: number
+  percentage: number
+}
+
+export type MonthlySpendingTrend = {
+  month: number
+  income: number
+  expense: number
+}
+
+export type RecentTransactions = Transaction[]
