@@ -10,6 +10,9 @@ import {
   SquarePen,
   Trash2,
   Filter,
+  WalletIcon,
+  ListTodoIcon,
+  MinusIcon,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
@@ -28,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -239,9 +241,9 @@ const openTransferDialog = () => {
           :class="showFilters ? 'grid grid-cols-1' : 'hidden'"
         >
           <div class="space-y-2">
-            <Label>{{ __('balance') }}</Label>
             <Select v-model="balanceFilter">
               <SelectTrigger>
+                <WalletIcon />
                 <SelectValue :placeholder="__('balance')" />
               </SelectTrigger>
               <SelectContent>
@@ -260,9 +262,9 @@ const openTransferDialog = () => {
           </div>
 
           <div class="space-y-2">
-            <Label>{{ __('category') }}</Label>
             <Select v-model="categoryFilter">
               <SelectTrigger>
+                <ListTodoIcon />
                 <span
                   v-if="currentCategory?.type"
                   class="text-muted-foreground"
@@ -308,13 +310,9 @@ const openTransferDialog = () => {
             </Select>
           </div>
 
-          <div class="space-y-2">
-            <Label>{{ __('date_from') }}</Label>
+          <div class="flex items-center gap-2">
             <Input type="date" v-model="dateFromFilter" />
-          </div>
-
-          <div class="space-y-2">
-            <Label>{{ __('date_to') }}</Label>
+            <MinusIcon />
             <Input type="date" v-model="dateToFilter" />
           </div>
         </div>
