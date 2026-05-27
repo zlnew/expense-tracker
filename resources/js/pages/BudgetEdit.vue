@@ -36,10 +36,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { index as budgetIndex, update as budgetUpdate } from '@/routes/budgets'
-import type { Budget, BudgetItem } from '@/types'
+import type { Budget, BudgetItem, Category } from '@/types'
 
 const props = defineProps<{
   budget: Budget
+  categories: Category[]
 }>()
 
 const { __ } = useLang()
@@ -67,6 +68,14 @@ const form = useForm({
 const expenseBudgetItems = ref<Partial<BudgetItem>[]>([])
 const incomeBudgetItems = ref<Partial<BudgetItem>[]>([])
 
+const expenseCategories = computed(() =>
+  props.categories.filter((c) => c.type === 'expense'),
+)
+
+const incomeCategories = computed(() =>
+  props.categories.filter((c) => c.type === 'income'),
+)
+
 const expenseTotal = computed(() =>
   expenseBudgetItems.value.reduce(
     (acc, curr) => acc + (curr.planned_amount ?? 0),
@@ -90,8 +99,41 @@ onMounted(() => {
 })
 
 const initBudgetItems = () => {
-  expenseBudgetItems.value = props.budget.expenses ?? []
-  incomeBudgetItems.value = props.budget.incomes ?? []
+  expenseCategories.value.forEach((ec) => {
+    const exist = props.budget.expenses?.find((e) => e.category_id === ec.id)
+
+    if (exist) {
+      expenseBudgetItems.value.push(exist)
+
+      return
+    }
+
+    expenseBudgetItems.value.push({
+      budget_id: props.budget.id,
+      category_id: ec.id,
+      type: ec.type,
+      planned_amount: 0,
+      category: ec,
+    })
+  })
+
+  incomeCategories.value.forEach((ic) => {
+    const exist = props.budget.incomes?.find((e) => e.category_id === ic.id)
+
+    if (exist) {
+      incomeBudgetItems.value.push(exist)
+
+      return
+    }
+
+    incomeBudgetItems.value.push({
+      budget_id: props.budget.id,
+      category_id: ic.id,
+      type: ic.type,
+      planned_amount: 0,
+      category: ic,
+    })
+  })
 }
 
 const submit = () => {

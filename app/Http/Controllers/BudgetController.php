@@ -30,7 +30,10 @@ class BudgetController extends Controller
 
     public function create(): Response
     {
-        $categories = Category::all();
+        $categories = Category::query()
+            ->orderBy('type', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
 
         return Inertia::render('BudgetCreate', [
             'categories' => CategoryData::collect($categories),
@@ -44,8 +47,14 @@ class BudgetController extends Controller
             'incomes.category',
         ]);
 
+        $categories = Category::query()
+            ->orderBy('type', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
+
         return Inertia::render('BudgetEdit', [
             'budget' => BudgetData::from($budget),
+            'categories' => CategoryData::collect($categories),
         ]);
     }
 
@@ -55,6 +64,16 @@ class BudgetController extends Controller
             'expenses.category',
             'incomes.category',
         ]);
+
+        $budget->setRelation(
+            'expenses',
+            $budget->expenses->sortBy(fn ($e) => $e->category?->name)->values()
+        );
+
+        $budget->setRelation(
+            'incomes',
+            $budget->incomes->sortBy(fn ($i) => $i->category?->name)->values()
+        );
 
         return Inertia::render('BudgetDetail', [
             'budget' => BudgetData::from($budget),

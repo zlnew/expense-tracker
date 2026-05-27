@@ -50,20 +50,22 @@ class GetBudgetProgress extends Action
             ->groupBy('budget_item_id')
             ->pluck('total_amount', 'budget_item_id');
 
-        $progress = $budgetItems->map(function ($bi) use ($expenses) {
-            $actualAmount = (int) ($expenses[$bi->id] ?? 0);
+        $progress = $budgetItems
+            ->sortBy(fn ($bi) => $bi->category?->name)
+            ->map(function ($bi) use ($expenses) {
+                $actualAmount = (int) ($expenses[$bi->id] ?? 0);
 
-            return BudgetItemData::from([
-                'id' => $bi->id,
-                'budget_id' => $bi->budget_id,
-                'category_id' => $bi->category_id,
-                'type' => $bi->type,
-                'planned_amount' => $bi->planned_amount,
-                'actual_amount' => $actualAmount,
-                'diff_amount' => $bi->planned_amount - $actualAmount,
-                'category' => $bi->category,
-            ]);
-        });
+                return BudgetItemData::from([
+                    'id' => $bi->id,
+                    'budget_id' => $bi->budget_id,
+                    'category_id' => $bi->category_id,
+                    'type' => $bi->type,
+                    'planned_amount' => $bi->planned_amount,
+                    'actual_amount' => $actualAmount,
+                    'diff_amount' => $bi->planned_amount - $actualAmount,
+                    'category' => $bi->category,
+                ]);
+            })->values();
 
         return BudgetItemData::collect($progress, DataCollection::class);
     }

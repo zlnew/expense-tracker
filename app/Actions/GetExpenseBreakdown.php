@@ -55,6 +55,7 @@ class GetExpenseBreakdown extends Action
         }
 
         return $budgetItems
+            ->sortBy(fn ($bi) => $bi->category?->name)
             ->map(function ($budgetItem) use ($expenses, $totalExpense) {
                 $amount = (int) ($expenses[$budgetItem->id] ?? 0);
                 $percentage = round(($amount / $totalExpense) * 100, 2);
