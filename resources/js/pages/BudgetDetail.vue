@@ -55,12 +55,18 @@ setLayoutProps({
   ],
 })
 
-const currentDate = new Date()
+const now = new Date()
+
+const currentCycleDate = new Date(now)
+
+if (now.getDate() > props.budget.cutoff_day) {
+  currentCycleDate.setMonth(currentCycleDate.getMonth() + 1)
+}
 
 const transactionApi = useHttp({
   budget: props.budget.id,
-  month: currentDate.getMonth() + 1,
-  year: currentDate.getFullYear().toString(),
+  month: currentCycleDate.getMonth() + 1,
+  year: currentCycleDate.getFullYear().toString(),
 })
 
 const transactions = ref<Transaction[]>([])
@@ -81,62 +87,24 @@ const months = computed(() => {
     'december',
   ]
 
-  const items = Array.from(
-    new Map(
-      transactions.value.map((transaction) => {
-        const date = new Date(transaction.date)
-        const month = date.getMonth() + 1
-
-        return [
-          month,
-          {
-            label: __(monthNames[month - 1]),
-            value: month,
-          },
-        ]
-      }),
-    ).values(),
-  )
-
-  const currentMonth = currentDate.getMonth() + 1
-
-  if (!items.some((item) => item.value === currentMonth)) {
-    items.unshift({
-      label: __(monthNames[currentMonth - 1]),
-      value: currentMonth,
-    })
-  }
-
-  return items
+  return monthNames.map((month, index) => ({
+    label: __(month),
+    value: index + 1,
+  }))
 })
 
 const years = computed(() => {
-  const items = Array.from(
-    new Map(
-      transactions.value.map((transaction) => {
-        const year = new Date(transaction.date).getFullYear().toString()
+  const startYear = new Date(props.budget.period_start).getFullYear()
+  const endYear = new Date(props.budget.period_end).getFullYear()
 
-        return [
-          year,
-          {
-            label: year,
-            value: year,
-          },
-        ]
-      }),
-    ).values(),
-  )
+  return Array.from({ length: endYear - startYear + 1 }, (_, index) => {
+    const year = (startYear + index).toString()
 
-  const currentYear = currentDate.getFullYear().toString()
-
-  if (!items.some((item) => item.value === currentYear)) {
-    items.unshift({
-      label: currentYear,
-      value: currentYear,
-    })
-  }
-
-  return items
+    return {
+      label: year,
+      value: year,
+    }
+  })
 })
 
 const expenses = computed(() =>
@@ -283,6 +251,11 @@ const setActive = () => {
             {{ formatDate(budget.period_start, 'DD MMM YYYY') }} -
             {{ formatDate(budget.period_end, 'DD MMM YYYY') }}
           </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <div class="text-sm font-semibold">{{ __('cutoff_day') }}</div>
+          <div class="text-lg">{{ budget.cutoff_day }}</div>
         </div>
 
         <div class="flex flex-col gap-1">

@@ -26,6 +26,7 @@ class BudgetSaveRequest extends FormRequest
         return [
             'period_start' => ['required', 'date'],
             'period_end' => ['required', 'date'],
+            'cutoff_day' => ['required', 'integer'],
             'notes' => ['nullable', 'string'],
             'items.*.category_id' => ['required', 'exists:categories,id'],
             'items.*.type' => ['required', new Enum(CategoryType::class)],

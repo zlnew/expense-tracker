@@ -21,6 +21,7 @@ class SaveBudget extends Action
             $this->budget->fill([
                 'period_start' => $this->data->period_start,
                 'period_end' => $this->data->period_end,
+                'cutoff_day' => $this->data->cutoff_day,
                 'notes' => $this->data->notes,
             ]);
 

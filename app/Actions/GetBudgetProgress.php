@@ -14,39 +14,40 @@ class GetBudgetProgress extends Action
 {
     public readonly User $user;
 
+    private readonly ?Budget $activeBudget;
+
     public function __construct(User|int $user)
     {
         $this->user = $user instanceof User
             ? $user
             : User::query()->findOrFail($user);
+
+        $this->activeBudget = Budget::query()
+            ->where('user_id', $this->user->id)
+            ->where('is_active', true)
+            ->first();
     }
 
     public function handle(): DataCollection
     {
-        $now = now();
-
-        $activeBudget = Budget::query()
-            ->where('user_id', $this->user->id)
-            ->where('is_active', true)
-            ->first();
-
-        if (! $activeBudget) {
+        if (! $this->activeBudget) {
             return new DataCollection(BudgetItemData::class, []);
         }
 
+        [$start, $end] = $this->getCurrentCycleRange();
+
         $budgetItems = BudgetItem::query()
             ->with('category')
-            ->where('budget_id', $activeBudget->id)
+            ->where('budget_id', $this->activeBudget->id)
             ->where('type', CategoryType::EXPENSE)
             ->get();
 
         $expenses = Transaction::query()
             ->selectRaw('budget_item_id, SUM(amount) as total_amount')
             ->where('user_id', $this->user->id)
-            ->where('budget_id', $activeBudget->id)
+            ->where('budget_id', $this->activeBudget->id)
             ->where('type', CategoryType::EXPENSE)
-            ->whereYear('date', $now->year)
-            ->whereMonth('date', $now->month)
+            ->whereBetween('date', [$start, $end])
             ->groupBy('budget_item_id')
             ->pluck('total_amount', 'budget_item_id');
 
@@ -68,5 +69,35 @@ class GetBudgetProgress extends Action
             })->values();
 
         return BudgetItemData::collect($progress, DataCollection::class);
+    }
+
+    private function getCurrentCycleRange(): array
+    {
+        $now = now()->toImmutable();
+
+        $cutoffDay = $this->activeBudget->cutoff_day;
+
+        if ($now->day > $cutoffDay) {
+            $start = $now
+                ->addMonth()
+                ->startOfMonth()
+                ->subMonth()
+                ->addDays($cutoffDay);
+
+            $end = $start
+                ->addMonth()
+                ->subDay();
+        } else {
+            $start = $now
+                ->startOfMonth()
+                ->subMonth()
+                ->addDays($cutoffDay);
+
+            $end = $start
+                ->addMonth()
+                ->subDay();
+        }
+
+        return [$start->startOfDay(), $end->endOfDay()];
     }
 }

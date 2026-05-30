@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,9 +26,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read Budget|null $budget
  * @property-read BudgetItem|null $budgetItem
  * @property-read Category|null $category
+ * @property-read int $cycle_month
+ * @property-read int $cycle_year
  * @property-read User $user
- *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newModelQuery()
+
+   @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereAmount($value)
@@ -55,6 +58,33 @@ class Transaction extends Model
             'date' => 'date',
             'amount' => 'integer',
         ];
+    }
+
+    protected function cycleMonth(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->getCycleDate()->month,
+        );
+    }
+
+    protected function cycleYear(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->getCycleDate()->year,
+        );
+    }
+
+    private function getCycleDate(): CarbonImmutable
+    {
+        $date = CarbonImmutable::parse($this->date);
+
+        $cutoffDay = $this->budget?->cutoff_day ?? 0;
+
+        if ($date->day > $cutoffDay) {
+            return $date->addMonth();
+        }
+
+        return $date;
     }
 
     public function user(): BelongsTo

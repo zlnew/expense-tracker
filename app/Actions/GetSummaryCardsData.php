@@ -55,14 +55,13 @@ class GetSummaryCardsData extends Action
             return 0;
         }
 
-        $now = now();
+        [$start, $end] = $this->getCurrentCycleRange();
 
         return (int) Transaction::query()
             ->where('user_id', $this->user->id)
             ->where('budget_id', $this->activeBudget->id)
             ->where('type', CategoryType::EXPENSE)
-            ->whereYear('date', $now->year)
-            ->whereMonth('date', $now->month)
+            ->whereBetween('date', [$start, $end])
             ->sum('amount');
     }
 
@@ -72,14 +71,13 @@ class GetSummaryCardsData extends Action
             return 0;
         }
 
-        $now = now();
+        [$start, $end] = $this->getCurrentCycleRange();
 
         return (int) Transaction::query()
             ->where('user_id', $this->user->id)
             ->where('budget_id', $this->activeBudget->id)
             ->where('type', CategoryType::INCOME)
-            ->whereYear('date', $now->year)
-            ->whereMonth('date', $now->month)
+            ->whereBetween('date', [$start, $end])
             ->sum('amount');
     }
 
@@ -93,5 +91,35 @@ class GetSummaryCardsData extends Action
             ->where('budget_id', $this->activeBudget->id)
             ->where('type', CategoryType::EXPENSE)
             ->sum('planned_amount');
+    }
+
+    private function getCurrentCycleRange(): array
+    {
+        $now = now()->toImmutable();
+
+        $cutoffDay = $this->activeBudget->cutoff_day;
+
+        if ($now->day > $cutoffDay) {
+            $start = $now
+                ->addMonth()
+                ->startOfMonth()
+                ->subMonth()
+                ->addDays($cutoffDay);
+
+            $end = $start
+                ->addMonth()
+                ->subDay();
+        } else {
+            $start = $now
+                ->startOfMonth()
+                ->subMonth()
+                ->addDays($cutoffDay);
+
+            $end = $start
+                ->addMonth()
+                ->subDay();
+        }
+
+        return [$start->startOfDay(), $end->endOfDay()];
     }
 }

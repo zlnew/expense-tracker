@@ -47,6 +47,7 @@ export type Budget = {
   user_id: number
   period_start: string
   period_end: string
+  cutoff_day: number
   is_active: boolean
   notes: string | null
   updated_at: string | null
@@ -88,6 +89,8 @@ export type Transaction = {
   date: string
   amount: number
   description: string | null
+  cycle_month: number
+  cycle_year: number
   user: User | null
   balance: Balance | null
   budget: Budget | null

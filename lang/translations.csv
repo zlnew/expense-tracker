@@ -45,6 +45,7 @@ created_data,":data Created",":data Dibuat"
 current_month_expenses,"Current Month Expenses","Pengeluaran Bulan Ini"
 current_month_incomes,"Current Month Incomes","Pendapatan Bulan Ini"
 current_password,"Current Password","Kata Sandi Saat Ini"
+cutoff_day,"Cutoff Day","Cutoff Day"
 dashboard,Dashboard,Dasbor
 dashboard_description,"Track your financial activity, monitor spending habits, and stay on top of your budgets in one place.","Pantau aktivitas keuangan, kebiasaan pengeluaran, dan progres anggaran Anda dalam satu dashboard."
 date,Date,Tanggal

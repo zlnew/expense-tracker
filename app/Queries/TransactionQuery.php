@@ -14,9 +14,33 @@ class TransactionQuery extends BaseQuery
 
     protected array $searchable = ['description', 'category.name'];
 
-    protected array $sortable = ['date', 'created_at'];
+    protected array $sortable = [
+        'transactions.date',
+        'transactions.created_at',
+    ];
 
-    protected array $defaultSorts = ['-date', '-created_at'];
+    protected array $defaultSorts = [
+        '-transactions.date',
+        '-transactions.created_at',
+    ];
+
+    private bool $budgetJoined = false;
+
+    private function ensureBudgetJoin(): void
+    {
+        if ($this->budgetJoined) {
+            return;
+        }
+
+        $this->query->join(
+            'budgets',
+            'budgets.id',
+            '=',
+            'transactions.budget_id',
+        );
+
+        $this->budgetJoined = true;
+    }
 
     public function user(mixed $value): static
     {
@@ -77,15 +101,45 @@ class TransactionQuery extends BaseQuery
 
     public function month(mixed $value): static
     {
-        $this->query->whereMonth('date', $value);
+        $this->ensureBudgetJoin();
+
+        $monthSql = $this->getCycleMonthSql();
+
+        $this->query->whereRaw("CAST({$monthSql} AS INTEGER) = ?", [$value]);
 
         return $this;
     }
 
     public function year(mixed $value): static
     {
-        $this->query->whereYear('date', $value);
+        $this->ensureBudgetJoin();
+
+        $yearSql = $this->getCycleYearSql();
+
+        $this->query->whereRaw("CAST({$yearSql} AS INTEGER) = ?", [$value]);
 
         return $this;
+    }
+
+    private function getCycleMonthSql(): string
+    {
+        return "
+            CASE
+                WHEN EXTRACT(DAY FROM transactions.date) > budgets.cutoff_day
+                    THEN EXTRACT(MONTH FROM (transactions.date + INTERVAL '1 month'))
+                ELSE EXTRACT(MONTH FROM transactions.date)
+            END
+        ";
+    }
+
+    private function getCycleYearSql(): string
+    {
+        return "
+            CASE
+                WHEN EXTRACT(DAY FROM transactions.date) > budgets.cutoff_day
+                    THEN EXTRACT(YEAR FROM (transactions.date + INTERVAL '1 month'))
+                ELSE EXTRACT(YEAR FROM transactions.date)
+            END
+        ";
     }
 }

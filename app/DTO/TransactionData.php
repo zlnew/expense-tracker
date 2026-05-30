@@ -25,6 +25,8 @@ class TransactionData extends Data
         public CarbonImmutable $date,
         public int $amount,
         public ?string $description,
+        public ?int $cycle_month,
+        public ?int $cycle_year,
         public ?UserData $user,
         public ?BalanceData $balance,
         public ?BudgetData $budget,

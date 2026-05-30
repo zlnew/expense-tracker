@@ -47,6 +47,7 @@ return [
     'current_month_expenses' => 'Pengeluaran Bulan Ini',
     'current_month_incomes' => 'Pendapatan Bulan Ini',
     'current_password' => 'Kata Sandi Saat Ini',
+    'cutoff_day' => 'Cutoff Day',
     'dashboard' => 'Dasbor',
     'dashboard_description' => 'Pantau aktivitas keuangan, kebiasaan pengeluaran, dan progres anggaran Anda dalam satu dashboard.',
     'date' => 'Tanggal',

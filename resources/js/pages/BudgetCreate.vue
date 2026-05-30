@@ -60,6 +60,7 @@ setLayoutProps({
 const form = useForm({
   period_start: '',
   period_end: '',
+  cutoff_day: 25,
   notes: null as string | null,
   items: [] as any[],
 })
@@ -170,6 +171,20 @@ const goBack = () => {
                 required
               />
             </div>
+          </div>
+
+          <div class="grid max-w-md gap-2">
+            <Label for="cutoff_day">
+              {{ __('cutoff_day') }}
+              <span class="text-destructive">*</span>
+            </Label>
+            <Input
+              id="cutoff_day"
+              type="number"
+              v-model.number="form.cutoff_day"
+              min="1"
+              max="31"
+            />
           </div>
 
           <div class="grid max-w-md gap-2">

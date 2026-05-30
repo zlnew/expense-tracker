@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $notes
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ * @property int $cutoff_day
  * @property-read Collection<int, BudgetItem> $expenses
  * @property-read int|null $expenses_count
  * @property-read Collection<int, BudgetItem> $incomes
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget whereCutoffDay($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget whereNotes($value)
@@ -43,7 +45,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['period_start', 'period_end', 'notes'])]
+#[Fillable(['period_start', 'period_end', 'cutoff_day', 'notes'])]
 class Budget extends Model
 {
     protected function casts(): array
