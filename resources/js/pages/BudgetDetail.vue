@@ -55,18 +55,45 @@ setLayoutProps({
   ],
 })
 
-const now = new Date()
+function resolveEffectiveCutoff(
+  year: number,
+  month: number,
+  cutoffDay: number,
+): number {
+  const lastDayOfMonth = new Date(year, month, 0).getDate()
 
-const currentCycleDate = new Date(now)
-
-if (now.getDate() > props.budget.cutoff_day) {
-  currentCycleDate.setMonth(currentCycleDate.getMonth() + 1)
+  return Math.min(cutoffDay, lastDayOfMonth)
 }
+
+function resolveCurrentCycleDate(cutoffDay: number): {
+  month: number
+  year: number
+} {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const today = now.getDate()
+
+  const effectiveCutoff = resolveEffectiveCutoff(year, month, cutoffDay)
+
+  if (today > effectiveCutoff) {
+    const nextMonth = new Date(year, month, 1)
+
+    return {
+      month: nextMonth.getMonth() + 1,
+      year: nextMonth.getFullYear(),
+    }
+  }
+
+  return { month, year }
+}
+
+const currentCycle = resolveCurrentCycleDate(props.budget.cutoff_day)
 
 const transactionApi = useHttp({
   budget: props.budget.id,
-  month: currentCycleDate.getMonth() + 1,
-  year: currentCycleDate.getFullYear().toString(),
+  month: currentCycle.month,
+  year: currentCycle.year.toString(),
 })
 
 const transactions = ref<Transaction[]>([])

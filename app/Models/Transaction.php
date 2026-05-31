@@ -29,8 +29,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read int $cycle_month
  * @property-read int $cycle_year
  * @property-read User $user
-
-   @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newModelQuery()
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereAmount($value)
@@ -76,15 +76,28 @@ class Transaction extends Model
 
     private function getCycleDate(): CarbonImmutable
     {
+        /** @var CarbonImmutable $date */
         $date = CarbonImmutable::parse($this->date);
+        $cutoffDay = $this->budget?->cutoff_day;
 
-        $cutoffDay = $this->budget?->cutoff_day ?? 0;
+        if ($cutoffDay === null) {
+            return $date;
+        }
 
-        if ($date->day > $cutoffDay) {
-            return $date->addMonth();
+        $effectiveCutoff = $this->resolveEffectiveCutoff($date, $cutoffDay);
+
+        if ($date->gt($effectiveCutoff)) {
+            return $date->addMonthNoOverflow();
         }
 
         return $date;
+    }
+
+    private function resolveEffectiveCutoff(CarbonImmutable $date, int $cutoffDay): CarbonImmutable
+    {
+        $resolvedDay = min($cutoffDay, $date->daysInMonth);
+
+        return $date->setDay($resolvedDay)->startOfDay();
     }
 
     public function user(): BelongsTo

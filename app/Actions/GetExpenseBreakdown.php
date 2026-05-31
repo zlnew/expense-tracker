@@ -7,6 +7,8 @@ use App\Models\Budget;
 use App\Models\BudgetItem;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 
 class GetExpenseBreakdown extends Action
 {
@@ -72,33 +74,41 @@ class GetExpenseBreakdown extends Action
             ->toArray();
     }
 
+    private function getCutoffDateForMonth(CarbonImmutable $date, int $cutoffDay): CarbonImmutable
+    {
+        $lastDayOfMonth = $date->daysInMonth;
+        $resolvedDay = min($cutoffDay, $lastDayOfMonth);
+
+        return $date->setDay($resolvedDay)->startOfDay();
+    }
+
     private function getCurrentCycleRange(): array
     {
-        $now = now()->toImmutable();
-
+        $now = Carbon::now()->toImmutable();
         $cutoffDay = $this->activeBudget->cutoff_day;
 
-        if ($now->day > $cutoffDay) {
-            $start = $now
-                ->addMonth()
-                ->startOfMonth()
-                ->subMonth()
-                ->addDays($cutoffDay);
+        $cutoffThisMonth = $this->getCutoffDateForMonth($now, $cutoffDay);
 
-            $end = $start
-                ->addMonth()
-                ->subDay();
-        } else {
-            $start = $now
-                ->startOfMonth()
-                ->subMonth()
-                ->addDays($cutoffDay);
+        if ($now->lte($cutoffThisMonth->endOfDay())) {
+            $cutoffLastMonth = $this->getCutoffDateForMonth(
+                $now->subMonthNoOverflow(),
+                $cutoffDay
+            );
 
-            $end = $start
-                ->addMonth()
-                ->subDay();
+            return [
+                $cutoffLastMonth->addDay()->startOfDay(),
+                $cutoffThisMonth->endOfDay(),
+            ];
         }
 
-        return [$start->startOfDay(), $end->endOfDay()];
+        $cutoffNextMonth = $this->getCutoffDateForMonth(
+            $now->addMonthNoOverflow(),
+            $cutoffDay
+        );
+
+        return [
+            $cutoffThisMonth->addDay()->startOfDay(),
+            $cutoffNextMonth->endOfDay(),
+        ];
     }
 }

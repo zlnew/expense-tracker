@@ -27,56 +27,51 @@ class GetMonthlySpendingTrend extends Action
 
     public function handle(): array
     {
-        if (! $this->activeBudget) {
+        if ($this->activeBudget === null) {
             return [];
         }
 
         $cutoffDay = $this->activeBudget->cutoff_day;
+        $currentYear = now()->year;
 
-        $cycleMonthSql = "
-            CASE
-                WHEN EXTRACT(DAY FROM date) > {$cutoffDay}
-                    THEN EXTRACT(MONTH FROM (date + INTERVAL '1 month'))
-                ELSE EXTRACT(MONTH FROM date)
-            END
-        ";
-
-        $cycleYearSql = "
-            CASE
-                WHEN EXTRACT(DAY FROM date) > {$cutoffDay}
-                    THEN EXTRACT(YEAR FROM (date + INTERVAL '1 month'))
-                ELSE EXTRACT(YEAR FROM date)
-            END
-        ";
-
-        $now = now();
+        $subquery = Transaction::query()
+            ->selectRaw("
+                *,
+                CASE
+                    WHEN EXTRACT(DAY FROM date) > LEAST(
+                        ?,
+                        EXTRACT(DAY FROM (DATE_TRUNC('month', date) + INTERVAL '1 month' - INTERVAL '1 day'))
+                    )
+                        THEN date + INTERVAL '1 month'
+                    ELSE date
+                END AS cycle_date
+            ", [$cutoffDay])
+            ->where('user_id', $this->user->id)
+            ->where('budget_id', $this->activeBudget->id);
 
         $transactions = Transaction::query()
-            ->selectRaw("
-                CAST({$cycleMonthSql} AS INTEGER) as month,
+            ->fromSub($subquery, 'txn')
+            ->selectRaw('
+                CAST(EXTRACT(MONTH FROM cycle_date) AS INTEGER) AS month,
                 type,
-                SUM(amount) as total_amount
-            ")
-            ->where('user_id', $this->user->id)
-            ->where('budget_id', $this->activeBudget->id)
-            ->whereRaw("CAST({$cycleYearSql} AS INTEGER) = ?", [$now->year])
+                SUM(amount) AS total_amount
+            ')
+            ->whereRaw('CAST(EXTRACT(YEAR FROM cycle_date) AS INTEGER) = ?', [$currentYear])
             ->groupBy('month', 'type')
             ->get();
 
         $grouped = $transactions->groupBy('month');
 
         return collect(range(1, 12))
-            ->map(function ($month) use ($grouped) {
+            ->map(function (int $month) use ($grouped): array {
                 $items = $grouped->get($month, collect());
 
                 $income = (int) (
-                    $items->firstWhere('type', CategoryType::INCOME->value)?->total_amount
-                    ?? 0
+                    $items->firstWhere('type', CategoryType::INCOME->value)?->total_amount ?? 0
                 );
 
                 $expense = (int) (
-                    $items->firstWhere('type', CategoryType::EXPENSE->value)?->total_amount
-                    ?? 0
+                    $items->firstWhere('type', CategoryType::EXPENSE->value)?->total_amount ?? 0
                 );
 
                 return [

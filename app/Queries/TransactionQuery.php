@@ -32,7 +32,7 @@ class TransactionQuery extends BaseQuery
             return;
         }
 
-        $this->query->join(
+        $this->query->leftJoin(
             'budgets',
             'budgets.id',
             '=',
@@ -40,6 +40,27 @@ class TransactionQuery extends BaseQuery
         );
 
         $this->budgetJoined = true;
+    }
+
+    private function getEffectiveCutoffSql(): string
+    {
+        return "LEAST(
+            budgets.cutoff_day,
+            EXTRACT(DAY FROM (DATE_TRUNC('month', transactions.date) + INTERVAL '1 month' - INTERVAL '1 day'))
+        )";
+    }
+
+    private function getCycleDateSql(): string
+    {
+        $effectiveCutoff = $this->getEffectiveCutoffSql();
+
+        return "
+            CASE
+                WHEN EXTRACT(DAY FROM transactions.date) > ({$effectiveCutoff})
+                    THEN transactions.date + INTERVAL '1 month'
+                ELSE transactions.date
+            END
+        ";
     }
 
     public function user(mixed $value): static
@@ -103,9 +124,12 @@ class TransactionQuery extends BaseQuery
     {
         $this->ensureBudgetJoin();
 
-        $monthSql = $this->getCycleMonthSql();
+        $cycleDateSql = $this->getCycleDateSql();
 
-        $this->query->whereRaw("CAST({$monthSql} AS INTEGER) = ?", [$value]);
+        $this->query->whereRaw(
+            "CAST(EXTRACT(MONTH FROM ({$cycleDateSql})) AS INTEGER) = ?",
+            [(int) $value],
+        );
 
         return $this;
     }
@@ -114,32 +138,13 @@ class TransactionQuery extends BaseQuery
     {
         $this->ensureBudgetJoin();
 
-        $yearSql = $this->getCycleYearSql();
+        $cycleDateSql = $this->getCycleDateSql();
 
-        $this->query->whereRaw("CAST({$yearSql} AS INTEGER) = ?", [$value]);
+        $this->query->whereRaw(
+            "CAST(EXTRACT(YEAR FROM ({$cycleDateSql})) AS INTEGER) = ?",
+            [(int) $value],
+        );
 
         return $this;
-    }
-
-    private function getCycleMonthSql(): string
-    {
-        return "
-            CASE
-                WHEN EXTRACT(DAY FROM transactions.date) > budgets.cutoff_day
-                    THEN EXTRACT(MONTH FROM (transactions.date + INTERVAL '1 month'))
-                ELSE EXTRACT(MONTH FROM transactions.date)
-            END
-        ";
-    }
-
-    private function getCycleYearSql(): string
-    {
-        return "
-            CASE
-                WHEN EXTRACT(DAY FROM transactions.date) > budgets.cutoff_day
-                    THEN EXTRACT(YEAR FROM (transactions.date + INTERVAL '1 month'))
-                ELSE EXTRACT(YEAR FROM transactions.date)
-            END
-        ";
     }
 }
