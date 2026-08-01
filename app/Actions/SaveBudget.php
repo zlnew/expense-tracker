@@ -33,6 +33,8 @@ class SaveBudget extends Action
 
             $items = $this->data->items;
 
+            $submittedItemIds = [];
+
             foreach ($items as $item) {
                 $budgetItem = $item->id ? BudgetItem::query()->findOrFail($item->id) : new BudgetItem;
 
@@ -45,7 +47,25 @@ class SaveBudget extends Action
                 $budgetItem->category()->associate($item->category_id);
 
                 $budgetItem->save();
+
+                if ($budgetItem->id) {
+                    $submittedItemIds[] = $budgetItem->id;
+                }
             }
+
+            // Prune budget items that existed before but were removed from the
+            // form, so the budget never carries stale planned-amount rows.
+            // (Empty submitted set => delete everything; Laravel's whereNotIn
+            // with an empty array is a no-op, so branch explicitly.)
+            // Items still referenced by transactions are kept — deleting them
+            // would violate the FK, mirroring DeleteBudget's guard.
+            $pruneQuery = $this->budget->items()->whereDoesntHave('transactions');
+
+            if ($submittedItemIds !== []) {
+                $pruneQuery->whereNotIn('id', $submittedItemIds);
+            }
+
+            $pruneQuery->delete();
 
             return $this->budget;
         });
