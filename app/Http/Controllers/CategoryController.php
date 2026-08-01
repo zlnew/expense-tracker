@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Queries\CategoryQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -19,7 +20,9 @@ class CategoryController extends Controller
 {
     public function index(Request $request): Response
     {
-        $categories = CategoryQuery::make($request->all())->paginate();
+        $categories = CategoryQuery::make($request->all())
+            ->forUser(Auth::id())
+            ->paginate();
         $types = CategoryType::cases();
 
         return Inertia::render('CategoryList', [

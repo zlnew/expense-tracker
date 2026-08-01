@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\DTO\TransferBetweenAccountsData;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Spatie\LaravelData\WithData;
 
 class TransferBetweenAccountsRequest extends FormRequest
@@ -22,8 +23,14 @@ class TransferBetweenAccountsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'from_account_id' => ['required', 'exists:balances,id'],
-            'to_account_id' => ['required', 'exists:balances,id'],
+            'from_account_id' => [
+                'required',
+                Rule::exists('balances', 'id')->where('user_id', $this->user()?->id),
+            ],
+            'to_account_id' => [
+                'required',
+                Rule::exists('balances', 'id')->where('user_id', $this->user()?->id),
+            ],
             'date' => ['required', 'date'],
             'amount' => ['required', 'integer'],
             'description' => ['nullable', 'string'],

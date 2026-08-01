@@ -34,6 +34,7 @@ class BudgetController extends Controller
     public function create(): Response
     {
         $categories = Category::query()
+            ->where('user_id', Auth::id())
             ->orderBy('type', 'asc')
             ->orderBy('name', 'asc')
             ->get();
@@ -51,6 +52,7 @@ class BudgetController extends Controller
         ]);
 
         $categories = Category::query()
+            ->where('user_id', Auth::id())
             ->orderBy('type', 'asc')
             ->orderBy('name', 'asc')
             ->get();

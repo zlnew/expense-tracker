@@ -35,7 +35,7 @@ class TransactionController extends Controller
 
         $balances = Balance::where('user_id', Auth::id())->get();
         $budgets = Budget::where('user_id', Auth::id())->with('items.category')->get();
-        $categories = Category::all();
+        $categories = Category::where('user_id', Auth::id())->get();
 
         $primaryBalance = $balances->firstWhere('is_primary', true);
         $activeBudget = $budgets->firstWhere('is_active', true);
