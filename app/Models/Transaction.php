@@ -6,6 +6,7 @@ use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -48,9 +49,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['type', 'date', 'amount', 'description'])]
+#[Fillable(['type', 'date', 'amount', 'description', 'transfer_group_id'])]
 class Transaction extends Model
 {
+    use HasFactory;
+
     protected function casts(): array
     {
         return [

@@ -7,8 +7,7 @@ use App\Models\Budget;
 use App\Models\BudgetItem;
 use App\Models\Transaction;
 use App\Models\User;
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
+use App\Support\BudgetCycle;
 
 class GetExpenseBreakdown extends Action
 {
@@ -34,7 +33,7 @@ class GetExpenseBreakdown extends Action
             return [];
         }
 
-        [$start, $end] = $this->getCurrentCycleRange();
+        [$start, $end] = BudgetCycle::currentCycleRange($this->activeBudget);
 
         $budgetItems = BudgetItem::query()
             ->with('category')
@@ -72,43 +71,5 @@ class GetExpenseBreakdown extends Action
             ->sortByDesc(fn ($item) => $item['amount'])
             ->values()
             ->toArray();
-    }
-
-    private function getCutoffDateForMonth(CarbonImmutable $date, int $cutoffDay): CarbonImmutable
-    {
-        $lastDayOfMonth = $date->daysInMonth;
-        $resolvedDay = min($cutoffDay, $lastDayOfMonth);
-
-        return $date->setDay($resolvedDay)->startOfDay();
-    }
-
-    private function getCurrentCycleRange(): array
-    {
-        $now = Carbon::now()->toImmutable();
-        $cutoffDay = $this->activeBudget->cutoff_day;
-
-        $cutoffThisMonth = $this->getCutoffDateForMonth($now, $cutoffDay);
-
-        if ($now->lte($cutoffThisMonth->endOfDay())) {
-            $cutoffLastMonth = $this->getCutoffDateForMonth(
-                $now->subMonthNoOverflow(),
-                $cutoffDay
-            );
-
-            return [
-                $cutoffLastMonth->addDay()->startOfDay(),
-                $cutoffThisMonth->endOfDay(),
-            ];
-        }
-
-        $cutoffNextMonth = $this->getCutoffDateForMonth(
-            $now->addMonthNoOverflow(),
-            $cutoffDay
-        );
-
-        return [
-            $cutoffThisMonth->addDay()->startOfDay(),
-            $cutoffNextMonth->endOfDay(),
-        ];
     }
 }

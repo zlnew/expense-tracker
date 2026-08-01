@@ -84,6 +84,11 @@ class User extends Authenticatable
         return $this->hasOne(Budget::class)->where('is_active', true);
     }
 
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
     public function budgets(): HasMany
     {
         return $this->hasMany(Budget::class);

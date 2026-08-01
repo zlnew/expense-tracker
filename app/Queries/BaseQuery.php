@@ -34,6 +34,16 @@ abstract class BaseQuery
 
     protected int $defaultPerPage = 10;
 
+    /** Server-side user scope — always applied (never trusts the client). */
+    protected ?int $userId = null;
+
+    public function forUser(?int $userId): static
+    {
+        $this->userId = $userId;
+
+        return $this;
+    }
+
     public static function with(array $with = []): static
     {
         $instance = new static;
@@ -68,10 +78,22 @@ abstract class BaseQuery
 
         $this->query = $model->newQuery();
 
+        $this->applyUserScope();
         $this->applyWith();
         $this->applyFilters();
 
         $this->initialized = true;
+    }
+
+    /**
+     * Force the server-side user scope when one was set via forUser().
+     * Applied before filters so a client-supplied user filter can never widen it.
+     */
+    protected function applyUserScope(): void
+    {
+        if ($this->userId !== null) {
+            $this->query->where('user_id', $this->userId);
+        }
     }
 
     protected function applyFilters(): void

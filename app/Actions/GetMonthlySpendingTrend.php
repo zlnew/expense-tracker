@@ -6,6 +6,7 @@ use App\Enums\CategoryType;
 use App\Models\Budget;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\BudgetCycle;
 
 class GetMonthlySpendingTrend extends Action
 {
@@ -33,19 +34,15 @@ class GetMonthlySpendingTrend extends Action
 
         $cutoffDay = $this->activeBudget->cutoff_day;
         $currentYear = now()->year;
+        $cycleDateSql = BudgetCycle::cycleDateSql('date', '?');
 
         $subquery = Transaction::query()
-            ->selectRaw("
-                *,
-                CASE
-                    WHEN EXTRACT(DAY FROM date) > LEAST(
-                        ?,
-                        EXTRACT(DAY FROM (DATE_TRUNC('month', date) + INTERVAL '1 month' - INTERVAL '1 day'))
-                    )
-                        THEN date + INTERVAL '1 month'
-                    ELSE date
-                END AS cycle_date
-            ", [$cutoffDay])
+            ->selectRaw(
+                "*,
+                {$cycleDateSql} AS cycle_date
+            ",
+                [$cutoffDay],
+            )
             ->where('user_id', $this->user->id)
             ->where('budget_id', $this->activeBudget->id);
 

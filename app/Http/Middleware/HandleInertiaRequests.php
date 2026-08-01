@@ -59,7 +59,7 @@ class HandleInertiaRequests extends Middleware
                 ? BudgetData::collect(Budget::where('user_id', $request->user()->id)->with('items.category')->get())
                 : [],
             'categories' => fn () => $request->user()
-                ? CategoryData::collect(Category::all())
+                ? CategoryData::collect(Category::where('user_id', $request->user()->id)->get())
                 : [],
             'primaryBalanceId' => fn () => $request->user()
                 ? (Balance::where('user_id', $request->user()->id)->where('is_primary', true)->value('id'))

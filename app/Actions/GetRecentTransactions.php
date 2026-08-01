@@ -6,6 +6,7 @@ use App\DTO\TransactionData;
 use App\Models\Budget;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\BudgetCycle;
 use Spatie\LaravelData\DataCollection;
 
 class GetRecentTransactions extends Action
@@ -21,8 +22,6 @@ class GetRecentTransactions extends Action
 
     public function handle(): DataCollection
     {
-        $now = now();
-
         $activeBudget = Budget::query()
             ->where('user_id', $this->user->id)
             ->where('is_active', true)
@@ -32,12 +31,15 @@ class GetRecentTransactions extends Action
             return new DataCollection(TransactionData::class, []);
         }
 
+        // Use the budget cutoff cycle (not the calendar month) so the "recent
+        // transactions" widget agrees with the summary cards + budget progress.
+        [$start, $end] = BudgetCycle::currentCycleRange($activeBudget);
+
         $transactions = Transaction::query()
             ->with(['category', 'balance'])
             ->where('user_id', $this->user->id)
             ->where('budget_id', $activeBudget->id)
-            ->whereYear('date', $now->year)
-            ->whereMonth('date', $now->month)
+            ->whereBetween('date', [$start, $end])
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->limit(10)
