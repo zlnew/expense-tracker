@@ -19,6 +19,11 @@ declare module '@inertiajs/core' {
       name: string
       auth: Auth
       sidebarOpen: boolean
+      balances?: Balance[]
+      budgets?: Budget[]
+      categories?: Category[]
+      primaryBalanceId?: number
+      activeBudgetId?: number
       [key: string]: unknown
     }
   }

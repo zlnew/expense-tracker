@@ -6,12 +6,12 @@ import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -137,7 +137,7 @@ const submit = () => {
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[425px]">
+    <SheetDialogContent class="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>
           {{ __('add_data', { data: __('transaction') }) }}
@@ -265,6 +265,8 @@ const submit = () => {
           <Input
             id="amount"
             type="number"
+            inputmode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
             v-model="form.amount"
             required
             placeholder="0"
@@ -298,6 +300,6 @@ const submit = () => {
           {{ form.processing ? __('saving') : __('save') }}
         </Button>
       </DialogFooter>
-    </DialogContent>
+    </SheetDialogContent>
   </Dialog>
 </template>

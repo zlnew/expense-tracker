@@ -32,7 +32,7 @@ const props = defineProps<{
 
 const { __ } = useLang()
 const { formatDate } = useDate()
-const { formatNumber } = useNumber()
+const { formatAmount } = useNumber()
 
 setLayoutProps({
   breadcrumbs: [
@@ -53,7 +53,12 @@ setLayoutProps({
   <AppContent>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="h-10 w-10 md:h-8 md:w-8"
+          asChild
+        >
           <Link :href="balanceIndex.url()">
             <ArrowLeft class="size-4" />
           </Link>
@@ -79,7 +84,7 @@ setLayoutProps({
           </CardHeader>
           <CardContent>
             <div class="text-2xl font-bold">
-              {{ formatNumber(balance.initial_amount) }}
+              {{ formatAmount(balance.initial_amount) }}
             </div>
           </CardContent>
         </Card>
@@ -101,7 +106,7 @@ setLayoutProps({
           </CardHeader>
           <CardContent>
             <div class="text-2xl font-bold">
-              {{ formatNumber(balance.final_amount) }}
+              {{ formatAmount(balance.final_amount) }}
             </div>
           </CardContent>
         </Card>
@@ -159,8 +164,7 @@ setLayoutProps({
                     : 'text-red-600 dark:text-red-400'
                 "
               >
-                {{ t.type === 'income' ? '+' : '-' }}
-                {{ formatNumber(t.amount) }}
+                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
               </span>
             </div>
             <div
@@ -220,8 +224,7 @@ setLayoutProps({
                         : 'text-red-600 dark:text-red-400'
                     "
                   >
-                    {{ t.type === 'income' ? '+' : '-' }}
-                    {{ formatNumber(t.amount) }}
+                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
                   </TableCell>
                 </TableRow>
               </template>

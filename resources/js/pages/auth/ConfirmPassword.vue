@@ -26,7 +26,7 @@ defineOptions({
         <PasswordInput
           id="password"
           name="password"
-          class="mt-1 block w-full"
+          class="mt-1 block h-11 w-full md:h-9"
           required
           autocomplete="current-password"
           autofocus
@@ -37,7 +37,7 @@ defineOptions({
 
       <div class="flex items-center">
         <Button
-          class="w-full"
+          class="h-11 w-full md:h-9"
           :disabled="processing"
           data-test="confirm-password-button"
         >

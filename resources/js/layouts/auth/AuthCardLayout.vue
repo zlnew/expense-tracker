@@ -32,13 +32,13 @@ defineProps<{
 
       <div class="flex flex-col gap-6">
         <Card class="rounded-xl">
-          <CardHeader class="px-10 pt-8 pb-0 text-center">
+          <CardHeader class="px-6 pt-6 pb-0 text-center sm:px-10 sm:pt-8">
             <CardTitle class="text-xl">{{ title }}</CardTitle>
             <CardDescription>
               {{ description }}
             </CardDescription>
           </CardHeader>
-          <CardContent class="px-10 py-8">
+          <CardContent class="px-6 py-6 sm:px-10 sm:py-8">
             <slot />
           </CardContent>
         </Card>

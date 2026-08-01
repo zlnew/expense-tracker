@@ -75,12 +75,17 @@ expenses,Expenses,Pengeluaran
 february,February,Februari
 filter_by_balance,"Filter by Balance","Filter berdasarkan Saldo"
 filter_by_category,"Filter by Category","Filter berdasarkan Kategori"
+filter_transactions,"Filter Transactions","Filter Transaksi"
 final_amount,"Final Amount","Saldo Akhir"
 from_account,"From Account","Dari Akun"
 full_name,"Full Name","Nama Lengkap"
 income,Income,Pemasukan
 incomes,Incomes,Pemasukan
 initial_amount,"Initial Amount","Saldo Awal"
+install_banner_action,Install,Pasang
+install_banner_description,"Add Expense Tracker to your home screen for quick access.","Tambahkan Expense Tracker ke layar utama untuk akses cepat."
+install_banner_dismiss,"Dismiss install banner","Tutup banner pemasangan"
+install_banner_title,"Install Expense Tracker","Pasang Expense Tracker"
 is_primary,"Primary Balance","Saldo Utama"
 item,Item,Item
 january,January,Januari
@@ -104,6 +109,7 @@ notes,Notes,Catatan
 november,November,November
 october,October,Oktober
 optional,Optional,Opsional
+overspent,Overspent,Melebihi
 password,Password,"Kata Sandi"
 password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
 password_update_title,"Update Password","Perbarui Kata Sandi"
@@ -119,6 +125,7 @@ profile_update_description,"Update your name and email address","Perbarui nama d
 profile_update_title,"Profile Information","Informasi Profil"
 recent_transactions,"Recent Transactions","Transaksi Terakhir"
 recent_transactions_description,"Quickly review your latest financial activities and transactions.","Lihat aktivitas dan transaksi keuangan terbaru Anda dengan cepat."
+remaining,Remaining,Sisa
 remaining_budget,"Remaining Budget","Sisa Anggaran"
 save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
@@ -135,7 +142,9 @@ set_as_primary,"Set as Primary","Jadikan Utama"
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
+show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
 single_transaction,"Single Transaction","Satu Transaksi"
+spent,Spent,Terpakai
 status,Status,Status
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
@@ -155,6 +164,7 @@ transfer,Transfer,Transfer
 transfer_description,"Transfer between accounts","Transfer antar akun"
 type,Type,Jenis
 types,Types,Jenis
+unknown,Unknown,"Tidak diketahui"
 update,Update,Perbarui
 updated_data,":data Updated",":data Diperbarui"
 updating,Updating...,Memperbarui...

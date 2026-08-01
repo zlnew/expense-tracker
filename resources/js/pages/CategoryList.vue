@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
-import { Plus, Search, SquarePen, Trash2 } from 'lucide-vue-next'
+import { Plus, Search, SquarePen, Tags, Trash2 } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
@@ -9,6 +9,7 @@ import CategoryCreateDialog from '@/components/dialogs/CategoryCreateDialog.vue'
 import CategoryDeleteDialog from '@/components/dialogs/CategoryDeleteDialog.vue'
 import CategoryUpdateDialog from '@/components/dialogs/CategoryUpdateDialog.vue'
 import Heading from '@/components/Heading.vue'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -62,6 +63,9 @@ const targetData = ref<Data | null>(null)
 const search = ref(param.get('search') || '')
 const typeFilter = ref(param.get('type') || 'all')
 
+// True while a debounced search/filter visit is in flight — shows the skeleton.
+const loading = ref(false)
+
 watch([search, typeFilter], () => {
   fetchData()
 })
@@ -81,6 +85,12 @@ const fetchData = useDebounceFn(() => {
     preserveState: true,
     preserveScroll: true,
     replace: true,
+    onStart: () => {
+      loading.value = true
+    },
+    onFinish: () => {
+      loading.value = false
+    },
   })
 }, 300)
 
@@ -123,7 +133,7 @@ const openDeleteDialog = (data: Data) => {
             <Input
               v-model="search"
               :placeholder="__('search_categories_placeholder')"
-              class="w-full bg-background pl-8"
+              class="h-10 w-full bg-background pl-8 md:h-9"
             />
           </div>
         </div>
@@ -131,7 +141,7 @@ const openDeleteDialog = (data: Data) => {
         <div class="flex w-full gap-2 sm:w-auto">
           <div class="w-full">
             <Select v-model="typeFilter">
-              <SelectTrigger class="bg-background">
+              <SelectTrigger class="h-10 w-full bg-background md:h-9">
                 <SelectValue
                   :placeholder="__('all_data', { data: __('types') })"
                 />
@@ -155,13 +165,28 @@ const openDeleteDialog = (data: Data) => {
         </div>
       </div>
 
+      <!-- Loading skeleton while a search/filter visit is in flight -->
+      <ListSkeleton v-if="loading" :rows="5" />
+
       <!-- Mobile View: Cards -->
-      <div class="grid grid-cols-1 gap-4 md:hidden">
+      <div v-if="!loading" class="grid grid-cols-1 gap-4 md:hidden">
         <div
           v-if="categories.data.length === 0"
-          class="h-24 content-center text-center text-muted-foreground"
+          class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
         >
-          {{ __('no_data_found', { data: __('categories') }) }}
+          <div class="mb-4 rounded-full bg-muted p-4">
+            <Tags class="size-8 text-muted-foreground" />
+          </div>
+          <h3 class="text-lg font-semibold">
+            {{ __('no_data_found', { data: __('categories') }) }}
+          </h3>
+          <p class="mb-6 text-muted-foreground">
+            {{ __('category_list_description') }}
+          </p>
+          <Button @click="createDialogOpen = true">
+            <Plus class="mr-2 size-4" />
+            {{ __('add_data', { data: __('category') }) }}
+          </Button>
         </div>
         <div
           v-for="c in categories.data"
@@ -181,6 +206,7 @@ const openDeleteDialog = (data: Data) => {
               <Button
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10"
                 @click="openEditDialog(c)"
                 :title="__('edit_data', { data: __('category') })"
               >
@@ -189,7 +215,7 @@ const openDeleteDialog = (data: Data) => {
               <Button
                 variant="ghost"
                 size="icon"
-                class="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                class="h-10 w-10 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 @click="openDeleteDialog(c)"
                 :title="__('delete_data', { data: __('category') })"
               >
@@ -202,6 +228,7 @@ const openDeleteDialog = (data: Data) => {
 
       <!-- Desktop View: Table -->
       <div
+        v-if="!loading"
         class="hidden overflow-hidden rounded-md border bg-background md:block"
       >
         <Table>
@@ -265,7 +292,7 @@ const openDeleteDialog = (data: Data) => {
       </div>
 
       <AppPagination
-        v-if="categories.meta"
+        v-if="!loading && categories.meta"
         :meta="categories.meta"
         :links="categories.links"
       />
