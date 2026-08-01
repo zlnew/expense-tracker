@@ -17,7 +17,7 @@ class DeleteBudget extends Action
         DB::transaction(function () {
             if ($this->budget->is_active) {
                 throw ValidationException::withMessages([
-                    'budget' => 'Cannot delete active budget.',
+                    'budget' => __('cannot_delete_active_budget'),
                 ]);
             }
 

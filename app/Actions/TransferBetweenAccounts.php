@@ -22,26 +22,26 @@ class TransferBetweenAccounts extends Action
         $sourceAccount = Balance::query()->find($this->data->from_account_id);
         if (! $sourceAccount) {
             throw ValidationException::withMessages([
-                'account' => 'Invalid account source',
+                'account' => __('invalid_account_source'),
             ]);
         }
 
         $destinationAccount = Balance::query()->find($this->data->to_account_id);
         if (! $destinationAccount) {
             throw ValidationException::withMessages([
-                'account' => 'Invalid account destination',
+                'account' => __('invalid_account_destination'),
             ]);
         }
 
         if ($sourceAccount->id === $destinationAccount->id) {
             throw ValidationException::withMessages([
-                'account' => 'Source and destination accounts must be different',
+                'account' => __('transfer_same_account_error'),
             ]);
         }
 
         if ($sourceAccount->final_amount < $this->data->amount) {
             throw ValidationException::withMessages([
-                'account' => 'Insufficient balance',
+                'account' => __('insufficient_balance'),
             ]);
         }
 

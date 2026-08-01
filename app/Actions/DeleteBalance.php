@@ -15,7 +15,7 @@ class DeleteBalance extends Action
     {
         if ($this->balance->is_primary) {
             throw ValidationException::withMessages([
-                'balance' => 'Cannon delete primary balance.',
+                'balance' => __('cannot_delete_primary_balance'),
             ]);
         }
 

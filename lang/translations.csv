@@ -32,6 +32,8 @@ budget_progress_description,"Track how much of your budget has been used and how
 budget_update_description,"Update and adjust your monthly budget plans","Perbarui dan sesuaikan perencanaan anggaran bulanan Anda"
 budgets,Budgets,Anggaran
 cancel,Cancel,Batal
+cannot_delete_active_budget,"Cannot delete active budget.","Tidak dapat menghapus anggaran aktif."
+cannot_delete_primary_balance,"Cannot delete primary balance.","Tidak dapat menghapus saldo utama."
 categories,Categories,Kategori
 category,Category,Kategori
 category_create_description,"Create a new budget category","Buat kategori anggaran baru"
@@ -86,6 +88,9 @@ install_banner_action,Install,Pasang
 install_banner_description,"Add Expense Tracker to your home screen for quick access.","Tambahkan Expense Tracker ke layar utama untuk akses cepat."
 install_banner_dismiss,"Dismiss install banner","Tutup banner pemasangan"
 install_banner_title,"Install Expense Tracker","Pasang Expense Tracker"
+insufficient_balance,"Insufficient balance","Saldo tidak mencukupi"
+invalid_account_destination,"Invalid account destination","Tujuan akun tidak valid"
+invalid_account_source,"Invalid account source","Sumber akun tidak valid"
 is_primary,"Primary Balance","Saldo Utama"
 item,Item,Item
 january,January,Januari
@@ -162,6 +167,7 @@ transaction_update_description,"Update the selected transaction details.","Perba
 transactions,Transactions,Transaksi
 transfer,Transfer,Transfer
 transfer_description,"Transfer between accounts","Transfer antar akun"
+transfer_same_account_error,"Source and destination accounts must be different","Akun sumber dan tujuan harus berbeda"
 type,Type,Jenis
 types,Types,Jenis
 unknown,Unknown,"Tidak diketahui"
