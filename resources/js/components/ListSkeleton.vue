@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 
 interface ListSkeletonProps {
   /** Number of skeleton rows to render. */

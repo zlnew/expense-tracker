@@ -19,13 +19,13 @@ import {
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
-import ListSkeleton from '@/components/ListSkeleton.vue'
 import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
 import TransactionCreateDialog from '@/components/dialogs/TransactionCreateDialog.vue'
 import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialog.vue'
 import TransactionTransferDialog from '@/components/dialogs/TransactionTransferDialog.vue'
 import TransactionUpdateDialog from '@/components/dialogs/TransactionUpdateDialog.vue'
 import Heading from '@/components/Heading.vue'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
