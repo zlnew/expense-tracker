@@ -82,6 +82,7 @@ expense,Expense,Pengeluaran
 expense_breakdown,"Expense Breakdown","Proporsi Pengeluaran"
 expense_breakdown_description,"Analyze which categories contribute the most to your expenses.","Analisis kategori yang paling banyak menyumbang pengeluaran Anda."
 expenses,Expenses,Pengeluaran
+export_transactions,"Export transactions (CSV)","Ekspor transaksi (CSV)"
 february,February,Februari
 filter_by_balance,"Filter by Balance","Filter berdasarkan Saldo"
 filter_by_category,"Filter by Category","Filter berdasarkan Kategori"

@@ -84,6 +84,7 @@ return [
     'expense_breakdown' => 'Expense Breakdown',
     'expense_breakdown_description' => 'Analyze which categories contribute the most to your expenses.',
     'expenses' => 'Expenses',
+    'export_transactions' => 'Export transactions (CSV)',
     'february' => 'February',
     'filter_by_balance' => 'Filter by Balance',
     'filter_by_category' => 'Filter by Category',

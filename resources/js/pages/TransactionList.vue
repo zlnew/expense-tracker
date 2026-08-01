@@ -10,6 +10,7 @@ import {
   SquarePen,
   Trash2,
   Filter,
+  Download,
   WalletIcon,
   ListTodoIcon,
   MinusIcon,
@@ -61,7 +62,7 @@ import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { useParam } from '@/composables/useParam'
-import { index as transactionIndex } from '@/routes/transactions'
+import { exportMethod as transactionExport, index as transactionIndex } from '@/routes/transactions'
 import type { Balance, Budget, Category, Paginate, Transaction } from '@/types'
 
 const props = defineProps<{
@@ -134,7 +135,7 @@ watch(
   },
 )
 
-const fetchData = useDebounceFn(() => {
+const buildFilterParams = (): Record<string, any> => {
   const params: Record<string, any> = {}
 
   params.search = search.value
@@ -154,6 +155,26 @@ const fetchData = useDebounceFn(() => {
   if (dateToFilter.value) {
     params.dateTo = dateToFilter.value
   }
+
+  return params
+}
+
+// Download the current filter view as CSV (full download, not Inertia visit).
+const exportCsv = () => {
+  const params = buildFilterParams()
+
+  const url = new URL(transactionExport.url(), window.location.origin)
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== '' && value !== undefined) {
+      url.searchParams.set(key, String(value))
+    }
+  })
+
+  window.location.href = url.toString()
+}
+
+const fetchData = useDebounceFn(() => {
+  const params = buildFilterParams()
 
   router.get(transactionIndex.url(), params, {
     preserveState: true,
@@ -267,6 +288,16 @@ const openTransferDialog = () => {
             @click="filterSheetOpen = true"
           >
             <Filter class="size-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            class="h-10 w-10 shrink-0"
+            :aria-label="__('export_transactions')"
+            :title="__('export_transactions')"
+            @click="exportCsv"
+          >
+            <Download class="size-4" />
           </Button>
         </div>
 

@@ -84,6 +84,7 @@ return [
     'expense_breakdown' => 'Proporsi Pengeluaran',
     'expense_breakdown_description' => 'Analisis kategori yang paling banyak menyumbang pengeluaran Anda.',
     'expenses' => 'Pengeluaran',
+    'export_transactions' => 'Ekspor transaksi (CSV)',
     'february' => 'Februari',
     'filter_by_balance' => 'Filter berdasarkan Saldo',
     'filter_by_category' => 'Filter berdasarkan Kategori',

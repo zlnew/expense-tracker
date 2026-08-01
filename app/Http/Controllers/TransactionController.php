@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TransactionController extends Controller
 {
@@ -49,6 +50,47 @@ class TransactionController extends Controller
             'primaryBalanceId' => $primaryBalance?->id,
             'activeBudgetId' => $activeBudget?->id,
         ]);
+    }
+
+    /**
+     * Export the current transaction filters as a CSV (for Excel / tax).
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        $transactions = TransactionQuery::make($request->all(), ['balance', 'category'])
+            ->forUser(Auth::id())
+            ->get();
+
+        $filename = 'transactions-'.now()->format('Y-m-d-His').'.csv';
+
+        return response()->streamDownload(function () use ($transactions) {
+            $handle = fopen('php://output', 'w');
+
+            // UTF-8 BOM so Excel opens the file with correct encoding.
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, [
+                'Date',
+                'Type',
+                'Category',
+                'Balance',
+                'Amount',
+                'Description',
+            ]);
+
+            foreach ($transactions as $transaction) {
+                fputcsv($handle, [
+                    $transaction->date?->format('Y-m-d'),
+                    $transaction->type->value,
+                    $transaction->category?->name ?? '',
+                    $transaction->balance?->name ?? '',
+                    $transaction->amount,
+                    $transaction->description ?? '',
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public function store(TransactionSaveRequest $request): RedirectResponse
