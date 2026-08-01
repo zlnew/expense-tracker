@@ -38,6 +38,8 @@ return [
     'cannot_delete_primary_balance' => 'Tidak dapat menghapus saldo utama.',
     'carry_over' => 'Bawa sisa anggaran',
     'carry_over_description' => 'Mulai anggaran ini dengan sisa dari siklus sebelumnya ditambahkan ke setiap kategori.',
+    'carry_over_no_previous' => 'Belum ada anggaran sebelumnya — belum ada sisa yang bisa dibawa.',
+    'carry_over_preview' => 'Rp :amount dari siklus sebelumnya akan masuk ke anggaran ini.',
     'categories' => 'Kategori',
     'category' => 'Kategori',
     'category_create_description' => 'Buat kategori anggaran baru',

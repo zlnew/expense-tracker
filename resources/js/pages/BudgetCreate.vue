@@ -41,6 +41,7 @@ import type { BudgetItem, Category } from '@/types'
 
 const props = defineProps<{
   categories: Category[]
+  carryOverPreview: Record<string, number>
 }>()
 
 const { __ } = useLang()
@@ -99,6 +100,11 @@ onMounted(() => {
 const onCarryOverChange = (value: boolean | 'indeterminate') => {
   form.carry_over = value === true
 }
+
+// Total unused amount from the previous cycle that will roll in.
+const carryOverPreviewTotal = computed(() =>
+  Object.values(props.carryOverPreview ?? {}).reduce((sum, v) => sum + v, 0),
+)
 
 const initBudgetItems = () => {
   expenseCategories.value.forEach((ec) => {
@@ -217,6 +223,18 @@ const goBack = () => {
           </div>
           <p class="text-sm text-muted-foreground">
             {{ __('carry_over_description') }}
+          </p>
+          <p
+            v-if="form.carry_over && carryOverPreviewTotal > 0"
+            class="text-sm font-medium text-primary"
+          >
+            {{ __('carry_over_preview', { amount: formatNumber(carryOverPreviewTotal) }) }}
+          </p>
+          <p
+            v-else-if="form.carry_over"
+            class="text-sm text-muted-foreground"
+          >
+            {{ __('carry_over_no_previous') }}
           </p>
 
           <Separator />

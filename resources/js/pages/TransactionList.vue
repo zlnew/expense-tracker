@@ -11,6 +11,7 @@ import {
   Trash2,
   Filter,
   Download,
+  Repeat,
   WalletIcon,
   ListTodoIcon,
   MinusIcon,
@@ -63,6 +64,7 @@ import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { useParam } from '@/composables/useParam'
 import { exportMethod as transactionExport, index as transactionIndex } from '@/routes/transactions'
+import recurringTransactions from '@/routes/recurring-transactions'
 import type { Balance, Budget, Category, Paginate, Transaction } from '@/types'
 
 const props = defineProps<{
@@ -288,6 +290,16 @@ const openTransferDialog = () => {
             @click="filterSheetOpen = true"
           >
             <Filter class="size-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            class="h-10 w-10 shrink-0"
+            :aria-label="__('recurring_transactions')"
+            :title="__('recurring_transactions')"
+            @click="router.visit(recurringTransactions.index().url)"
+          >
+            <Repeat class="size-4" />
           </Button>
           <Button
             variant="outline"

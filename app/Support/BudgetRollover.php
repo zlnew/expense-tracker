@@ -42,8 +42,39 @@ class BudgetRollover
             return [];
         }
 
+        return self::budgetLeftovers($previous);
+    }
+
+    /**
+     * Preview what would roll over for a brand-new budget: the user's most
+     * recent ended budget's own unused amounts, keyed by category_id.
+     *
+     * @return array<int, int>
+     */
+    public static function previewForUser(User $user): array
+    {
+        $latest = Budget::query()
+            ->where('user_id', $user->id)
+            ->where('period_end', '<', now())
+            ->orderByDesc('period_end')
+            ->first();
+
+        if (! $latest) {
+            return [];
+        }
+
+        return self::budgetLeftovers($latest);
+    }
+
+    /**
+     * Compute the unused amount per expense category of a single budget.
+     *
+     * @return array<int, int>
+     */
+    private static function budgetLeftovers(Budget $budget): array
+    {
         $items = BudgetItem::query()
-            ->where('budget_id', $previous->id)
+            ->where('budget_id', $budget->id)
             ->where('type', CategoryType::EXPENSE)
             ->get()
             ->keyBy('category_id');
@@ -55,9 +86,9 @@ class BudgetRollover
         $spent = Transaction::query()
             ->selectRaw('budget_item_id, SUM(amount) as total_amount')
             ->where('user_id', $budget->user_id)
-            ->where('budget_id', $previous->id)
+            ->where('budget_id', $budget->id)
             ->where('type', CategoryType::EXPENSE)
-            ->whereBetween('date', [$previous->period_start, $previous->period_end])
+            ->whereBetween('date', [$budget->period_start, $budget->period_end])
             ->groupBy('budget_item_id')
             ->pluck('total_amount', 'budget_item_id');
 
