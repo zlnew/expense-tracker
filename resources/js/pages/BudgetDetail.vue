@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps, useHttp } from '@inertiajs/vue3'
-import { CheckCircle2, CalendarDays, SquarePen } from 'lucide-vue-next'
+import { AlertTriangle, CheckCircle2, CalendarDays, SquarePen } from 'lucide-vue-next'
 import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useBudgetProgress } from '@/composables/useBudgetProgress'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -43,6 +44,12 @@ const props = defineProps<{
 const { __ } = useLang()
 const { formatAmount } = useNumber()
 const { formatDate } = useDate()
+const {
+  getProgressPercent,
+  getProgressColor,
+  getProgressBgColor,
+  getProgressTextColor,
+} = useBudgetProgress()
 
 setLayoutProps({
   breadcrumbs: [
@@ -350,8 +357,8 @@ const setActive = () => {
               :icon="false"
             />
 
-            <!-- Mobile view for expenses -->
-            <div v-if="!transactionsLoading" class="space-y-4 md:hidden">
+            <!-- Budget progress style (mobile + desktop), matching Dashboard -->
+            <div v-if="!transactionsLoading" class="space-y-4">
               <div
                 v-if="expenseBudgetItems.length === 0"
                 class="py-8 text-center text-muted-foreground"
@@ -361,31 +368,76 @@ const setActive = () => {
               <div
                 v-for="(exp, index) in expenseBudgetItems"
                 :key="index"
-                class="border-b pb-4 last:border-0"
+                class="-mx-2 space-y-1.5 rounded-lg px-2 py-2 transition-colors duration-200 hover:bg-muted/10"
               >
-                <div class="flex items-center justify-between font-bold">
-                  <span>{{ exp.category?.name }}</span>
+                <div class="flex items-center justify-between text-sm">
+                  <div class="flex min-w-0 items-center gap-1.5">
+                    <span class="truncate font-bold text-foreground">
+                      {{ exp.category?.name || __('unknown') }}
+                    </span>
+                    <span
+                      v-if="exp.actual_amount > exp.planned_amount"
+                      class="inline-flex items-center gap-0.5 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-semibold text-rose-600 dark:bg-rose-950/20 dark:text-rose-400"
+                    >
+                      <AlertTriangle class="size-2.5" />
+                      {{ __('overspent') }}
+                    </span>
+                  </div>
+                  <span
+                    class="text-xs font-semibold"
+                    :class="
+                      getProgressTextColor(
+                        exp.planned_amount,
+                        exp.actual_amount ?? 0,
+                      )
+                    "
+                  >
+                    {{ getProgressPercent(exp.planned_amount, exp.actual_amount ?? 0) }}% {{ __('spent') }}
+                  </span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div
+                  class="h-2 w-full overflow-hidden rounded-full"
+                  :class="
+                    getProgressBgColor(exp.planned_amount, exp.actual_amount ?? 0)
+                  "
+                >
+                  <div
+                    class="h-full rounded-full transition-all duration-500 ease-out"
+                    :class="
+                      getProgressColor(exp.planned_amount, exp.actual_amount ?? 0)
+                    "
+                    :style="{
+                      width: `${getProgressPercent(exp.planned_amount, exp.actual_amount ?? 0)}%`,
+                    }"
+                  ></div>
+                </div>
+
+                <!-- Amounts detail -->
+                <div
+                  class="flex justify-between font-mono text-[11px] text-muted-foreground"
+                >
+                  <span>
+                    {{ formatAmount(exp.actual_amount ?? 0) }} / {{ formatAmount(exp.planned_amount) }}
+                  </span>
                   <span
                     :class="
                       exp.diff_amount < 0
-                        ? 'text-destructive'
-                        : 'text-muted-foreground'
+                        ? 'text-rose-500'
+                        : 'text-emerald-500'
                     "
                   >
-                    {{ formatAmount(exp.diff_amount) }}
+                    {{
+                      exp.diff_amount < 0
+                        ? `-${formatAmount(Math.abs(exp.diff_amount))}`
+                        : `${__('remaining')} ${formatAmount(exp.diff_amount)}`
+                    }}
                   </span>
                 </div>
-                <div
-                  class="mt-1 flex items-center justify-between text-sm text-muted-foreground"
-                >
-                  <span
-                    >{{ __('planned') }}: {{ formatAmount(exp.planned_amount) }}</span
-                  >
-                  <span
-                    >{{ __('actual') }}: {{ formatAmount(exp.actual_amount) }}</span
-                  >
-                </div>
               </div>
+
+              <!-- Totals -->
               <div
                 v-if="expenseBudgetItems.length > 0"
                 class="flex flex-col gap-1 border-t pt-4 text-sm font-bold"
@@ -411,75 +463,6 @@ const setActive = () => {
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Desktop View: Table -->
-            <div v-if="!transactionsLoading" class="hidden md:block">
-              <Table>
-                <TableHeader class="bg-accent">
-                  <TableRow>
-                    <TableHead>
-                      {{ __('category') }}
-                    </TableHead>
-                    <TableHead class="w-[300px] text-end">
-                      {{ __('planned') }}
-                    </TableHead>
-                    <TableHead class="w-[300px] text-end">
-                      {{ __('actual') }}
-                    </TableHead>
-                    <TableHead class="w-[300px] text-end">
-                      {{ __('diff') }}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow
-                    v-for="(exp, index) in expenseBudgetItems"
-                    :key="index"
-                  >
-                    <TableCell>{{ exp.category?.name }}</TableCell>
-                    <TableCell class="text-end">
-                      {{ formatAmount(exp.planned_amount) }}
-                    </TableCell>
-                    <TableCell class="text-end">
-                      {{ formatAmount(exp.actual_amount) }}
-                    </TableCell>
-                    <TableCell class="text-end">
-                      <span
-                        :class="
-                          exp.diff_amount < 0
-                            ? 'text-destructive'
-                            : 'text-muted-foreground'
-                        "
-                      >
-                        {{ formatAmount(exp.diff_amount) }}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell>{{ __('total') }}</TableCell>
-                    <TableCell class="text-right">
-                      {{ formatAmount(plannedExpenseTotal) }}
-                    </TableCell>
-                    <TableCell class="text-right">
-                      {{ formatAmount(actualExpenseTotal) }}
-                    </TableCell>
-                    <TableCell class="text-right">
-                      <span
-                        :class="
-                          diffExpenseTotal < 0
-                            ? 'text-destructive'
-                            : 'text-muted-foreground'
-                        "
-                      >
-                        {{ formatAmount(diffExpenseTotal) }}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
             </div>
           </CardContent>
         </Card>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
 import { Eye, EyeOff } from 'lucide-vue-next'
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import AppLogoIcon from '@/components/AppLogoIcon.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -39,11 +39,45 @@ const pageTitle = computed(() => {
 
   return page.props.name
 })
+
+// Hide-on-scroll-down / show-on-scroll-up (modern mobile app bar behavior).
+// Only affects the mobile header; desktop keeps the header pinned.
+const hidden = ref(false)
+let lastScrollY = 0
+let ticking = false
+
+function onScroll() {
+  if (ticking) {
+    return
+  }
+
+  ticking = true
+
+  requestAnimationFrame(() => {
+    const y = window.scrollY
+    const delta = y - lastScrollY
+
+    // Ignore tiny jitter; only hide after scrolling down past the header.
+    hidden.value = delta > 4 && y > 80
+    lastScrollY = y
+    ticking = false
+  })
+}
+
+onMounted(() => {
+  lastScrollY = window.scrollY
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
+})
 </script>
 
 <template>
   <header
-    class="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
+    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] ease-linear duration-200 group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
+    :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
     <!-- Desktop: sidebar trigger + breadcrumbs -->
     <SidebarTrigger class="-ml-1 hidden md:flex" />

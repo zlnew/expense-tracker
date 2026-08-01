@@ -176,7 +176,7 @@ watch(
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="max-w-[calc(100%-2rem)] lg:max-w-6xl">
+    <SheetDialogContent class="w-full sm:max-w-6xl">
       <DialogHeader>
         <DialogTitle>{{ __('multiple_transactions') }}</DialogTitle>
         <DialogDescription>

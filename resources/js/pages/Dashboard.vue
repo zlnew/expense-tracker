@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/chart'
 import ChartTooltipContent from '@/components/ui/chart/ChartTooltipContent.vue'
 import { componentToString } from '@/components/ui/chart/utils'
+import { useBudgetProgress } from '@/composables/useBudgetProgress'
 import { useDate } from '@/composables/useDate'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
 import { useLang } from '@/composables/useLang'
@@ -185,68 +186,13 @@ const donutTriggers = {
   [Donut.selectors.segment]: donutTemplate,
 }
 
-// --- Budget Progress Helpers ---
-const getProgressPercent = (planned: number, actual: number) => {
-  if (planned <= 0) {
-    return 0
-  }
-
-  return Math.min(Math.round((actual / planned) * 100), 100)
-}
-
-const getProgressColor = (planned: number, actual: number) => {
-  if (planned <= 0) {
-    return 'bg-emerald-500 dark:bg-emerald-600'
-  }
-
-  const percentage = (actual / planned) * 100
-
-  if (percentage >= 100) {
-    return 'bg-rose-500 dark:bg-rose-600'
-  }
-
-  if (percentage >= 80) {
-    return 'bg-amber-500 dark:bg-amber-600'
-  }
-
-  return 'bg-emerald-500 dark:bg-emerald-600'
-}
-
-const getProgressBgColor = (planned: number, actual: number) => {
-  if (planned <= 0) {
-    return 'bg-emerald-100 dark:bg-emerald-950/30'
-  }
-
-  const percentage = (actual / planned) * 100
-
-  if (percentage >= 100) {
-    return 'bg-rose-100 dark:bg-rose-950/30'
-  }
-
-  if (percentage >= 80) {
-    return 'bg-amber-100 dark:bg-amber-950/30'
-  }
-
-  return 'bg-emerald-100 dark:bg-emerald-950/30'
-}
-
-const getProgressTextColor = (planned: number, actual: number) => {
-  if (planned <= 0) {
-    return 'text-emerald-600 dark:text-emerald-400'
-  }
-
-  const percentage = (actual / planned) * 100
-
-  if (percentage >= 100) {
-    return 'text-rose-600 dark:text-rose-400 font-bold'
-  }
-
-  if (percentage >= 80) {
-    return 'text-amber-600 dark:text-amber-400 font-medium'
-  }
-
-  return 'text-emerald-600 dark:text-emerald-400'
-}
+// --- Budget Progress Helpers (shared with BudgetDetail) ---
+const {
+  getProgressPercent,
+  getProgressColor,
+  getProgressBgColor,
+  getProgressTextColor,
+} = useBudgetProgress()
 </script>
 
 <template>
@@ -756,7 +702,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                       class="inline-flex items-center gap-0.5 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-semibold text-rose-600 dark:bg-rose-950/20 dark:text-rose-400"
                     >
                       <AlertTriangle class="size-2.5" />
-                      Overspent
+                      {{ __('overspent') }}
                     </span>
                   </div>
                   <span
@@ -773,7 +719,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                         bi.planned_amount,
                         bi.actual_amount ?? 0,
                       )
-                    }}% Spent
+                    }}% {{ __('spent') }}
                   </span>
                 </div>
 
@@ -813,7 +759,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                     {{
                       bi.planned_amount - bi.actual_amount < 0
                         ? `-${formatAmount(Math.abs(bi.planned_amount - bi.actual_amount))}`
-                        : `Sisa ${formatAmount(bi.planned_amount - bi.actual_amount)}`
+                        : `${__('remaining')} ${formatAmount(bi.planned_amount - bi.actual_amount)}`
                     }}
                   </span>
                 </div>

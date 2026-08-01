@@ -306,17 +306,8 @@ const setActive = (budget: Budget) => {
     </div>
   </AppContent>
 
-  <!-- Mobile FAB: primary action above the bottom nav (md:hidden) -->
-  <Button
-    asChild
-    size="icon-lg"
-    :aria-label="__('add_data', { data: __('budget') })"
-    class="fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)] z-50 h-14 w-14 rounded-full shadow-xl md:hidden"
-  >
-    <Link :href="budgetCreate.url()">
-      <Plus class="size-6" />
-    </Link>
-  </Button>
+  <!-- Mobile FAB removed: header CTA is the single budget-add; the bottom nav
+       center FAB covers transaction create. No redundant floating buttons. -->
 
   <BudgetDeleteDialog v-model:open="deleteDialogOpen" :budget="targetData" />
 </template>

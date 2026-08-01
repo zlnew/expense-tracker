@@ -2,9 +2,7 @@
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 import {
-  ArrowDownToLine,
   ArrowRightLeft,
-  ArrowUpFromLine,
   ChevronDown,
   ListPlus,
   Plus,
@@ -15,6 +13,8 @@ import {
   WalletIcon,
   ListTodoIcon,
   MinusIcon,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
@@ -90,6 +90,7 @@ const updateDialogOpen = ref(false)
 const bulkCreateDialogOpen = ref(false)
 const transferDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
+const addSheetOpen = ref(false)
 const targetData = ref<Transaction | null>(null)
 
 const search = ref(param.get('search') || '')
@@ -207,9 +208,10 @@ const openTransferDialog = () => {
           class="mb-0"
         />
         <div class="flex items-center gap-2">
+          <!-- Desktop: dropdown with all three actions -->
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
-              <Button>
+              <Button class="hidden sm:inline-flex">
                 <Plus class="mr-2 size-4" />
                 {{ __('add_data', { data: __('transaction') }) }}
                 <ChevronDown class="ml-2 size-4" />
@@ -230,6 +232,17 @@ const openTransferDialog = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <!-- Mobile: compact add button opens a bottom-sheet action menu -->
+          <Button
+            variant="default"
+            size="icon"
+            class="h-11 w-11 sm:hidden"
+            :aria-label="__('add_data', { data: __('transaction') })"
+            @click="addSheetOpen = true"
+          >
+            <Plus class="size-5" />
+          </Button>
         </div>
       </div>
 
@@ -438,6 +451,45 @@ const openTransferDialog = () => {
         </SheetDialogContent>
       </Dialog>
 
+      <!-- Mobile: add-transaction action sheet (sm:hidden equivalent via content) -->
+      <Dialog v-model:open="addSheetOpen">
+        <SheetDialogContent class="sm:hidden">
+          <DialogHeader>
+            <DialogTitle class="flex items-center gap-2">
+              <Plus class="size-4" />
+              {{ __('add_data', { data: __('transaction') }) }}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div class="space-y-2">
+            <Button
+              variant="outline"
+              class="h-12 w-full justify-start gap-3 text-base"
+              @click="openCreateDialog"
+            >
+              <Plus class="size-5" />
+              {{ __('single_transaction') }}
+            </Button>
+            <Button
+              variant="outline"
+              class="h-12 w-full justify-start gap-3 text-base"
+              @click="openBulkCreateDialog"
+            >
+              <ListPlus class="size-5" />
+              {{ __('multiple_transactions') }}
+            </Button>
+            <Button
+              variant="outline"
+              class="h-12 w-full justify-start gap-3 text-base"
+              @click="openTransferDialog"
+            >
+              <ArrowRightLeft class="size-5" />
+              {{ __('transfer') }}
+            </Button>
+          </div>
+        </SheetDialogContent>
+      </Dialog>
+
       <!-- Loading skeleton while a search/filter visit is in flight -->
       <ListSkeleton v-if="loading" :rows="5" />
 
@@ -498,7 +550,7 @@ const openTransferDialog = () => {
                 >
                   <component
                     :is="
-                      t.type === 'income' ? ArrowDownToLine : ArrowUpFromLine
+                      t.type === 'income' ? TrendingUp : TrendingDown
                     "
                     class="size-5"
                   />

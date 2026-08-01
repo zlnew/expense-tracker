@@ -23,25 +23,25 @@ const items = [
     title: __('dashboard'),
     href: dashboard.url(),
     icon: LayoutGrid,
-    active: page.url === dashboard.url() || page.url === '/',
+    active: () => page.url === dashboard.url() || page.url === '/',
   },
   {
     title: __('transactions'),
     href: transactions.index.url(),
     icon: ArrowLeftRight,
-    active: page.url.startsWith(transactions.index.url()),
+    active: () => page.url.startsWith(transactions.index.url()),
   },
   {
     title: __('budgets'),
     href: budgets.index.url(),
     icon: CircleDollarSign,
-    active: page.url.startsWith(budgets.index.url()),
+    active: () => page.url.startsWith(budgets.index.url()),
   },
   {
     title: __('balances'),
     href: balances.index.url(),
     icon: Wallet,
-    active: page.url.startsWith(balances.index.url()),
+    active: () => page.url.startsWith(balances.index.url()),
   },
 ]
 
@@ -67,7 +67,7 @@ function openTransactionCreate() {
           :href="item.href"
           class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
           :class="
-            item.active
+            item.active()
               ? 'text-primary'
               : 'text-sidebar-foreground/60 hover:text-sidebar-foreground'
           "
@@ -96,7 +96,7 @@ function openTransactionCreate() {
           :href="item.href"
           class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
           :class="
-            item.active
+            item.active()
               ? 'text-primary'
               : 'text-sidebar-foreground/60 hover:text-sidebar-foreground'
           "
