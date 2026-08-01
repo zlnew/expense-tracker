@@ -8,8 +8,7 @@ use App\Models\Budget;
 use App\Models\BudgetItem;
 use App\Models\Transaction;
 use App\Models\User;
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
+use App\Support\BudgetCycle;
 use Spatie\LaravelData\DataCollection;
 
 class GetBudgetProgress extends Action
@@ -36,7 +35,7 @@ class GetBudgetProgress extends Action
             return new DataCollection(BudgetItemData::class, []);
         }
 
-        [$start, $end] = $this->getCurrentCycleRange();
+        [$start, $end] = BudgetCycle::currentCycleRange($this->activeBudget);
 
         $budgetItems = BudgetItem::query()
             ->with('category')
@@ -71,43 +70,5 @@ class GetBudgetProgress extends Action
             })->values();
 
         return BudgetItemData::collect($progress, DataCollection::class);
-    }
-
-    private function getCutoffDateForMonth(CarbonImmutable $date, int $cutoffDay): CarbonImmutable
-    {
-        $lastDayOfMonth = $date->daysInMonth;
-        $resolvedDay = min($cutoffDay, $lastDayOfMonth);
-
-        return $date->setDay($resolvedDay)->startOfDay();
-    }
-
-    private function getCurrentCycleRange(): array
-    {
-        $now = Carbon::now()->toImmutable();
-        $cutoffDay = $this->activeBudget->cutoff_day;
-
-        $cutoffThisMonth = $this->getCutoffDateForMonth($now, $cutoffDay);
-
-        if ($now->lte($cutoffThisMonth->endOfDay())) {
-            $cutoffLastMonth = $this->getCutoffDateForMonth(
-                $now->subMonthNoOverflow(),
-                $cutoffDay
-            );
-
-            return [
-                $cutoffLastMonth->addDay()->startOfDay(),
-                $cutoffThisMonth->endOfDay(),
-            ];
-        }
-
-        $cutoffNextMonth = $this->getCutoffDateForMonth(
-            $now->addMonthNoOverflow(),
-            $cutoffDay
-        );
-
-        return [
-            $cutoffThisMonth->addDay()->startOfDay(),
-            $cutoffNextMonth->endOfDay(),
-        ];
     }
 }
