@@ -5,6 +5,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -97,6 +98,9 @@ const transactionApi = useHttp({
 })
 
 const transactions = ref<Transaction[]>([])
+
+// True while the transactions API fetch is in flight — shows the skeleton.
+const transactionsLoading = ref(false)
 
 const months = computed(() => {
   const monthNames = [
@@ -232,12 +236,16 @@ onMounted(() => {
 })
 
 const fetchTransactions = async () => {
+  transactionsLoading.value = true
+
   try {
     const res = await transactionApi.get('/api/transactions')
     transactions.value = res as Transaction[]
   } catch (error) {
     const apiError = error as Error
     toast.error(apiError.message)
+  } finally {
+    transactionsLoading.value = false
   }
 }
 
@@ -336,8 +344,14 @@ const setActive = () => {
             <CardTitle>{{ __('monthly_expenses') }}</CardTitle>
           </CardHeader>
           <CardContent>
+            <ListSkeleton
+              v-if="transactionsLoading"
+              :rows="4"
+              :icon="false"
+            />
+
             <!-- Mobile view for expenses -->
-            <div class="space-y-4 md:hidden">
+            <div v-if="!transactionsLoading" class="space-y-4 md:hidden">
               <div
                 v-if="expenseBudgetItems.length === 0"
                 class="py-8 text-center text-muted-foreground"
@@ -400,7 +414,7 @@ const setActive = () => {
             </div>
 
             <!-- Desktop View: Table -->
-            <div class="hidden md:block">
+            <div v-if="!transactionsLoading" class="hidden md:block">
               <Table>
                 <TableHeader class="bg-accent">
                   <TableRow>
@@ -475,8 +489,14 @@ const setActive = () => {
             <CardTitle>{{ __('monthly_incomes') }}</CardTitle>
           </CardHeader>
           <CardContent>
+            <ListSkeleton
+              v-if="transactionsLoading"
+              :rows="4"
+              :icon="false"
+            />
+
             <!-- Mobile view for incomes -->
-            <div class="space-y-4 md:hidden">
+            <div v-if="!transactionsLoading" class="space-y-4 md:hidden">
               <div
                 v-if="incomeBudgetItems.length === 0"
                 class="py-8 text-center text-muted-foreground"
@@ -539,7 +559,7 @@ const setActive = () => {
             </div>
 
             <!-- Desktop View: Table -->
-            <div class="hidden md:block">
+            <div v-if="!transactionsLoading" class="hidden md:block">
               <Table>
                 <TableHeader class="bg-accent">
                   <TableRow>

@@ -5,6 +5,7 @@ import { Plus, Search, SquarePen, Tags, Trash2 } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import CategoryCreateDialog from '@/components/dialogs/CategoryCreateDialog.vue'
 import CategoryDeleteDialog from '@/components/dialogs/CategoryDeleteDialog.vue'
 import CategoryUpdateDialog from '@/components/dialogs/CategoryUpdateDialog.vue'
@@ -62,6 +63,9 @@ const targetData = ref<Data | null>(null)
 const search = ref(param.get('search') || '')
 const typeFilter = ref(param.get('type') || 'all')
 
+// True while a debounced search/filter visit is in flight — shows the skeleton.
+const loading = ref(false)
+
 watch([search, typeFilter], () => {
   fetchData()
 })
@@ -81,6 +85,12 @@ const fetchData = useDebounceFn(() => {
     preserveState: true,
     preserveScroll: true,
     replace: true,
+    onStart: () => {
+      loading.value = true
+    },
+    onFinish: () => {
+      loading.value = false
+    },
   })
 }, 300)
 
@@ -155,8 +165,11 @@ const openDeleteDialog = (data: Data) => {
         </div>
       </div>
 
+      <!-- Loading skeleton while a search/filter visit is in flight -->
+      <ListSkeleton v-if="loading" :rows="5" />
+
       <!-- Mobile View: Cards -->
-      <div class="grid grid-cols-1 gap-4 md:hidden">
+      <div v-if="!loading" class="grid grid-cols-1 gap-4 md:hidden">
         <div
           v-if="categories.data.length === 0"
           class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
@@ -215,6 +228,7 @@ const openDeleteDialog = (data: Data) => {
 
       <!-- Desktop View: Table -->
       <div
+        v-if="!loading"
         class="hidden overflow-hidden rounded-md border bg-background md:block"
       >
         <Table>
@@ -278,7 +292,7 @@ const openDeleteDialog = (data: Data) => {
       </div>
 
       <AppPagination
-        v-if="categories.meta"
+        v-if="!loading && categories.meta"
         :meta="categories.meta"
         :links="categories.links"
       />

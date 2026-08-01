@@ -13,6 +13,7 @@ import { ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import BalanceDeleteDialog from '@/components/dialogs/BalanceDeleteDialog.vue'
 import BalanceSaveDialog from '@/components/dialogs/BalanceSaveDialog.vue'
 import Heading from '@/components/Heading.vue'
@@ -58,6 +59,9 @@ const targetData = ref<Balance | null>(null)
 
 const search = ref(param.get('search') || '')
 
+// True while a debounced search visit is in flight — shows the skeleton.
+const loading = ref(false)
+
 watch(search, () => {
   fetchData()
 })
@@ -73,6 +77,12 @@ const fetchData = useDebounceFn(() => {
     preserveState: true,
     preserveScroll: true,
     replace: true,
+    onStart: () => {
+      loading.value = true
+    },
+    onFinish: () => {
+      loading.value = false
+    },
   })
 }, 300)
 
@@ -142,8 +152,11 @@ const setPrimary = (balance: Balance) => {
         </div>
       </div>
 
+      <!-- Loading skeleton while a search visit is in flight -->
+      <ListSkeleton v-if="loading" :rows="5" />
+
       <div
-        v-if="balances.data.length === 0"
+        v-if="!loading && balances.data.length === 0"
         class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
       >
         <div class="mb-4 rounded-full bg-muted p-4">
@@ -244,7 +257,7 @@ const setPrimary = (balance: Balance) => {
       </div>
 
       <AppPagination
-        v-if="balances.meta"
+        v-if="!loading && balances.meta"
         :meta="balances.meta"
         :links="balances.links"
       />

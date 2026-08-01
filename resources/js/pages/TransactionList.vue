@@ -19,6 +19,7 @@ import {
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
 import TransactionCreateDialog from '@/components/dialogs/TransactionCreateDialog.vue'
 import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialog.vue'
@@ -101,6 +102,9 @@ const dateToFilter = ref(param.get('dateTo') || '')
 
 const filterSheetOpen = ref(false)
 
+// True while a debounced search/filter visit is in flight — shows the skeleton.
+const loading = ref(false)
+
 const groupedCategories = computed(() => {
   const items = props.categories
 
@@ -156,6 +160,12 @@ const fetchData = useDebounceFn(() => {
     preserveState: true,
     preserveScroll: true,
     replace: true,
+    onStart: () => {
+      loading.value = true
+    },
+    onFinish: () => {
+      loading.value = false
+    },
   })
 }, 300)
 
@@ -437,9 +447,12 @@ const openTransferDialog = () => {
         </SheetDialogContent>
       </Dialog>
 
+      <!-- Loading skeleton while a search/filter visit is in flight -->
+      <ListSkeleton v-if="loading" :rows="5" />
+
       <!-- Empty state -->
       <div
-        v-if="transactions.data.length === 0"
+        v-if="!loading && transactions.data.length === 0"
         class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
       >
         <div class="mb-4 rounded-full bg-muted p-4">
@@ -551,6 +564,7 @@ const openTransferDialog = () => {
 
       <!-- Desktop View: Table -->
       <div
+        v-if="!loading"
         class="hidden overflow-hidden rounded-md border bg-background md:block"
       >
         <Table>
@@ -632,7 +646,7 @@ const openTransferDialog = () => {
       </div>
 
       <AppPagination
-        v-if="transactions.meta"
+        v-if="!loading && transactions.meta"
         :meta="transactions.meta"
         :links="transactions.links"
       />
