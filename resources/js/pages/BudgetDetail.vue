@@ -300,6 +300,13 @@ const setActive = () => {
           <div class="text-lg">{{ budget.cutoff_day }}</div>
         </div>
 
+        <div v-if="budget.carry_over" class="flex flex-col gap-1">
+          <div class="text-sm font-semibold">{{ __('carry_over') }}</div>
+          <div class="max-w-md text-muted-foreground">
+            {{ __('carry_over_description') }}
+          </div>
+        </div>
+
         <div class="flex flex-col gap-1">
           <div class="text-sm font-semibold">{{ __('notes') }}</div>
           <div class="max-w-md text-muted-foreground">

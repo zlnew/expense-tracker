@@ -83,6 +83,25 @@ const user = computed(() => page.props.auth.user)
         <InputError class="mt-2" :message="errors.email" />
       </div>
 
+      <div class="grid gap-2">
+        <Label for="discord_webhook_url">
+          {{ __('discord_webhook_url') }}
+        </Label>
+        <Input
+          id="discord_webhook_url"
+          type="url"
+          class="mt-1 block w-full"
+          name="discord_webhook_url"
+          :default-value="user.discord_webhook_url ?? ''"
+          autocomplete="off"
+          :placeholder="__('discord_webhook_url_placeholder')"
+        />
+        <InputError class="mt-2" :message="errors.discord_webhook_url" />
+        <p class="text-sm text-muted-foreground">
+          {{ __('discord_webhook_url_description') }}
+        </p>
+      </div>
+
       <div v-if="mustVerifyEmail && !user.email_verified_at">
         <p class="-mt-4 text-sm text-muted-foreground">
           Your email address is unverified.

@@ -6,6 +6,7 @@ export type User = {
   email: string
   avatar?: string
   email_verified_at: string | null
+  discord_webhook_url: string | null
   two_factor_confirmed_at: string | null
   active_budget: Budget | null
   budgets: Budget[] | null

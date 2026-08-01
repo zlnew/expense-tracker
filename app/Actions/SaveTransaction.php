@@ -14,7 +14,7 @@ class SaveTransaction extends Action
         private readonly TransactionData $data,
     ) {}
 
-    public function handle(): void
+    public function handle(): Transaction
     {
         DB::transaction(function () {
             $userId = Auth::id();
@@ -56,5 +56,7 @@ class SaveTransaction extends Action
                 SyncBalance::run($oldBalanceId);
             }
         });
+
+        return $this->transaction;
     }
 }
