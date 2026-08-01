@@ -37,6 +37,7 @@ export default defineConfig({
             base: '/',
             scope: '/',
             manifest: {
+                id: '/',
                 name: 'Expense Tracker',
                 short_name: 'ExpenseTracker',
                 description: 'A mobile-first expense tracking application.',
@@ -45,6 +46,24 @@ export default defineConfig({
                 display: 'standalone',
                 orientation: 'portrait',
                 start_url: '/',
+                screenshots: [
+                    // Placeholder paths — replace with real 1920x1080 captures
+                    // placed under public/screenshots/ before shipping...
+                    {
+                        src: '/screenshots/home-1920.png',
+                        sizes: '1920x1080',
+                        type: 'image/png',
+                        form_factor: 'wide',
+                        label: 'Expense Tracker dashboard',
+                    },
+                    {
+                        src: '/screenshots/transactions-1920.png',
+                        sizes: '1920x1080',
+                        type: 'image/png',
+                        form_factor: 'wide',
+                        label: 'Expense Tracker transaction list',
+                    },
+                ],
                 icons: [
                     {
                         src: '/pwa-192x192.png',

@@ -16,6 +16,7 @@ import AppPagination from '@/components/AppPagination.vue'
 import BalanceDeleteDialog from '@/components/dialogs/BalanceDeleteDialog.vue'
 import BalanceSaveDialog from '@/components/dialogs/BalanceSaveDialog.vue'
 import Heading from '@/components/Heading.vue'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -41,7 +42,7 @@ defineProps<{
 }>()
 
 const { __ } = useLang()
-const { formatNumber } = useNumber()
+const { formatAmount } = useNumber()
 const param = useParam()
 
 setLayoutProps({
@@ -58,6 +59,9 @@ const targetData = ref<Balance | null>(null)
 
 const search = ref(param.get('search') || '')
 
+// True while a debounced search visit is in flight — shows the skeleton.
+const loading = ref(false)
+
 watch(search, () => {
   fetchData()
 })
@@ -73,6 +77,12 @@ const fetchData = useDebounceFn(() => {
     preserveState: true,
     preserveScroll: true,
     replace: true,
+    onStart: () => {
+      loading.value = true
+    },
+    onFinish: () => {
+      loading.value = false
+    },
   })
 }, 300)
 
@@ -142,8 +152,11 @@ const setPrimary = (balance: Balance) => {
         </div>
       </div>
 
+      <!-- Loading skeleton while a search visit is in flight -->
+      <ListSkeleton v-if="loading" :rows="5" />
+
       <div
-        v-if="balances.data.length === 0"
+        v-if="!loading && balances.data.length === 0"
         class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
       >
         <div class="mb-4 rounded-full bg-muted p-4">
@@ -194,14 +207,14 @@ const setPrimary = (balance: Balance) => {
                   __('final_amount')
                 }}</span>
                 <span class="text-2xl font-bold tracking-tight">
-                  Rp {{ formatNumber(b.final_amount) }}
+                  {{ formatAmount(b.final_amount) }}
                 </span>
               </div>
               <div
                 class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
               >
                 <span>{{ __('initial_amount') }}</span>
-                <span>Rp {{ formatNumber(b.initial_amount) }}</span>
+                <span>{{ formatAmount(b.initial_amount) }}</span>
               </div>
             </div>
           </CardContent>
@@ -213,6 +226,7 @@ const setPrimary = (balance: Balance) => {
               <Button
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10 md:h-8 md:w-8"
                 @click="openEditDialog(b)"
                 :title="__('edit_data', { data: __('balance') })"
               >
@@ -221,8 +235,8 @@ const setPrimary = (balance: Balance) => {
               <Button
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10 md:h-8 md:w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 @click="openDeleteDialog(b)"
-                class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 :title="__('delete_data', { data: __('balance') })"
               >
                 <Trash2 class="size-4" />
@@ -233,6 +247,7 @@ const setPrimary = (balance: Balance) => {
               v-if="!b.is_primary"
               variant="outline"
               size="sm"
+              class="h-10 md:h-9"
               @click="setPrimary(b)"
             >
               {{ __('set_as_primary') }}
@@ -242,7 +257,7 @@ const setPrimary = (balance: Balance) => {
       </div>
 
       <AppPagination
-        v-if="balances.meta"
+        v-if="!loading && balances.meta"
         :meta="balances.meta"
         :links="balances.links"
       />

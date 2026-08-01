@@ -8,12 +8,12 @@ import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -176,7 +176,7 @@ watch(
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-w-[calc(100%-2rem)] lg:max-w-6xl">
+    <SheetDialogContent class="w-full sm:max-w-6xl">
       <DialogHeader>
         <DialogTitle>{{ __('multiple_transactions') }}</DialogTitle>
         <DialogDescription>
@@ -298,7 +298,13 @@ watch(
 
           <div class="space-y-2">
             <Label>{{ __('amount') }}</Label>
-            <Input type="number" v-model="item.amount" placeholder="0" />
+            <Input
+              type="number"
+              inputmode="decimal"
+              pattern="[0-9]*[.,]?[0-9]*"
+              v-model="item.amount"
+              placeholder="0"
+            />
           </div>
 
           <div class="space-y-2 sm:col-span-2 lg:col-span-1">
@@ -360,6 +366,6 @@ watch(
           {{ form.processing ? __('saving') : __('save') }}
         </Button>
       </DialogFooter>
-    </DialogContent>
+    </SheetDialogContent>
   </Dialog>
 </template>

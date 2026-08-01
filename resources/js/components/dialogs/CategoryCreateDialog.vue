@@ -5,12 +5,12 @@ import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -54,7 +54,7 @@ const submit = () => {
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[425px]">
+    <SheetDialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>
           {{ __('add_data', { data: __('category') }) }}
@@ -121,6 +121,6 @@ const submit = () => {
           </Button>
         </DialogFooter>
       </form>
-    </DialogContent>
+    </SheetDialogContent>
   </Dialog>
 </template>

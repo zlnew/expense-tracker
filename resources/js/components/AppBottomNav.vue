@@ -4,17 +4,11 @@ import {
   ArrowLeftRight,
   CircleDollarSign,
   LayoutGrid,
+  Plus,
   Wallet,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import UserMenuContent from '@/components/UserMenuContent.vue'
-import { getInitials } from '@/composables/useInitials'
+import { Button } from '@/components/ui/button'
 import { useLang } from '@/composables/useLang'
 import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
@@ -23,80 +17,94 @@ import transactions from '@/routes/transactions'
 
 const { __ } = useLang()
 const page = usePage()
-const user = computed(() => page.props.auth.user)
 
 const items = [
   {
     title: __('dashboard'),
     href: dashboard.url(),
     icon: LayoutGrid,
-    active: page.url === dashboard.url() || page.url === '/',
+    active: () => page.url === dashboard.url() || page.url === '/',
   },
   {
     title: __('transactions'),
     href: transactions.index.url(),
     icon: ArrowLeftRight,
-    active: page.url.startsWith(transactions.index.url()),
+    active: () => page.url.startsWith(transactions.index.url()),
   },
   {
     title: __('budgets'),
     href: budgets.index.url(),
     icon: CircleDollarSign,
-    active: page.url.startsWith(budgets.index.url()),
+    active: () => page.url.startsWith(budgets.index.url()),
   },
   {
     title: __('balances'),
     href: balances.index.url(),
     icon: Wallet,
-    active: page.url.startsWith(balances.index.url()),
+    active: () => page.url.startsWith(balances.index.url()),
   },
 ]
+
+// Left pair = first two items, right pair = last two; the FAB occupies the center slot.
+const leftItems = computed(() => items.slice(0, 2))
+const rightItems = computed(() => items.slice(2))
+
+function openTransactionCreate() {
+  window.dispatchEvent(new CustomEvent('open:transaction-create'))
+}
 </script>
 
 <template>
   <nav
-    class="fixed bottom-0 left-0 z-50 h-16 w-full border-t border-sidebar-border bg-sidebar px-4 md:hidden"
+    class="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
   >
-    <div class="mx-auto flex h-full max-w-lg items-center justify-between">
-      <Link
-        v-for="item in items"
-        :key="item.href"
-        :href="item.href"
-        class="flex flex-col items-center gap-1 transition-colors"
-        :class="
-          item.active
-            ? 'text-primary'
-            : 'text-sidebar-foreground/70 hover:text-sidebar-foreground'
-        "
-      >
-        <component :is="item.icon" class="size-5" />
-        <span class="text-[10px] font-medium">{{ item.title }}</span>
-      </Link>
+    <div
+      class="relative mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2"
+    >
+      <!-- Nav links (2 left) -->
+      <template v-for="item in leftItems" :key="item.href">
+        <Link
+          :href="item.href"
+          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
+          :class="
+            item.active()
+              ? 'text-primary'
+              : 'text-sidebar-foreground/60 hover:text-sidebar-foreground'
+          "
+        >
+          <component :is="item.icon" class="size-[22px]" />
+          <span class="text-[10px] font-medium">{{ item.title }}</span>
+        </Link>
+      </template>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
-          <button class="flex flex-col items-center gap-1 outline-none">
-            <Avatar class="size-5 overflow-hidden rounded-full">
-              <AvatarImage
-                v-if="user.avatar"
-                :src="user.avatar"
-                :alt="user.name"
-              />
-              <AvatarFallback
-                class="rounded-lg bg-neutral-200 text-[10px] font-semibold text-black dark:bg-neutral-700 dark:text-white"
-              >
-                {{ getInitials(user?.name) }}
-              </AvatarFallback>
-            </Avatar>
-            <span class="text-[10px] font-medium text-sidebar-foreground/70">
-              {{ __('profile') }}
-            </span>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" class="w-56" :side-offset="8">
-          <UserMenuContent :user="user" />
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <!-- Center slot: quick-add FAB, raised above the bar -->
+      <div class="flex items-center justify-center">
+        <Button
+          variant="default"
+          size="icon"
+          aria-label="Add transaction"
+          class="z-10 size-12 rounded-full shadow-lg transition-transform active:scale-95"
+          @click="openTransactionCreate"
+        >
+          <Plus class="size-6" />
+        </Button>
+      </div>
+
+      <!-- Nav links (2 right) -->
+      <template v-for="item in rightItems" :key="item.href">
+        <Link
+          :href="item.href"
+          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
+          :class="
+            item.active()
+              ? 'text-primary'
+              : 'text-sidebar-foreground/60 hover:text-sidebar-foreground'
+          "
+        >
+          <component :is="item.icon" class="size-[22px]" />
+          <span class="text-[10px] font-medium">{{ item.title }}</span>
+        </Link>
+      </template>
     </div>
   </nav>
 </template>

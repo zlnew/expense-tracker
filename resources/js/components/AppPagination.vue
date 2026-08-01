@@ -32,13 +32,14 @@ defineProps<{
 <template>
   <div v-if="meta.total > 0" class="flex items-center justify-between px-2">
     <div class="flex-1 text-sm text-muted-foreground">
-      Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} results
+      <span class="sm:hidden">{{ meta.from }}–{{ meta.to }} of {{ meta.total }}</span>
+      <span class="hidden sm:inline">Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} results</span>
     </div>
     <div class="flex items-center space-x-6 lg:space-x-8">
       <div class="flex items-center space-x-2">
         <Button
           variant="outline"
-          class="size-8 p-0"
+          class="size-10 p-0 md:size-8"
           :disabled="meta.current_page === 1"
           as-child
         >
@@ -55,7 +56,7 @@ defineProps<{
           v-for="link in links.slice(1, -1)"
           :key="link.label"
           :variant="link.active ? 'default' : 'outline'"
-          class="size-8 p-0"
+          class="hidden size-8 p-0 md:inline-flex"
           as-child
         >
           <Link v-if="link.url" :href="link.url" preserve-scroll>
@@ -65,7 +66,7 @@ defineProps<{
         </Button>
         <Button
           variant="outline"
-          class="size-8 p-0"
+          class="size-10 p-0 md:size-8"
           :disabled="meta.current_page === meta.last_page"
           as-child
         >

@@ -2,6 +2,7 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { registerSW } from 'virtual:pwa-register'
 import { createApp, h } from 'vue'
 import { initializeTheme } from '@/composables/useAppearance'
+import { useInstallPrompt } from '@/composables/useInstallPrompt'
 import { i18n } from '@/lang'
 import AppLayout from '@/layouts/AppLayout.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
@@ -9,6 +10,10 @@ import SettingsLayout from '@/layouts/settings/Layout.vue'
 import { initializeFlashToast } from '@/lib/flashToast'
 
 registerSW({ immediate: true })
+
+// Capture the browser's install prompt as early as possible so the
+// dismissible install banner (Dashboard) can react to it...
+useInstallPrompt()
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 

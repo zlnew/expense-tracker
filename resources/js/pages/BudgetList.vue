@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
-import { CheckCircle2, Info, Plus, SquarePen, Trash2 } from 'lucide-vue-next'
+import { CheckCircle2, Info, Plus, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
@@ -97,9 +97,23 @@ const setActive = (budget: Budget) => {
       <div class="grid grid-cols-1 gap-4 md:hidden">
         <div
           v-if="budgets.data.length === 0"
-          class="h-24 content-center text-center text-muted-foreground"
+          class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
         >
-          {{ __('no_data_found', { data: __('budgets') }) }}
+          <div class="mb-4 rounded-full bg-muted p-4">
+            <Wallet class="size-8 text-muted-foreground" />
+          </div>
+          <h3 class="text-lg font-semibold">
+            {{ __('no_data_found', { data: __('budgets') }) }}
+          </h3>
+          <p class="mb-6 text-muted-foreground">
+            {{ __('budget_list_description') }}
+          </p>
+          <Button asChild>
+            <Link :href="budgetCreate.url()">
+              <Plus class="mr-2 size-4" />
+              {{ __('add_data', { data: __('budget') }) }}
+            </Link>
+          </Button>
         </div>
         <div
           v-for="b in budgets.data"
@@ -111,14 +125,18 @@ const setActive = (budget: Budget) => {
               <span class="text-sm font-bold">{{
                 formatDate(b.period_start, 'MMM YYYY')
               }}</span>
-              <Badge v-if="b.is_active" variant="default" class="text-[10px]">{{
-                __('active')
-              }}</Badge>
+              <Badge
+                v-if="b.is_active"
+                variant="default"
+                class="px-2.5 py-1 text-xs"
+                >{{ __('active') }}</Badge
+              >
             </div>
-            <div class="flex items-center gap-0.5">
+            <div class="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10"
                 :title="__('view_detail')"
                 asChild
               >
@@ -130,6 +148,7 @@ const setActive = (budget: Budget) => {
                 v-if="!b.is_active"
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10"
                 @click="setActive(b)"
                 :title="__('set_as_active')"
               >
@@ -138,6 +157,7 @@ const setActive = (budget: Budget) => {
               <Button
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10"
                 :title="__('edit_data', { data: __('budget') })"
                 asChild
               >
@@ -148,7 +168,7 @@ const setActive = (budget: Budget) => {
               <Button
                 variant="ghost"
                 size="icon"
-                class="text-destructive"
+                class="h-10 w-10 text-destructive"
                 @click="openDeleteDialog(b)"
                 :title="__('delete_data', { data: __('budget') })"
               >
@@ -285,6 +305,9 @@ const setActive = (budget: Budget) => {
       />
     </div>
   </AppContent>
+
+  <!-- Mobile FAB removed: header CTA is the single budget-add; the bottom nav
+       center FAB covers transaction create. No redundant floating buttons. -->
 
   <BudgetDeleteDialog v-model:open="deleteDialogOpen" :budget="targetData" />
 </template>
