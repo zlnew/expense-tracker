@@ -7,7 +7,6 @@ import AlertError from '@/components/AlertError.vue'
 import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Card,
   CardAction,
@@ -102,10 +101,6 @@ onMounted(() => {
 
   initBudgetItems()
 })
-
-const onCarryOverChange = (value: boolean | 'indeterminate') => {
-  form.carry_over = value === true
-}
 
 const initBudgetItems = () => {
   expenseCategories.value.forEach((ec) => {
@@ -230,19 +225,12 @@ const goBack = () => {
             />
           </div>
 
-          <div class="flex items-center gap-2">
-            <Checkbox
-              id="carry_over"
-              :checked="form.carry_over"
-              @update:checked="onCarryOverChange"
-            />
-            <Label for="carry_over" class="cursor-pointer">
-              {{ __('carry_over') }}
-            </Label>
+          <div v-if="form.carry_over" class="flex flex-col gap-1">
+            <div class="text-sm font-semibold">{{ __('carry_over') }}</div>
+            <p class="text-sm text-muted-foreground">
+              {{ __('carry_over_description') }}
+            </p>
           </div>
-          <p class="text-sm text-muted-foreground">
-            {{ __('carry_over_description') }}
-          </p>
 
           <Separator />
 
