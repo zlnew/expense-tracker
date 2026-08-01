@@ -19,7 +19,9 @@ class BalanceController extends Controller
 {
     public function index(Request $request): Response
     {
-        $balances = BalanceQuery::make($request->all())->paginate();
+        $balances = BalanceQuery::make($request->all())
+            ->forUser(Auth::id())
+            ->paginate();
 
         return Inertia::render('BalanceList', [
             'balances' => BalanceData::collect($balances, PaginatedDataCollection::class),

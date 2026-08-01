@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Queries\BudgetQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -21,7 +22,9 @@ class BudgetController extends Controller
 {
     public function index(Request $request): Response
     {
-        $budgets = BudgetQuery::make($request->all())->paginate();
+        $budgets = BudgetQuery::make($request->all())
+            ->forUser(Auth::id())
+            ->paginate();
 
         return Inertia::render('BudgetList', [
             'budgets' => BudgetData::collect($budgets, PaginatedDataCollection::class),

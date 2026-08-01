@@ -29,7 +29,9 @@ class TransactionController extends Controller
 {
     public function index(Request $request): Response
     {
-        $transactions = TransactionQuery::make($request->all(), ['balance', 'category'])->paginate();
+        $transactions = TransactionQuery::make($request->all(), ['balance', 'category'])
+            ->forUser(Auth::id())
+            ->paginate();
 
         $balances = Balance::where('user_id', Auth::id())->get();
         $budgets = Budget::where('user_id', Auth::id())->with('items.category')->get();
