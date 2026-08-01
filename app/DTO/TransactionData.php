@@ -32,5 +32,6 @@ class TransactionData extends Data
         public ?BudgetData $budget,
         public ?BudgetItemData $budget_item,
         public ?CategoryData $category,
+        public ?string $transfer_group_id = null,
     ) {}
 }

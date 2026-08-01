@@ -6,6 +6,7 @@ use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,6 +49,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['period_start', 'period_end', 'cutoff_day', 'notes'])]
 class Budget extends Model
 {
+    use HasFactory;
+
     protected function casts(): array
     {
         return [

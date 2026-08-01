@@ -25,6 +25,7 @@ class SaveTransaction extends Action
                 'date' => $this->data->date,
                 'amount' => $this->data->amount,
                 'description' => $this->data->description,
+                'transfer_group_id' => $this->data->transfer_group_id,
             ]);
 
             if (! $this->transaction->user_id) {

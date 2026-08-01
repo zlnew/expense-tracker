@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\DTO\CategoryData;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
 class SaveCategory extends Action
 {
@@ -18,6 +19,10 @@ class SaveCategory extends Action
             'type' => $this->data->type,
             'name' => $this->data->name,
         ]);
+
+        if (! $this->category->user_id) {
+            $this->category->user()->associate(Auth::id());
+        }
 
         $this->category->save();
     }

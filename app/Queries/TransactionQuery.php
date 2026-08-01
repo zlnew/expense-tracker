@@ -3,6 +3,7 @@
 namespace App\Queries;
 
 use App\Models\Transaction;
+use App\Support\BudgetCycle;
 
 class TransactionQuery extends BaseQuery
 {
@@ -42,25 +43,9 @@ class TransactionQuery extends BaseQuery
         $this->budgetJoined = true;
     }
 
-    private function getEffectiveCutoffSql(): string
-    {
-        return "LEAST(
-            budgets.cutoff_day,
-            EXTRACT(DAY FROM (DATE_TRUNC('month', transactions.date) + INTERVAL '1 month' - INTERVAL '1 day'))
-        )";
-    }
-
     private function getCycleDateSql(): string
     {
-        $effectiveCutoff = $this->getEffectiveCutoffSql();
-
-        return "
-            CASE
-                WHEN EXTRACT(DAY FROM transactions.date) > ({$effectiveCutoff})
-                    THEN transactions.date + INTERVAL '1 month'
-                ELSE transactions.date
-            END
-        ";
+        return BudgetCycle::cycleDateSql('transactions.date', 'budgets.cutoff_day');
     }
 
     public function user(mixed $value): static

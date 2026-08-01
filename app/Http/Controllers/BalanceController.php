@@ -11,6 +11,7 @@ use App\Models\Balance;
 use App\Queries\BalanceQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -19,7 +20,9 @@ class BalanceController extends Controller
 {
     public function index(Request $request): Response
     {
-        $balances = BalanceQuery::make($request->all())->paginate();
+        $balances = BalanceQuery::make($request->all())
+            ->forUser(Auth::id())
+            ->paginate();
 
         return Inertia::render('BalanceList', [
             'balances' => BalanceData::collect($balances, PaginatedDataCollection::class),
