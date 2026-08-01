@@ -120,3 +120,20 @@ export type MonthlySpendingTrend = {
 }
 
 export type RecentTransactions = Transaction[]
+
+export type RecurringTransaction = {
+  id: number
+  user_id: number
+  type: string
+  balance_id: number
+  category_id: number | null
+  amount: number
+  description: string | null
+  frequency: string
+  start_date: string
+  end_date: string | null
+  next_run_date: string
+  is_active: boolean
+  balance: Balance | null
+  category: Category | null
+}

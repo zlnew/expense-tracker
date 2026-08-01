@@ -40,6 +40,7 @@ category_create_description,"Create a new budget category","Buat kategori anggar
 category_delete_description,"Are you sure you want to delete this budget category permanently?","Apakah Anda yakin ingin menghapus kategori anggaran ini secara permanen?"
 category_list_description,"Manage your buget categories","Kelola kategori anggaran Anda"
 category_update_description,"Update budget category","Perbarui kategori anggaran"
+confirm_delete_recurring,"Are you sure you want to delete this recurring transaction?","Apakah Anda yakin ingin menghapus transaksi berulang ini?"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
 create,Create,Buat
 create_data,"Create :data","Buat :data"
@@ -48,6 +49,7 @@ current_month_expenses,"Current Month Expenses","Pengeluaran Bulan Ini"
 current_month_incomes,"Current Month Incomes","Pendapatan Bulan Ini"
 current_password,"Current Password","Kata Sandi Saat Ini"
 cutoff_day,"Cutoff Day","Cutoff Day"
+daily,Daily,Harian
 dashboard,Dashboard,Dasbor
 dashboard_description,"Track your financial activity, monitor spending habits, and stay on top of your budgets in one place.","Pantau aktivitas keuangan, kebiasaan pengeluaran, dan progres anggaran Anda dalam satu dashboard."
 date,Date,Tanggal
@@ -70,6 +72,7 @@ diff,Diff,Diff
 edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
+end_date,"End Date","Tanggal Selesai"
 expense,Expense,Pengeluaran
 expense_breakdown,"Expense Breakdown","Proporsi Pengeluaran"
 expense_breakdown_description,"Analyze which categories contribute the most to your expenses.","Analisis kategori yang paling banyak menyumbang pengeluaran Anda."
@@ -79,8 +82,10 @@ filter_by_balance,"Filter by Balance","Filter berdasarkan Saldo"
 filter_by_category,"Filter by Category","Filter berdasarkan Kategori"
 filter_transactions,"Filter Transactions","Filter Transaksi"
 final_amount,"Final Amount","Saldo Akhir"
+frequency,Frequency,Frekuensi
 from_account,"From Account","Dari Akun"
 full_name,"Full Name","Nama Lengkap"
+inactive,Inactive,"Tidak Aktif"
 income,Income,Pemasukan
 incomes,Incomes,Pemasukan
 initial_amount,"Initial Amount","Saldo Awal"
@@ -102,6 +107,7 @@ log_out,"Log Out",Keluar
 march,March,Maret
 may,May,Mei
 month,Month,Bulan
+monthly,Monthly,Bulanan
 monthly_expenses,"Monthly Expenses","Pengeluaran Bulanan"
 monthly_incomes,"Monthly Incomes","Pendapatan Bulanan"
 monthly_spending_trend,"Monthly Spending Trend","Tren Pengeluaran & Pemasukan Bulanan"
@@ -109,6 +115,7 @@ monthly_spending_trend_description,"See how your income and expenses change over
 multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
+next_run_date,"Next Run","Berjalan Berikutnya"
 no_data_found,"No :data found",":data tidak ditemukan"
 notes,Notes,Catatan
 november,November,November
@@ -130,8 +137,14 @@ profile_update_description,"Update your name and email address","Perbarui nama d
 profile_update_title,"Profile Information","Informasi Profil"
 recent_transactions,"Recent Transactions","Transaksi Terakhir"
 recent_transactions_description,"Quickly review your latest financial activities and transactions.","Lihat aktivitas dan transaksi keuangan terbaru Anda dengan cepat."
+recurring_transaction,"Recurring Transaction","Transaksi Berulang"
+recurring_transactions,"Recurring Transactions","Transaksi Berulang"
+recurring_transactions_create_description,"Create a recurring transaction that repeats automatically","Buat transaksi berulang yang berulang secara otomatis"
+recurring_transactions_description,"Manage automatic recurring income and expenses","Kelola pemasukan dan pengeluaran berulang otomatis"
+recurring_transactions_update_description,"Update the recurring transaction schedule","Perbarui jadwal transaksi berulang"
 remaining,Remaining,Sisa
 remaining_budget,"Remaining Budget","Sisa Anggaran"
+resume_recurring,"Resume Recurring","Lanjutkan Berulang"
 save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
 saved_data,":data Saved",":data Disimpan"
@@ -150,7 +163,9 @@ settings_title,Settings,Pengaturan
 show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
 single_transaction,"Single Transaction","Satu Transaksi"
 spent,Spent,Terpakai
+start_date,"Start Date","Tanggal Mulai"
 status,Status,Status
+stop_recurring,"Stop Recurring","Hentikan Berulang"
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
 total,Total,Total
@@ -176,4 +191,6 @@ updated_data,":data Updated",":data Diperbarui"
 updating,Updating...,Memperbarui...
 view_detail,"View Detail","Lihat Detail"
 warning,Warning,Peringatan
+weekly,Weekly,Mingguan
 year,Year,Tahun
+yearly,Yearly,Tahunan
