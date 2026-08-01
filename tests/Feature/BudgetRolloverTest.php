@@ -137,3 +137,74 @@ test('overspent previous cycle rolls over zero (never negative)', function () {
     $budget->refresh();
     expect($budget->items()->first()->planned_amount)->toBe(400_000);
 });
+
+test('toggling carry_over on edit applies rollover once, not twice', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $category = Category::factory()->for($user)->create(['name' => 'Food']);
+
+    // Previous cycle with 200k leftover.
+    $previous = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth()->subMonth(),
+        'period_end' => now()->endOfMonth()->subMonth(),
+        'cutoff_day' => 1,
+    ]);
+    $prevItem = $previous->items()->create([
+        'category_id' => $category->id,
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+    $balance = Balance::factory()->for($user)->create(['name' => 'Cash', 'initial_amount' => 1_000_000, 'final_amount' => 700_000]);
+    Transaction::factory()->for($user)->for($balance)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'amount' => 300_000,
+        'budget_id' => $previous->id,
+        'budget_item_id' => $prevItem->id,
+        'date' => $previous->period_start,
+    ]);
+
+    // Existing budget WITHOUT carry-over yet.
+    $budget = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 1,
+        'carry_over' => false,
+    ]);
+    $budget->items()->create([
+        'category_id' => $category->id,
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 400_000,
+    ]);
+
+    // Edit 1: tick carry_over => rollover applies once.
+    $budget = SaveBudget::run($budget, BudgetData::from([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 1,
+        'carry_over' => true,
+        'notes' => null,
+        'items' => [
+            ['id' => $budget->items()->first()->id, 'category_id' => $category->id, 'type' => CategoryType::EXPENSE, 'planned_amount' => 400_000],
+        ],
+    ]));
+
+    $budget->refresh();
+    expect($budget->carry_over)->toBeTrue();
+    expect($budget->items()->first()->planned_amount)->toBe(600_000);
+
+    // Edit 2: carry_over still on, planned amount untouched => must NOT re-roll.
+    $budget = SaveBudget::run($budget, BudgetData::from([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 1,
+        'carry_over' => true,
+        'notes' => null,
+        'items' => [
+            ['id' => $budget->items()->first()->id, 'category_id' => $category->id, 'type' => CategoryType::EXPENSE, 'planned_amount' => 600_000],
+        ],
+    ]));
+
+    $budget->refresh();
+    expect($budget->items()->first()->planned_amount)->toBe(600_000);
+});
