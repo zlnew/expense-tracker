@@ -213,6 +213,7 @@ const setPrimary = (balance: Balance) => {
               <Button
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10 md:h-8 md:w-8"
                 @click="openEditDialog(b)"
                 :title="__('edit_data', { data: __('balance') })"
               >
@@ -221,8 +222,8 @@ const setPrimary = (balance: Balance) => {
               <Button
                 variant="ghost"
                 size="icon"
+                class="h-10 w-10 md:h-8 md:w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 @click="openDeleteDialog(b)"
-                class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 :title="__('delete_data', { data: __('balance') })"
               >
                 <Trash2 class="size-4" />
@@ -233,6 +234,7 @@ const setPrimary = (balance: Balance) => {
               v-if="!b.is_primary"
               variant="outline"
               size="sm"
+              class="h-10 md:h-9"
               @click="setPrimary(b)"
             >
               {{ __('set_as_primary') }}

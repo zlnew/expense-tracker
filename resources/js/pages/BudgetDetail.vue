@@ -310,7 +310,7 @@ const setActive = () => {
         <div class="flex items-center justify-center gap-2 lg:col-span-2">
           <CalendarDays class="mr-1 text-muted-foreground" />
           <Select v-model="transactionApi.month">
-            <SelectTrigger>
+            <SelectTrigger class="h-10 md:h-9">
               <SelectValue :placeholder="__('month')" />
             </SelectTrigger>
             <SelectContent>
@@ -320,7 +320,7 @@ const setActive = () => {
             </SelectContent>
           </Select>
           <Select v-model="transactionApi.year">
-            <SelectTrigger>
+            <SelectTrigger class="h-10 md:h-9">
               <SelectValue :placeholder="__('year')" />
             </SelectTrigger>
             <SelectContent>
@@ -620,7 +620,9 @@ const setActive = () => {
     </div>
   </AppContent>
 
-  <div class="fixed right-4 bottom-20 z-50 flex gap-2 md:right-8 md:bottom-8">
+  <div
+    class="fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)] z-50 flex gap-2 md:right-8 md:bottom-8"
+  >
     <Button
       v-if="!budget.is_active"
       type="button"

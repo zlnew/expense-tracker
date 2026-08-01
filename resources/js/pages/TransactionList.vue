@@ -2,8 +2,10 @@
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 import {
-  ChevronDown,
+  ArrowDownToLine,
   ArrowRightLeft,
+  ArrowUpFromLine,
+  ChevronDown,
   ListPlus,
   Plus,
   Search,
@@ -14,7 +16,7 @@ import {
   ListTodoIcon,
   MinusIcon,
 } from 'lucide-vue-next'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
@@ -24,6 +26,13 @@ import TransactionTransferDialog from '@/components/dialogs/TransactionTransferD
 import TransactionUpdateDialog from '@/components/dialogs/TransactionUpdateDialog.vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,7 +99,7 @@ const categoryFilter = ref(param.get('category') || 'all')
 const dateFromFilter = ref(param.get('dateFrom') || '')
 const dateToFilter = ref(param.get('dateTo') || '')
 
-const showFilters = ref(false)
+const filterSheetOpen = ref(false)
 
 const groupedCategories = computed(() => {
   const items = props.categories
@@ -153,6 +162,16 @@ const fetchData = useDebounceFn(() => {
 const openCreateDialog = () => {
   createDialogOpen.value = true
 }
+
+// The global bottom-nav quick-add FAB dispatches this event — open the dialog
+// from any in-page trigger so the mobile FAB works on this page too.
+onMounted(() => {
+  window.addEventListener('open:transaction-create', openCreateDialog)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('open:transaction-create', openCreateDialog)
+})
 
 const openUpdateDialog = (data: Transaction) => {
   targetData.value = data
@@ -228,18 +247,15 @@ const openTransferDialog = () => {
           <Button
             variant="outline"
             size="icon"
-            class="shrink-0 lg:hidden"
-            @click="showFilters = !showFilters"
-            :class="{ 'bg-secondary': showFilters }"
+            class="h-10 w-10 shrink-0 lg:hidden"
+            :aria-label="__('filter_by_balance')"
+            @click="filterSheetOpen = true"
           >
             <Filter class="size-4" />
           </Button>
         </div>
 
-        <div
-          class="w-full gap-4 lg:flex lg:w-auto"
-          :class="showFilters ? 'grid grid-cols-1' : 'hidden'"
-        >
+        <div class="hidden w-full gap-4 lg:flex lg:w-auto">
           <div class="space-y-2">
             <Select v-model="balanceFilter">
               <SelectTrigger>
@@ -318,78 +334,221 @@ const openTransferDialog = () => {
         </div>
       </div>
 
-      <!-- Mobile View: Cards -->
-      <div class="grid grid-cols-1 gap-4 md:hidden">
-        <div
-          v-if="transactions.data.length === 0"
-          class="h-24 content-center text-center text-muted-foreground"
-        >
-          {{ __('no_data_found', { data: __('transactions') }) }}
-        </div>
-        <div
-          v-for="t in transactions.data"
-          :key="t.id"
-          class="rounded-lg border bg-background p-4 shadow-sm"
-        >
-          <div class="mb-2 flex items-center justify-between">
-            <span class="text-xs font-medium text-muted-foreground">{{
-              formatDate(t.date)
-            }}</span>
-            <div
-              class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase"
-              :class="
-                t.type === 'income'
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-              "
-            >
-              {{ __(t.type) }}
+      <!-- Mobile: filter bottom sheet (md-) / centered dialog (md+) -->
+      <Dialog v-model:open="filterSheetOpen">
+        <SheetDialogContent class="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle class="flex items-center gap-2">
+              <Filter class="size-4" />
+              {{ __('filter_by_balance') }}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div class="grid gap-4 py-2">
+            <div class="space-y-2">
+              <Select v-model="balanceFilter">
+                <SelectTrigger>
+                  <WalletIcon />
+                  <SelectValue :placeholder="__('balance')" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {{ __('all_data', { data: __('balances') }) }}
+                  </SelectItem>
+                  <SelectItem
+                    v-for="b in balances"
+                    :key="b.id"
+                    :value="b.id.toString()"
+                  >
+                    {{ b.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div class="space-y-2">
+              <Select v-model="categoryFilter">
+                <SelectTrigger>
+                  <ListTodoIcon />
+                  <span
+                    v-if="currentCategory?.type"
+                    class="text-muted-foreground"
+                  >
+                    {{ __(currentCategory.type) }}
+                  </span>
+                  <SelectValue :placeholder="__('category')" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {{ __('all_data', { data: __('categories') }) }}
+                  </SelectItem>
+                  <SelectGroup v-if="groupedCategories.expense.length > 0">
+                    <SelectLabel>{{ __('expense') }}</SelectLabel>
+                    <SelectItem
+                      v-for="c in groupedCategories.expense"
+                      :key="c.id"
+                      :value="c.id.toString()"
+                    >
+                      {{ c.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                  <SelectGroup v-if="groupedCategories.income.length > 0">
+                    <SelectLabel>{{ __('income') }}</SelectLabel>
+                    <SelectItem
+                      v-for="c in groupedCategories.income"
+                      :key="c.id"
+                      :value="c.id.toString()"
+                    >
+                      {{ c.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                  <div
+                    v-if="
+                      groupedCategories.income.length === 0 &&
+                      groupedCategories.expense.length === 0
+                    "
+                    class="p-4 text-center text-sm text-muted-foreground"
+                  >
+                    {{ __('no_data_found', { data: __('category') }) }}
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div class="grid gap-2">
+              <Input
+                type="date"
+                v-model="dateFromFilter"
+                :aria-label="__('date_from')"
+              />
+              <Input
+                type="date"
+                v-model="dateToFilter"
+                :aria-label="__('date_to')"
+              />
             </div>
           </div>
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <h3 class="text-lg font-bold">{{ t.category?.name }}</h3>
-              <p class="text-xs text-muted-foreground">{{ t.balance?.name }}</p>
-              <p
-                v-if="t.description"
-                class="mt-1 max-w-[200px] truncate text-sm text-muted-foreground"
+
+          <DialogFooter>
+            <Button class="w-full" @click="filterSheetOpen = false">
+              {{ __('save') }}
+            </Button>
+          </DialogFooter>
+        </SheetDialogContent>
+      </Dialog>
+
+      <!-- Empty state -->
+      <div
+        v-if="transactions.data.length === 0"
+        class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
+      >
+        <div class="mb-4 rounded-full bg-muted p-4">
+          <ArrowRightLeft class="size-8 text-muted-foreground" />
+        </div>
+        <h3 class="text-lg font-semibold">
+          {{ __('no_data_found', { data: __('transactions') }) }}
+        </h3>
+        <p class="mb-6 text-muted-foreground">
+          {{ __('transaction_create_description') }}
+        </p>
+        <Button @click="openCreateDialog">
+          <Plus class="mr-2 size-4" />
+          {{ __('add_data', { data: __('transaction') }) }}
+        </Button>
+      </div>
+
+      <template v-else>
+        <!-- Mobile View: Cards -->
+        <div class="grid grid-cols-1 gap-4 md:hidden">
+          <div
+            v-for="t in transactions.data"
+            :key="t.id"
+            class="rounded-lg border bg-background p-4 shadow-sm"
+          >
+            <div class="mb-3 flex items-center justify-between gap-2">
+              <span
+                class="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
               >
-                {{ t.description }}
-              </p>
-            </div>
-            <div class="text-right">
-              <p
-                class="font-bold"
+                {{ formatDate(t.date) }}
+              </span>
+              <span
+                class="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase"
                 :class="
                   t.type === 'income'
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                 "
               >
-                Rp {{ t.type === 'income' ? '+' : '-' }}
-                {{ formatNumber(t.amount) }}
-              </p>
-              <div class="mt-2 flex items-center justify-end gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  @click="openUpdateDialog(t)"
+                {{ __(t.type) }}
+              </span>
+            </div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex min-w-0 items-start gap-3">
+                <div
+                  class="flex size-10 shrink-0 items-center justify-center rounded-full"
+                  :class="
+                    t.type === 'income'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                  "
                 >
-                  <SquarePen class="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  class="text-destructive"
-                  @click="openDeleteDialog(t)"
+                  <component
+                    :is="
+                      t.type === 'income' ? ArrowDownToLine : ArrowUpFromLine
+                    "
+                    class="size-5"
+                  />
+                </div>
+                <div class="min-w-0">
+                  <h3 class="truncate text-base font-bold">
+                    {{ t.category?.name }}
+                  </h3>
+                  <p class="truncate text-xs text-muted-foreground">
+                    {{ t.balance?.name }}
+                  </p>
+                  <p
+                    v-if="t.description"
+                    class="mt-1 truncate text-sm text-muted-foreground"
+                  >
+                    {{ t.description }}
+                  </p>
+                </div>
+              </div>
+              <div class="shrink-0 text-right">
+                <p
+                  class="text-lg font-bold"
+                  :class="
+                    t.type === 'income'
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-600 dark:text-red-400'
+                  "
                 >
-                  <Trash2 class="size-4" />
-                </Button>
+                  Rp {{ t.type === 'income' ? '+' : '-' }}
+                  {{ formatNumber(t.amount) }}
+                </p>
+                <div class="mt-2 flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10"
+                    @click="openUpdateDialog(t)"
+                  >
+                    <SquarePen class="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10 text-destructive"
+                    @click="openDeleteDialog(t)"
+                  >
+                    <Trash2 class="size-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
       <!-- Desktop View: Table -->
       <div
@@ -410,73 +569,67 @@ const openTransferDialog = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-if="transactions.data.length === 0">
-              <TableCell colspan="7" class="h-24 text-center">
-                {{ __('no_data_found', { data: __('transactions') }) }}
+            <TableRow v-for="(t, index) in transactions.data" :key="t.id">
+              <TableCell>
+                {{
+                  (transactions.meta.current_page - 1) *
+                    transactions.meta.per_page +
+                  index +
+                  1
+                }}.
+              </TableCell>
+              <TableCell class="font-medium">
+                {{ formatDate(t.date) }}
+              </TableCell>
+              <TableCell>
+                <div class="flex items-center gap-2">
+                  <span class="text-muted-foreground">
+                    {{ __(t.type) }}
+                  </span>
+                  <span class="font-medium">
+                    {{ t.category?.name }}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>{{ t.balance?.name }}</TableCell>
+              <TableCell class="text-sm text-muted-foreground">
+                <div class="max-w-md truncate wrap-anywhere">
+                  {{ t.description || '-' }}
+                </div>
+              </TableCell>
+              <TableCell
+                class="text-right font-medium"
+                :class="
+                  t.type === 'income'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                "
+              >
+                Rp
+                {{ t.type === 'income' ? '+' : '-' }}
+                {{ formatNumber(t.amount) }}
+              </TableCell>
+              <TableCell class="text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10"
+                    @click="openUpdateDialog(t)"
+                  >
+                    <SquarePen class="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10 text-destructive"
+                    @click="openDeleteDialog(t)"
+                  >
+                    <Trash2 class="size-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
-            <template v-else>
-              <TableRow v-for="(t, index) in transactions.data" :key="t.id">
-                <TableCell>
-                  {{
-                    (transactions.meta.current_page - 1) *
-                      transactions.meta.per_page +
-                    index +
-                    1
-                  }}.
-                </TableCell>
-                <TableCell class="font-medium">
-                  {{ formatDate(t.date) }}
-                </TableCell>
-                <TableCell>
-                  <div class="flex items-center gap-2">
-                    <span class="text-muted-foreground">
-                      {{ __(t.type) }}
-                    </span>
-                    <span class="font-medium">
-                      {{ t.category?.name }}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>{{ t.balance?.name }}</TableCell>
-                <TableCell class="text-sm text-muted-foreground">
-                  <div class="max-w-md truncate wrap-anywhere">
-                    {{ t.description || '-' }}
-                  </div>
-                </TableCell>
-                <TableCell
-                  class="text-right font-medium"
-                  :class="
-                    t.type === 'income'
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
-                  "
-                >
-                  Rp
-                  {{ t.type === 'income' ? '+' : '-' }}
-                  {{ formatNumber(t.amount) }}
-                </TableCell>
-                <TableCell class="text-right">
-                  <div class="flex items-center justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      @click="openUpdateDialog(t)"
-                    >
-                      <SquarePen class="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      class="text-destructive"
-                      @click="openDeleteDialog(t)"
-                    >
-                      <Trash2 class="size-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </template>
           </TableBody>
         </Table>
       </div>
