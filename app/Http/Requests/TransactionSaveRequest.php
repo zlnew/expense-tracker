@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\DTO\TransactionData;
 use App\Enums\CategoryType;
+use App\Models\Budget;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,7 @@ class TransactionSaveRequest extends FormRequest
             'budget_item_id' => [
                 'nullable',
                 Rule::exists('budget_items', 'id')
-                    ->whereIn('budget_id', \App\Models\Budget::where('user_id', $this->user()?->id)->pluck('id')),
+                    ->whereIn('budget_id', Budget::where('user_id', $this->user()?->id)->pluck('id')),
             ],
             'category_id' => [
                 'nullable',

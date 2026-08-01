@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class BudgetItem extends Model
 {
     use HasFactory;
+
     protected function casts(): array
     {
         return [

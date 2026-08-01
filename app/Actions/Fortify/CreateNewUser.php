@@ -2,9 +2,9 @@
 
 namespace App\Actions\Fortify;
 
+use App\Actions\SeedDefaultCategories;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
-use App\Actions\SeedDefaultCategories;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;

@@ -43,6 +43,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Balance extends Model
 {
     use HasFactory;
+
     protected function casts(): array
     {
         return [

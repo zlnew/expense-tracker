@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Enums\CategoryType;
 use App\Models\Category;
+use App\Models\User;
 use App\Support\DefaultCategories;
 use Illuminate\Database\Seeder;
 
@@ -20,7 +20,7 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        $userId = \App\Models\User::query()->value('id');
+        $userId = User::query()->value('id');
 
         if ($userId === null || Category::query()->where('user_id', $userId)->exists()) {
             return;
