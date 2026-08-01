@@ -58,7 +58,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'discord_webhook_url'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {

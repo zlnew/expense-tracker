@@ -29,6 +29,7 @@ class BudgetSaveRequest extends FormRequest
             'period_end' => ['required', 'date'],
             'cutoff_day' => ['required', 'integer'],
             'notes' => ['nullable', 'string'],
+            'carry_over' => ['sometimes', 'boolean'],
             'items.*.category_id' => [
                 'required',
                 Rule::exists('categories', 'id')->where('user_id', $this->user()?->id),

@@ -24,6 +24,7 @@ import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
 import budgets from '@/routes/budgets'
 import categories from '@/routes/categories'
+import recurringTransactions from '@/routes/recurring-transactions'
 import transactions from '@/routes/transactions'
 import type { NavGroup, NavItem } from '@/types'
 
@@ -43,6 +44,16 @@ const mainNavItems: NavGroup[] = [
     title: __('transactions'),
     href: transactions.index(),
     icon: ArrowLeftRight,
+    children: [
+      {
+        title: __('list'),
+        href: transactions.index(),
+      },
+      {
+        title: __('recurring_transactions'),
+        href: recurringTransactions.index(),
+      },
+    ],
   },
   {
     title: __('budgets'),

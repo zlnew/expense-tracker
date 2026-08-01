@@ -37,7 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['category_id', 'type', 'planned_amount'])]
+#[Fillable(['category_id', 'type', 'planned_amount', 'alert_80_sent', 'alert_100_sent'])]
 class BudgetItem extends Model
 {
     use HasFactory;
@@ -47,6 +47,8 @@ class BudgetItem extends Model
         return [
             'type' => CategoryType::class,
             'planned_amount' => 'integer',
+            'alert_80_sent' => 'boolean',
+            'alert_100_sent' => 'boolean',
         ];
     }
 

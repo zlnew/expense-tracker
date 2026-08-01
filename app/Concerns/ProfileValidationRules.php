@@ -18,6 +18,7 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
+            'discord_webhook_url' => ['nullable', 'string', 'url', 'max:255'],
         ];
     }
 
