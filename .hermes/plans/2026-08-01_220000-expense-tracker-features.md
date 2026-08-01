@@ -1,6 +1,6 @@
 # Expense Tracker — Feature Roadmap (TK-0004)
 
-**Status:** Plan — F1–F4 in progress, F5–F11 backlog
+**Status:** F1–F4 implemented & verified; PR open for review — F5–F11 backlog
 **Repo:** `repo/expense-tracker` · **Branch:** `feature/tk-0004-features`
 **Date:** 2026-08-01 · **Owner:** Maul
 
