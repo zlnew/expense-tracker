@@ -32,7 +32,7 @@ const props = defineProps<{
 
 const { __ } = useLang()
 const { formatDate } = useDate()
-const { formatNumber } = useNumber()
+const { formatAmount } = useNumber()
 
 setLayoutProps({
   breadcrumbs: [
@@ -84,7 +84,7 @@ setLayoutProps({
           </CardHeader>
           <CardContent>
             <div class="text-2xl font-bold">
-              {{ formatNumber(balance.initial_amount) }}
+              {{ formatAmount(balance.initial_amount) }}
             </div>
           </CardContent>
         </Card>
@@ -106,7 +106,7 @@ setLayoutProps({
           </CardHeader>
           <CardContent>
             <div class="text-2xl font-bold">
-              {{ formatNumber(balance.final_amount) }}
+              {{ formatAmount(balance.final_amount) }}
             </div>
           </CardContent>
         </Card>
@@ -164,8 +164,7 @@ setLayoutProps({
                     : 'text-red-600 dark:text-red-400'
                 "
               >
-                {{ t.type === 'income' ? '+' : '-' }}
-                {{ formatNumber(t.amount) }}
+                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
               </span>
             </div>
             <div
@@ -225,8 +224,7 @@ setLayoutProps({
                         : 'text-red-600 dark:text-red-400'
                     "
                   >
-                    {{ t.type === 'income' ? '+' : '-' }}
-                    {{ formatNumber(t.amount) }}
+                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
                   </TableCell>
                 </TableRow>
               </template>

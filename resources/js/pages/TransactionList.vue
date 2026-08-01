@@ -75,7 +75,7 @@ const props = defineProps<{
 
 const { __ } = useLang()
 const { formatDate } = useDate()
-const { formatNumber } = useNumber()
+const { formatAmount } = useNumber()
 const param = useParam()
 
 setLayoutProps({
@@ -523,8 +523,7 @@ const openTransferDialog = () => {
                       : 'text-red-600 dark:text-red-400'
                   "
                 >
-                  Rp {{ t.type === 'income' ? '+' : '-' }}
-                  {{ formatNumber(t.amount) }}
+                  {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
                 </p>
                 <div class="mt-2 flex items-center justify-end gap-1">
                   <Button
@@ -605,9 +604,7 @@ const openTransferDialog = () => {
                     : 'text-red-600 dark:text-red-400'
                 "
               >
-                Rp
-                {{ t.type === 'income' ? '+' : '-' }}
-                {{ formatNumber(t.amount) }}
+                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
               </TableCell>
               <TableCell class="text-right">
                 <div class="flex items-center justify-end gap-2">

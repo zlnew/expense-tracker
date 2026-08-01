@@ -64,7 +64,7 @@ const props = defineProps<{
 
 const { __ } = useLang()
 const { formatDate } = useDate()
-const { formatNumber } = useNumber()
+const { formatAmount } = useNumber()
 const { canInstall, promptInstall, dismissInstall } = useInstallPrompt()
 
 setLayoutProps({
@@ -293,7 +293,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
             <div
               class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
             >
-              Rp {{ formatNumber(summary_cards.total_balance) }}
+              {{ formatAmount(summary_cards.total_balance) }}
             </div>
             <p
               class="mt-1 flex items-center gap-1 text-xs text-muted-foreground"
@@ -334,7 +334,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
             <div
               class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
             >
-              Rp {{ formatNumber(summary_cards.current_month_incomes) }}
+              {{ formatAmount(summary_cards.current_month_incomes) }}
             </div>
             <p
               class="mt-1 text-xs font-medium text-emerald-600 dark:text-emerald-400"
@@ -369,7 +369,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
             <div
               class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
             >
-              Rp {{ formatNumber(summary_cards.current_month_expenses) }}
+              {{ formatAmount(summary_cards.current_month_expenses) }}
             </div>
             <p
               class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400"
@@ -409,7 +409,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                   : 'text-foreground'
               "
             >
-              Rp {{ formatNumber(Math.abs(summary_cards.budget_remaining)) }}
+              {{ formatAmount(Math.abs(summary_cards.budget_remaining)) }}
               <span
                 v-if="summary_cards.budget_remaining < 0"
                 class="block text-xs font-normal text-rose-500 sm:ml-1 sm:inline-block"
@@ -567,7 +567,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                   <span
                     class="mt-0.5 text-sm font-extrabold text-foreground tabular-nums"
                   >
-                    Rp{{ formatNumber(totalExpenseAmount) }}
+                    {{ formatAmount(totalExpenseAmount) }}
                   </span>
                 </div>
               </div>
@@ -590,7 +590,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                   </div>
                   <div class="shrink-0 pl-2 text-right">
                     <span class="font-mono font-semibold text-foreground"
-                      >Rp{{ formatNumber(item.amount) }}</span
+                      >{{ formatAmount(item.amount) }}</span
                     >
                     <span class="ml-1 font-mono text-muted-foreground"
                       >({{ item.percentage }}%)</span
@@ -688,9 +688,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                         : 'text-rose-600 dark:text-rose-400'
                     "
                   >
-                    {{ t.type === 'income' ? '+' : '-' }}Rp{{
-                      formatNumber(t.amount)
-                    }}
+                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
                   </span>
                   <p class="text-[10px] text-muted-foreground">
                     {{ formatDate(t.date) }}
@@ -802,9 +800,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                   class="flex justify-between font-mono text-[11px] text-muted-foreground"
                 >
                   <span>
-                    Rp{{ formatNumber(bi.actual_amount ?? 0) }} / Rp{{
-                      formatNumber(bi.planned_amount)
-                    }}
+                    {{ formatAmount(bi.actual_amount ?? 0) }} / {{ formatAmount(bi.planned_amount) }}
                   </span>
                   <span
                     v-if="bi.actual_amount !== undefined"
@@ -816,8 +812,8 @@ const getProgressTextColor = (planned: number, actual: number) => {
                   >
                     {{
                       bi.planned_amount - bi.actual_amount < 0
-                        ? `-Rp${formatNumber(Math.abs(bi.planned_amount - bi.actual_amount))}`
-                        : `Sisa Rp${formatNumber(bi.planned_amount - bi.actual_amount)}`
+                        ? `-${formatAmount(Math.abs(bi.planned_amount - bi.actual_amount))}`
+                        : `Sisa ${formatAmount(bi.planned_amount - bi.actual_amount)}`
                     }}
                   </span>
                 </div>

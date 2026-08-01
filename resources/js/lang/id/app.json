@@ -139,6 +139,7 @@
   "settings": "Pengaturan",
   "settings_description": "Kelola profil dan pengaturan akun Anda",
   "settings_title": "Pengaturan",
+  "show_hide_balances": "Tampilkan/sembunyikan saldo",
   "single_transaction": "Satu Transaksi",
   "status": "Status",
   "te_description": "Buat beberapa transaksi sekaligus.",

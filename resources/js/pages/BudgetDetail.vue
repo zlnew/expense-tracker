@@ -40,7 +40,7 @@ const props = defineProps<{
 }>()
 
 const { __ } = useLang()
-const { formatNumber } = useNumber()
+const { formatAmount } = useNumber()
 const { formatDate } = useDate()
 
 setLayoutProps({
@@ -358,19 +358,17 @@ const setActive = () => {
                         : 'text-muted-foreground'
                     "
                   >
-                    Rp {{ formatNumber(exp.diff_amount) }}
+                    {{ formatAmount(exp.diff_amount) }}
                   </span>
                 </div>
                 <div
                   class="mt-1 flex items-center justify-between text-sm text-muted-foreground"
                 >
                   <span
-                    >{{ __('planned') }}: Rp
-                    {{ formatNumber(exp.planned_amount) }}</span
+                    >{{ __('planned') }}: {{ formatAmount(exp.planned_amount) }}</span
                   >
                   <span
-                    >{{ __('actual') }}: Rp
-                    {{ formatNumber(exp.actual_amount) }}</span
+                    >{{ __('actual') }}: {{ formatAmount(exp.actual_amount) }}</span
                   >
                 </div>
               </div>
@@ -382,12 +380,10 @@ const setActive = () => {
                   <span class="text-muted-foreground">{{ __('total') }}</span>
                   <div class="flex flex-col items-end">
                     <span>
-                      {{ __('planned') }}: Rp
-                      {{ formatNumber(plannedExpenseTotal) }}
+                      {{ __('planned') }}: {{ formatAmount(plannedExpenseTotal) }}
                     </span>
                     <span>
-                      {{ __('actual') }}: Rp
-                      {{ formatNumber(actualExpenseTotal) }}
+                      {{ __('actual') }}: {{ formatAmount(actualExpenseTotal) }}
                     </span>
                     <span
                       :class="
@@ -396,7 +392,7 @@ const setActive = () => {
                           : 'text-muted-foreground'
                       "
                     >
-                      {{ __('diff') }}: Rp {{ formatNumber(diffExpenseTotal) }}
+                      {{ __('diff') }}: {{ formatAmount(diffExpenseTotal) }}
                     </span>
                   </div>
                 </div>
@@ -429,10 +425,10 @@ const setActive = () => {
                   >
                     <TableCell>{{ exp.category?.name }}</TableCell>
                     <TableCell class="text-end">
-                      Rp {{ formatNumber(exp.planned_amount) }}
+                      {{ formatAmount(exp.planned_amount) }}
                     </TableCell>
                     <TableCell class="text-end">
-                      Rp {{ formatNumber(exp.actual_amount) }}
+                      {{ formatAmount(exp.actual_amount) }}
                     </TableCell>
                     <TableCell class="text-end">
                       <span
@@ -442,7 +438,7 @@ const setActive = () => {
                             : 'text-muted-foreground'
                         "
                       >
-                        Rp {{ formatNumber(exp.diff_amount) }}
+                        {{ formatAmount(exp.diff_amount) }}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -451,10 +447,10 @@ const setActive = () => {
                   <TableRow>
                     <TableCell>{{ __('total') }}</TableCell>
                     <TableCell class="text-right">
-                      Rp {{ formatNumber(plannedExpenseTotal) }}
+                      {{ formatAmount(plannedExpenseTotal) }}
                     </TableCell>
                     <TableCell class="text-right">
-                      Rp {{ formatNumber(actualExpenseTotal) }}
+                      {{ formatAmount(actualExpenseTotal) }}
                     </TableCell>
                     <TableCell class="text-right">
                       <span
@@ -464,7 +460,7 @@ const setActive = () => {
                             : 'text-muted-foreground'
                         "
                       >
-                        Rp {{ formatNumber(diffExpenseTotal) }}
+                        {{ formatAmount(diffExpenseTotal) }}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -501,19 +497,17 @@ const setActive = () => {
                         : 'text-muted-foreground'
                     "
                   >
-                    Rp {{ formatNumber(inc.diff_amount) }}
+                    {{ formatAmount(inc.diff_amount) }}
                   </span>
                 </div>
                 <div
                   class="mt-1 flex items-center justify-between text-sm text-muted-foreground"
                 >
                   <span
-                    >{{ __('planned') }}: Rp
-                    {{ formatNumber(inc.planned_amount) }}</span
+                    >{{ __('planned') }}: {{ formatAmount(inc.planned_amount) }}</span
                   >
                   <span
-                    >{{ __('actual') }}: Rp
-                    {{ formatNumber(inc.actual_amount) }}</span
+                    >{{ __('actual') }}: {{ formatAmount(inc.actual_amount) }}</span
                   >
                 </div>
               </div>
@@ -525,12 +519,10 @@ const setActive = () => {
                   <span class="text-muted-foreground">{{ __('total') }}</span>
                   <div class="flex flex-col items-end">
                     <span>
-                      {{ __('planned') }}: Rp
-                      {{ formatNumber(plannedIncomeTotal) }}
+                      {{ __('planned') }}: {{ formatAmount(plannedIncomeTotal) }}
                     </span>
                     <span>
-                      {{ __('actual') }}: Rp
-                      {{ formatNumber(actualIncomeTotal) }}
+                      {{ __('actual') }}: {{ formatAmount(actualIncomeTotal) }}
                     </span>
                     <span
                       :class="
@@ -539,7 +531,7 @@ const setActive = () => {
                           : 'text-muted-foreground'
                       "
                     >
-                      {{ __('diff') }}: Rp {{ formatNumber(diffIncomeTotal) }}
+                      {{ __('diff') }}: {{ formatAmount(diffIncomeTotal) }}
                     </span>
                   </div>
                 </div>
@@ -572,10 +564,10 @@ const setActive = () => {
                   >
                     <TableCell>{{ inc.category?.name }}</TableCell>
                     <TableCell class="text-end">
-                      Rp {{ formatNumber(inc.planned_amount) }}
+                      {{ formatAmount(inc.planned_amount) }}
                     </TableCell>
                     <TableCell class="text-end">
-                      Rp {{ formatNumber(inc.actual_amount) }}
+                      {{ formatAmount(inc.actual_amount) }}
                     </TableCell>
                     <TableCell class="text-end">
                       <span
@@ -585,7 +577,7 @@ const setActive = () => {
                             : 'text-muted-foreground'
                         "
                       >
-                        Rp {{ formatNumber(inc.diff_amount) }}
+                        {{ formatAmount(inc.diff_amount) }}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -594,10 +586,10 @@ const setActive = () => {
                   <TableRow>
                     <TableCell>{{ __('total') }}</TableCell>
                     <TableCell class="text-right">
-                      Rp {{ formatNumber(plannedIncomeTotal) }}
+                      {{ formatAmount(plannedIncomeTotal) }}
                     </TableCell>
                     <TableCell class="text-right">
-                      Rp {{ formatNumber(actualIncomeTotal) }}
+                      {{ formatAmount(actualIncomeTotal) }}
                     </TableCell>
                     <TableCell class="text-right">
                       <span
@@ -607,7 +599,7 @@ const setActive = () => {
                             : 'text-muted-foreground'
                         "
                       >
-                        Rp {{ formatNumber(diffIncomeTotal) }}
+                        {{ formatAmount(diffIncomeTotal) }}
                       </span>
                     </TableCell>
                   </TableRow>

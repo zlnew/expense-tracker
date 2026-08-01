@@ -77,13 +77,14 @@ const code = ref<string>('')
                   v-for="index in 6"
                   :key="index"
                   :index="index - 1"
+                  class="h-11 w-10 md:h-9 md:w-9"
                 />
               </InputOTPGroup>
             </InputOTP>
           </div>
           <InputError :message="errors.code" />
         </div>
-        <Button type="submit" class="w-full" :disabled="processing"
+        <Button type="submit" class="h-11 w-full md:h-9" :disabled="processing"
           >Continue</Button
         >
         <div class="text-center text-sm text-muted-foreground">
@@ -112,9 +113,10 @@ const code = ref<string>('')
           placeholder="Enter recovery code"
           :autofocus="showRecoveryInput"
           required
+          class="h-11 md:h-9"
         />
         <InputError :message="errors.recovery_code" />
-        <Button type="submit" class="w-full" :disabled="processing"
+        <Button type="submit" class="h-11 w-full md:h-9" :disabled="processing"
           >Continue</Button
         >
 

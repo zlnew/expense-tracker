@@ -3,6 +3,8 @@ import { Link, usePage } from '@inertiajs/vue3'
 import {
   ArrowLeftRight,
   CircleDollarSign,
+  Eye,
+  EyeOff,
   LayoutGrid,
   Plus,
   Wallet,
@@ -18,6 +20,7 @@ import {
 import UserMenuContent from '@/components/UserMenuContent.vue'
 import { getInitials } from '@/composables/useInitials'
 import { useLang } from '@/composables/useLang'
+import { useMasking } from '@/composables/useMasking'
 import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
 import budgets from '@/routes/budgets'
@@ -26,6 +29,7 @@ import transactions from '@/routes/transactions'
 const { __ } = useLang()
 const page = usePage()
 const user = computed(() => page.props.auth.user)
+const { masked, toggleMask } = useMasking()
 
 const items = [
   {
@@ -91,6 +95,17 @@ function openTransactionCreate() {
         <component :is="item.icon" class="size-6" />
         <span class="text-[10px] font-medium">{{ item.title }}</span>
       </Link>
+
+      <!-- Mask toggle: compact, sits next to the profile avatar -->
+      <button
+        type="button"
+        class="flex min-h-11 min-w-11 items-center justify-center rounded-md text-sidebar-foreground/70 transition-colors hover:text-sidebar-foreground"
+        :aria-label="__('show_hide_balances')"
+        :title="__('show_hide_balances')"
+        @click="toggleMask"
+      >
+        <component :is="masked ? EyeOff : Eye" class="size-5" />
+      </button>
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>

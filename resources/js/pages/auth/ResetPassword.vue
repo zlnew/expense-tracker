@@ -42,7 +42,7 @@ const inputEmail = ref(props.email)
           name="email"
           autocomplete="email"
           v-model="inputEmail"
-          class="mt-1 block w-full"
+          class="mt-1 block h-11 w-full md:h-9"
           readonly
         />
         <InputError :message="errors.email" class="mt-2" />
@@ -54,7 +54,7 @@ const inputEmail = ref(props.email)
           id="password"
           name="password"
           autocomplete="new-password"
-          class="mt-1 block w-full"
+          class="mt-1 block h-11 w-full md:h-9"
           autofocus
           placeholder="Password"
         />
@@ -67,7 +67,7 @@ const inputEmail = ref(props.email)
           id="password_confirmation"
           name="password_confirmation"
           autocomplete="new-password"
-          class="mt-1 block w-full"
+          class="mt-1 block h-11 w-full md:h-9"
           placeholder="Confirm password"
         />
         <InputError :message="errors.password_confirmation" />
@@ -75,7 +75,7 @@ const inputEmail = ref(props.email)
 
       <Button
         type="submit"
-        class="mt-4 w-full"
+        class="mt-4 h-11 w-full md:h-9"
         :disabled="processing"
         data-test="reset-password-button"
       >

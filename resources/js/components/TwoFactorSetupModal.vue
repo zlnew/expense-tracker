@@ -8,11 +8,11 @@ import InputError from '@/components/InputError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import {
   InputOTP,
   InputOTPGroup,
@@ -111,7 +111,7 @@ watch(
 
 <template>
   <Dialog :open="isOpen" @update:open="isOpen = $event">
-    <DialogContent class="sm:max-w-md">
+    <SheetDialogContent class="sm:max-w-md">
       <DialogHeader class="flex items-center justify-center">
         <div
           class="mb-3 w-auto rounded-full border border-border bg-card p-0.5 shadow-sm"
@@ -244,6 +244,7 @@ watch(
                       v-for="index in 6"
                       :key="index"
                       :index="index - 1"
+                      class="h-11 w-10 md:h-9 md:w-9"
                     />
                   </InputOTPGroup>
                 </InputOTP>
@@ -272,6 +273,6 @@ watch(
           </Form>
         </template>
       </div>
-    </DialogContent>
+    </SheetDialogContent>
   </Dialog>
 </template>

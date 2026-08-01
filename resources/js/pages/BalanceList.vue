@@ -41,7 +41,7 @@ defineProps<{
 }>()
 
 const { __ } = useLang()
-const { formatNumber } = useNumber()
+const { formatAmount } = useNumber()
 const param = useParam()
 
 setLayoutProps({
@@ -194,14 +194,14 @@ const setPrimary = (balance: Balance) => {
                   __('final_amount')
                 }}</span>
                 <span class="text-2xl font-bold tracking-tight">
-                  Rp {{ formatNumber(b.final_amount) }}
+                  {{ formatAmount(b.final_amount) }}
                 </span>
               </div>
               <div
                 class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
               >
                 <span>{{ __('initial_amount') }}</span>
-                <span>Rp {{ formatNumber(b.initial_amount) }}</span>
+                <span>{{ formatAmount(b.initial_amount) }}</span>
               </div>
             </div>
           </CardContent>

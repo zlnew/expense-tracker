@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
+import { Eye, EyeOff } from 'lucide-vue-next'
 import AppLogoIcon from '@/components/AppLogoIcon.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { useLang } from '@/composables/useLang'
+import { useMasking } from '@/composables/useMasking'
 import type { BreadcrumbItem } from '@/types'
 
 const page = usePage()
+const { __ } = useLang()
+const { masked, toggleMask } = useMasking()
 
 withDefaults(
   defineProps<{
@@ -37,6 +43,19 @@ withDefaults(
       <template v-if="breadcrumbs && breadcrumbs.length > 0">
         <Breadcrumbs :breadcrumbs="breadcrumbs" />
       </template>
+    </div>
+
+    <div class="ml-auto flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="icon"
+        class="h-9 w-9"
+        :aria-label="__('show_hide_balances')"
+        :title="__('show_hide_balances')"
+        @click="toggleMask"
+      >
+        <component :is="masked ? EyeOff : Eye" class="size-4" />
+      </Button>
     </div>
   </header>
 </template>

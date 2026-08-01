@@ -139,6 +139,7 @@
   "settings": "Settings",
   "settings_description": "Manage your profile and account settings",
   "settings_title": "Settings",
+  "show_hide_balances": "Show/hide balances",
   "single_transaction": "Single Transaction",
   "status": "Status",
   "te_description": "Create multiple transactions at once.",
