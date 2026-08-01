@@ -233,15 +233,16 @@ const openTransferDialog = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <!-- Mobile: compact add button opens a bottom-sheet action menu -->
+          <!-- Mobile: compact add button opens a bottom-sheet action menu.
+               Chevron signals that a selection (single/bulk/transfer) follows. -->
           <Button
             variant="default"
-            size="icon"
-            class="h-11 w-11 sm:hidden"
+            class="h-11 gap-1 rounded-lg px-3 sm:hidden"
             :aria-label="__('add_data', { data: __('transaction') })"
             @click="addSheetOpen = true"
           >
             <Plus class="size-5" />
+            <ChevronDown class="size-4" />
           </Button>
         </div>
       </div>

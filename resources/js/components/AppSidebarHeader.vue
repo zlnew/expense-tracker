@@ -41,7 +41,8 @@ const pageTitle = computed(() => {
 })
 
 // Hide-on-scroll-down / show-on-scroll-up (modern mobile app bar behavior).
-// Only affects the mobile header; desktop keeps the header pinned.
+// Direction-based state machine: the header only changes state on real scroll
+// motion — stopping mid-page keeps it hidden (does not re-show on delta≈0).
 const hidden = ref(false)
 let lastScrollY = 0
 let ticking = false
@@ -57,8 +58,17 @@ function onScroll() {
     const y = window.scrollY
     const delta = y - lastScrollY
 
-    // Ignore tiny jitter; only hide after scrolling down past the header.
-    hidden.value = delta > 4 && y > 80
+    // Only react to real scroll motion (ignore sub-pixel settling).
+    if (Math.abs(delta) > 2) {
+      if (delta > 0 && y > 80) {
+        // Scrolling down past the header -> hide.
+        hidden.value = true
+      } else if (delta < 0) {
+        // Scrolling up -> show.
+        hidden.value = false
+      }
+    }
+
     lastScrollY = y
     ticking = false
   })
@@ -76,7 +86,7 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] ease-linear duration-200 group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
+    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
     <!-- Desktop: sidebar trigger + breadcrumbs -->
