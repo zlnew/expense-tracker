@@ -4,10 +4,12 @@ import {
   ArrowLeftRight,
   CircleDollarSign,
   LayoutGrid,
+  Plus,
   Wallet,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,32 +53,51 @@ const items = [
     active: page.url.startsWith(balances.index.url()),
   },
 ]
+
+function openTransactionCreate() {
+  window.dispatchEvent(new CustomEvent('open:transaction-create'))
+}
 </script>
 
 <template>
   <nav
-    class="fixed bottom-0 left-0 z-50 h-16 w-full border-t border-sidebar-border bg-sidebar px-4 md:hidden"
+    class="fixed bottom-0 left-0 z-50 h-[calc(4rem+env(safe-area-inset-bottom))] w-full border-t border-sidebar-border bg-sidebar px-4 pb-[env(safe-area-inset-bottom)] md:hidden"
   >
-    <div class="mx-auto flex h-full max-w-lg items-center justify-between">
+    <div
+      class="relative mx-auto flex h-16 max-w-lg items-center justify-between"
+    >
+      <!-- Quick-add FAB: floats centered above the nav row, clear of the home indicator -->
+      <Button
+        variant="default"
+        size="icon"
+        aria-label="Add transaction"
+        class="absolute left-1/2 top-0 z-10 size-12 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-lg transition-transform active:scale-95"
+        @click="openTransactionCreate"
+      >
+        <Plus class="size-6" />
+      </Button>
+
       <Link
         v-for="item in items"
         :key="item.href"
         :href="item.href"
-        class="flex flex-col items-center gap-1 transition-colors"
+        class="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1 rounded-md transition-colors"
         :class="
           item.active
             ? 'text-primary'
             : 'text-sidebar-foreground/70 hover:text-sidebar-foreground'
         "
       >
-        <component :is="item.icon" class="size-5" />
+        <component :is="item.icon" class="size-6" />
         <span class="text-[10px] font-medium">{{ item.title }}</span>
       </Link>
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
-          <button class="flex flex-col items-center gap-1 outline-none">
-            <Avatar class="size-5 overflow-hidden rounded-full">
+          <button
+            class="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1 rounded-md outline-none"
+          >
+            <Avatar class="size-6 overflow-hidden rounded-full">
               <AvatarImage
                 v-if="user.avatar"
                 :src="user.avatar"
