@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CheckBudgetAlerts;
 use App\Actions\DeleteTransaction;
 use App\Actions\SaveTransaction;
 use App\Actions\StoreTransactions;
@@ -52,7 +53,9 @@ class TransactionController extends Controller
 
     public function store(TransactionSaveRequest $request): RedirectResponse
     {
-        SaveTransaction::run(new Transaction, $request->getData());
+        $transaction = SaveTransaction::run(new Transaction, $request->getData());
+
+        CheckBudgetAlerts::run($request->user(), $transaction);
 
         return back()->with('success', __('app.created_data', ['data' => __('app.transaction')]));
     }

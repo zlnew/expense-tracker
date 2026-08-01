@@ -71,6 +71,9 @@ description,Description,Deskripsi
 detail,Detail,Detail
 detail_data,":data Detail","Detail :data"
 diff,Diff,Diff
+discord_webhook_url,"Discord webhook URL","URL webhook Discord"
+discord_webhook_url_description,"Receive a Discord notification when a budget category reaches 80% or 100% of its planned amount.","Dapatkan notifikasi Discord saat kategori anggaran mencapai 80% atau 100% dari jumlah yang direncanakan."
+discord_webhook_url_placeholder,https://discord.com/api/webhooks/...,https://discord.com/api/webhooks/...
 edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
