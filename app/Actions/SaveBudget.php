@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\DTO\BudgetData;
 use App\Models\Budget;
 use App\Models\BudgetItem;
+use App\Support\BudgetRollover;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -18,11 +19,14 @@ class SaveBudget extends Action
     public function handle(): Budget
     {
         return DB::transaction(function () {
+            $isNew = ! $this->budget->exists;
+
             $this->budget->fill([
                 'period_start' => $this->data->period_start,
                 'period_end' => $this->data->period_end,
                 'cutoff_day' => $this->data->cutoff_day,
                 'notes' => $this->data->notes,
+                'carry_over' => $this->data->carry_over,
             ]);
 
             if (! $this->budget->user_id) {
@@ -32,6 +36,13 @@ class SaveBudget extends Action
             $this->budget->save();
 
             $items = $this->data->items;
+
+            // YNAB-style rollover: a NEW budget with carry_over enabled starts
+            // each category with the previous cycle's unused amount added to
+            // the planned amount.
+            if ($isNew && $this->data->carry_over) {
+                $items = BudgetRollover::apply($this->budget, $items);
+            }
 
             $submittedItemIds = [];
 

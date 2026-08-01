@@ -49,6 +49,7 @@ export type Budget = {
   period_end: string
   cutoff_day: number
   is_active: boolean
+  carry_over: boolean
   notes: string | null
   updated_at: string | null
   user: User | null

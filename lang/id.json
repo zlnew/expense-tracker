@@ -34,6 +34,8 @@
     "cancel": "Batal",
     "cannot_delete_active_budget": "Tidak dapat menghapus anggaran aktif.",
     "cannot_delete_primary_balance": "Tidak dapat menghapus saldo utama.",
+    "carry_over": "Bawa sisa anggaran",
+    "carry_over_description": "Mulai anggaran ini dengan sisa dari siklus sebelumnya ditambahkan ke setiap kategori.",
     "categories": "Kategori",
     "category": "Kategori",
     "category_create_description": "Buat kategori anggaran baru",

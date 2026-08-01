@@ -46,7 +46,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['period_start', 'period_end', 'cutoff_day', 'notes'])]
+#[Fillable(['period_start', 'period_end', 'cutoff_day', 'notes', 'carry_over'])]
 class Budget extends Model
 {
     use HasFactory;

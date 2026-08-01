@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\RecurringTransaction;
 use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -69,7 +70,7 @@ test('recurring page is scoped per user', function () {
     $balance = Balance::factory()->for($owner)->create(['name' => 'Cash', 'initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     RecurringTransaction::factory()->for($owner)->for($balance)->create(['description' => 'secret-schedule']);
 
-    $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class);
+    $this->withoutMiddleware(PreventRequestForgery::class);
 
     $this->actingAs($intruder)
         ->get(route('recurring-transactions.index'))
@@ -89,7 +90,7 @@ test('user cannot update or delete another user recurring', function () {
     $balance = Balance::factory()->for($owner)->create(['name' => 'Cash', 'initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     $recurring = RecurringTransaction::factory()->for($owner)->for($balance)->create(['description' => 'mine']);
 
-    $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class);
+    $this->withoutMiddleware(PreventRequestForgery::class);
 
     $this->actingAs($intruder)
         ->put(route('recurring-transactions.update', $recurring), [

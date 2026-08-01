@@ -24,6 +24,7 @@ class BudgetData extends Data
         public CarbonImmutable $period_end,
         public int $cutoff_day = 0,
         public bool $is_active = false,
+        public bool $carry_over = false,
         public ?string $notes = null,
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d H:i:s')]
         public ?CarbonImmutable $updated_at = null,

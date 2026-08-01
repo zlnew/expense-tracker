@@ -34,6 +34,8 @@ budgets,Budgets,Anggaran
 cancel,Cancel,Batal
 cannot_delete_active_budget,"Cannot delete active budget.","Tidak dapat menghapus anggaran aktif."
 cannot_delete_primary_balance,"Cannot delete primary balance.","Tidak dapat menghapus saldo utama."
+carry_over,"Carry over unused budget","Bawa sisa anggaran"
+carry_over_description,"Start this budget with the unused amount from the previous cycle added to each category.","Mulai anggaran ini dengan sisa dari siklus sebelumnya ditambahkan ke setiap kategori."
 categories,Categories,Kategori
 category,Category,Kategori
 category_create_description,"Create a new budget category","Buat kategori anggaran baru"

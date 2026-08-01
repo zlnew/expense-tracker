@@ -34,6 +34,8 @@
     "cancel": "Cancel",
     "cannot_delete_active_budget": "Cannot delete active budget.",
     "cannot_delete_primary_balance": "Cannot delete primary balance.",
+    "carry_over": "Carry over unused budget",
+    "carry_over_description": "Start this budget with the unused amount from the previous cycle added to each category.",
     "categories": "Categories",
     "category": "Category",
     "category_create_description": "Create a new budget category",
