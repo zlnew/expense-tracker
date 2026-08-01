@@ -8,6 +8,7 @@ use App\Enums\CategoryType;
 use App\Models\Balance;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class TransferBetweenAccounts extends Action
@@ -32,19 +33,28 @@ class TransferBetweenAccounts extends Action
             ]);
         }
 
-        if ($sourceAccount->final_amount < 0) {
+        if ($sourceAccount->id === $destinationAccount->id) {
+            throw ValidationException::withMessages([
+                'account' => 'Source and destination accounts must be different',
+            ]);
+        }
+
+        if ($sourceAccount->final_amount < $this->data->amount) {
             throw ValidationException::withMessages([
                 'account' => 'Insufficient balance',
             ]);
         }
 
-        DB::transaction(function () use ($destinationAccount, $sourceAccount) {
+        $transferGroupId = Str::uuid()->toString();
+
+        DB::transaction(function () use ($destinationAccount, $sourceAccount, $transferGroupId) {
             SaveTransaction::run(new Transaction, TransactionData::from([
                 'balance_id' => $sourceAccount->id,
                 'type' => CategoryType::EXPENSE->value,
                 'date' => $this->data->date,
                 'amount' => $this->data->amount,
                 'description' => $this->data->description,
+                'transfer_group_id' => $transferGroupId,
             ]));
 
             SaveTransaction::run(new Transaction, TransactionData::from([
@@ -53,6 +63,7 @@ class TransferBetweenAccounts extends Action
                 'date' => $this->data->date,
                 'amount' => $this->data->amount,
                 'description' => $this->data->description,
+                'transfer_group_id' => $transferGroupId,
             ]));
         });
     }

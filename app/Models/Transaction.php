@@ -48,7 +48,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['type', 'date', 'amount', 'description'])]
+#[Fillable(['type', 'date', 'amount', 'description', 'transfer_group_id'])]
 class Transaction extends Model
 {
     protected function casts(): array

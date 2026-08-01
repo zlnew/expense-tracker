@@ -32,6 +32,7 @@ class TransactionSaveRequest extends FormRequest
             'date' => ['required', 'date'],
             'amount' => ['required', 'integer'],
             'description' => ['nullable', 'string'],
+            'transfer_group_id' => ['nullable', 'string', 'max:36'],
         ];
     }
 
