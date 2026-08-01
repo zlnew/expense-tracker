@@ -5,12 +5,12 @@ import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import { useLang } from '@/composables/useLang'
 import { destroy as destroyBalance } from '@/routes/balances'
 import type { Balance } from '@/types'
@@ -48,7 +48,7 @@ const submit = () => {
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[425px]">
+    <SheetDialogContent class="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>
           {{ __('delete_data', { data: __('balance') }) }}
@@ -75,6 +75,6 @@ const submit = () => {
           {{ form.processing ? __('deleting') : __('delete') }}
         </Button>
       </DialogFooter>
-    </DialogContent>
+    </SheetDialogContent>
   </Dialog>
 </template>

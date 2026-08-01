@@ -17,7 +17,9 @@ import {
   TrendingUpIcon,
   AlertTriangle,
   ChevronRight,
+  Download,
   TrendingDownIcon,
+  X,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
 import AppContent from '@/components/AppContent.vue'
@@ -37,6 +39,7 @@ import {
 import ChartTooltipContent from '@/components/ui/chart/ChartTooltipContent.vue'
 import { componentToString } from '@/components/ui/chart/utils'
 import { useDate } from '@/composables/useDate'
+import { useInstallPrompt } from '@/composables/useInstallPrompt'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { dashboard } from '@/routes'
@@ -62,6 +65,7 @@ const props = defineProps<{
 const { __ } = useLang()
 const { formatDate } = useDate()
 const { formatNumber } = useNumber()
+const { canInstall, promptInstall, dismissInstall } = useInstallPrompt()
 
 setLayoutProps({
   breadcrumbs: [
@@ -263,19 +267,19 @@ const getProgressTextColor = (planned: number, actual: number) => {
       </div>
 
       <!-- Summary Cards Grid -->
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <!-- Total Balance -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-blue-500/5 blur-xl dark:bg-blue-400/5"
           ></div>
           <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
+            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
           >
             <CardTitle
-              class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+              class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
               {{ __('total_balance') }}
             </CardTitle>
@@ -285,9 +289,9 @@ const getProgressTextColor = (planned: number, actual: number) => {
               <Wallet class="size-4" />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent class="px-3 sm:px-6">
             <div
-              class="text-2xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
+              class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
             >
               Rp {{ formatNumber(summary_cards.total_balance) }}
             </div>
@@ -307,16 +311,16 @@ const getProgressTextColor = (planned: number, actual: number) => {
 
         <!-- Monthly Incomes -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-emerald-500/5 blur-xl dark:bg-emerald-400/5"
           ></div>
           <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
+            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
           >
             <CardTitle
-              class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+              class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
               {{ __('current_month_incomes') }}
             </CardTitle>
@@ -326,9 +330,9 @@ const getProgressTextColor = (planned: number, actual: number) => {
               <TrendingUp class="size-4" />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent class="px-3 sm:px-6">
             <div
-              class="text-2xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
+              class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
             >
               Rp {{ formatNumber(summary_cards.current_month_incomes) }}
             </div>
@@ -342,16 +346,16 @@ const getProgressTextColor = (planned: number, actual: number) => {
 
         <!-- Monthly Expenses -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-rose-500/5 blur-xl dark:bg-rose-400/5"
           ></div>
           <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
+            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
           >
             <CardTitle
-              class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+              class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
               {{ __('current_month_expenses') }}
             </CardTitle>
@@ -361,9 +365,9 @@ const getProgressTextColor = (planned: number, actual: number) => {
               <TrendingDown class="size-4" />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent class="px-3 sm:px-6">
             <div
-              class="text-2xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
+              class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
             >
               Rp {{ formatNumber(summary_cards.current_month_expenses) }}
             </div>
@@ -377,16 +381,16 @@ const getProgressTextColor = (planned: number, actual: number) => {
 
         <!-- Budget Remaining -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-violet-500/5 blur-xl dark:bg-violet-400/5"
           ></div>
           <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
+            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
           >
             <CardTitle
-              class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+              class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
               {{ __('remaining_budget') }}
             </CardTitle>
@@ -396,9 +400,9 @@ const getProgressTextColor = (planned: number, actual: number) => {
               <Target class="size-4" />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent class="px-3 sm:px-6">
             <div
-              class="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl"
+              class="min-w-0 truncate text-xl font-bold tracking-tight tabular-nums sm:text-3xl"
               :class="
                 summary_cards.budget_remaining < 0
                   ? 'text-rose-600 dark:text-rose-400'
@@ -460,7 +464,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
               </div>
             </div>
 
-            <div class="h-[300px] w-full overflow-hidden">
+            <div class="h-[220px] min-w-0 w-full overflow-hidden sm:h-[300px]">
               <ChartContainer :config="lineChartConfig" class="h-full w-full">
                 <VisXYContainer
                   :data="monthly_spending_trend"
@@ -510,7 +514,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
         </Card>
 
         <!-- Expense Breakdown (Pie/Donut Chart) -->
-        <Card class="border border-border/50 bg-card shadow-xs">
+        <Card class="min-w-0 border border-border/50 bg-card shadow-xs">
           <CardHeader>
             <CardTitle class="text-lg font-bold text-foreground">
               {{ __('expense_breakdown') }}
@@ -537,7 +541,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
 
             <div v-else class="flex flex-col gap-6">
               <!-- Donut Chart Wrapper -->
-              <div class="relative mx-auto h-[200px] w-[200px]">
+              <div class="relative mx-auto h-[160px] w-[160px] max-w-[180px] sm:h-[200px] sm:w-[200px]">
                 <ChartContainer :config="donutConfig" class="h-full w-full">
                   <VisSingleContainer
                     :data="expense_breakdown"
@@ -573,7 +577,7 @@ const getProgressTextColor = (planned: number, actual: number) => {
                 <div
                   v-for="(item, i) in expense_breakdown"
                   :key="item.category"
-                  class="flex items-center justify-between border-b border-border/20 py-1 text-xs last:border-b-0"
+                  class="flex items-center justify-between border-b border-border/20 py-1.5 text-xs last:border-b-0"
                 >
                   <div class="flex min-w-0 items-center gap-2">
                     <span
@@ -821,6 +825,44 @@ const getProgressTextColor = (planned: number, actual: number) => {
             </div>
           </CardContent>
         </Card>
+      </div>
+    </div>
+
+    <!-- PWA Install Banner (dismissible, once per session) -->
+    <div
+      v-if="canInstall"
+      role="region"
+      aria-label="Install app"
+      class="fixed inset-x-4 bottom-20 z-50 md:inset-x-auto md:bottom-6 md:left-1/2 md:w-full md:max-w-md md:-translate-x-1/2"
+    >
+      <div
+        class="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-3 shadow-lg"
+      >
+        <div
+          class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+        >
+          <Download class="size-4" />
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold text-foreground">
+            {{ __('install_banner_title') }}
+          </p>
+          <p class="truncate text-xs text-muted-foreground">
+            {{ __('install_banner_description') }}
+          </p>
+        </div>
+        <Button size="sm" class="shrink-0" @click="promptInstall">
+          {{ __('install_banner_action') }}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          class="shrink-0"
+          :aria-label="__('install_banner_dismiss')"
+          @click="dismissInstall"
+        >
+          <X class="size-4" />
+        </Button>
       </div>
     </div>
   </AppContent>
