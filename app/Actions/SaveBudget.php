@@ -19,7 +19,9 @@ class SaveBudget extends Action
     public function handle(): Budget
     {
         return DB::transaction(function () {
-            $isNew = ! $this->budget->exists;
+            // Track whether carry-over was already on, so we only roll the
+            // leftover in once (first time it's enabled — create or edit).
+            $wasCarryOver = (bool) $this->budget->getOriginal('carry_over');
 
             $this->budget->fill([
                 'period_start' => $this->data->period_start,
@@ -37,10 +39,12 @@ class SaveBudget extends Action
 
             $items = $this->data->items;
 
-            // YNAB-style rollover: a NEW budget with carry_over enabled starts
-            // each category with the previous cycle's unused amount added to
-            // the planned amount.
-            if ($isNew && $this->data->carry_over) {
+            // YNAB-style rollover: when carry_over is first enabled (on a new
+            // budget or by ticking the box on an existing one), each category
+            // starts with the previous cycle's unused amount added to the
+            // planned amount. Guarded by $wasCarryOver so a later edit of an
+            // already-carrying budget never rolls the leftover in twice.
+            if ($this->data->carry_over && ! $wasCarryOver) {
                 $items = BudgetRollover::apply($this->budget, $items);
             }
 

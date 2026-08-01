@@ -11,6 +11,7 @@ use App\Http\Requests\BudgetSaveRequest;
 use App\Models\Budget;
 use App\Models\Category;
 use App\Queries\BudgetQuery;
+use App\Support\BudgetRollover;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class BudgetController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
         $categories = Category::query()
             ->where('user_id', Auth::id())
@@ -41,6 +42,7 @@ class BudgetController extends Controller
 
         return Inertia::render('BudgetCreate', [
             'categories' => CategoryData::collect($categories),
+            'carryOverPreview' => BudgetRollover::previewForUser($request->user()),
         ]);
     }
 

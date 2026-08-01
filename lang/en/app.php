@@ -38,6 +38,8 @@ return [
     'cannot_delete_primary_balance' => 'Cannot delete primary balance.',
     'carry_over' => 'Carry over unused budget',
     'carry_over_description' => 'Start this budget with the unused amount from the previous cycle added to each category.',
+    'carry_over_no_previous' => 'No previous budget found — nothing to carry over yet.',
+    'carry_over_preview' => 'Rp :amount from the previous cycle will roll into this budget.',
     'categories' => 'Categories',
     'category' => 'Category',
     'category_create_description' => 'Create a new budget category',
