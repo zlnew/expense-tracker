@@ -16,11 +16,10 @@ import {
   ListTodoIcon,
   MinusIcon,
 } from 'lucide-vue-next'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
-import TransactionCreateDialog from '@/components/dialogs/TransactionCreateDialog.vue'
 import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialog.vue'
 import TransactionTransferDialog from '@/components/dialogs/TransactionTransferDialog.vue'
 import TransactionUpdateDialog from '@/components/dialogs/TransactionUpdateDialog.vue'
@@ -87,7 +86,6 @@ setLayoutProps({
   ],
 })
 
-const createDialogOpen = ref(false)
 const updateDialogOpen = ref(false)
 const bulkCreateDialogOpen = ref(false)
 const transferDialogOpen = ref(false)
@@ -169,19 +167,12 @@ const fetchData = useDebounceFn(() => {
   })
 }, 300)
 
+// The global quick-add FAB (mobile bottom nav) and this page's "Single
+// Transaction" action both open the shared create dialog mounted in the
+// layout via this custom event — works from ANY page.
 const openCreateDialog = () => {
-  createDialogOpen.value = true
+  window.dispatchEvent(new CustomEvent('open:transaction-create'))
 }
-
-// The global bottom-nav quick-add FAB dispatches this event — open the dialog
-// from any in-page trigger so the mobile FAB works on this page too.
-onMounted(() => {
-  window.addEventListener('open:transaction-create', openCreateDialog)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('open:transaction-create', openCreateDialog)
-})
 
 const openUpdateDialog = (data: Transaction) => {
   targetData.value = data
@@ -258,7 +249,7 @@ const openTransferDialog = () => {
             variant="outline"
             size="icon"
             class="h-10 w-10 shrink-0 lg:hidden"
-            :aria-label="__('filter_by_balance')"
+            :aria-label="__('filter_transactions')"
             @click="filterSheetOpen = true"
           >
             <Filter class="size-4" />
@@ -350,7 +341,7 @@ const openTransferDialog = () => {
           <DialogHeader>
             <DialogTitle class="flex items-center gap-2">
               <Filter class="size-4" />
-              {{ __('filter_by_balance') }}
+              {{ __('filter_transactions') }}
             </DialogTitle>
           </DialogHeader>
 
@@ -653,14 +644,6 @@ const openTransferDialog = () => {
     </div>
   </AppContent>
 
-  <TransactionCreateDialog
-    v-model:open="createDialogOpen"
-    :balances="balances"
-    :budgets="budgets"
-    :categories="categories"
-    :primaryBalanceId="primaryBalanceId"
-    :activeBudgetId="activeBudgetId"
-  />
   <TransactionUpdateDialog
     v-model:open="updateDialogOpen"
     :transaction="targetData"

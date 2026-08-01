@@ -11,7 +11,7 @@ class GetMonthlySpendingTrend extends Action
 {
     public readonly User $user;
 
-    private readonly Budget $activeBudget;
+    private readonly ?Budget $activeBudget;
 
     public function __construct(User|int $user)
     {
