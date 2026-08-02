@@ -1,8 +1,13 @@
 # Production compose for Expense Tracker — used by the HorizonX agent.
-# Builds the multi-stage Dockerfile.prod (php-fpm + nginx) and attaches to the
-# shared personal-network so it can reach personal-postgres / personal-redis.
+# The agent builds both services on deploy (`compose up -d --build`), tags the
+# fpm image as APP_IMAGE=<appKey>:<commitHash> (rollback replays that tag), and
+# recreates in place. Web is the Dockerfile.prod `web` stage (nginx + public/);
+# its image name is fixed — the agent rebuilds it on every deploy, so it always
+# matches the current build. On rollback the fpm code reverts; the static web
+# assets may be one commit newer (acceptable for a personal app).
 #
-# Env overrides come from HorizonX env vars (written to .env in the workdir):
+# Attaches to the shared personal-network so it can reach personal-postgres /
+# personal-redis. Env overrides come from HorizonX env vars (written to .env):
 #   EXPENSE_PORT (default 8010), DB creds, APP_KEY, etc.
 services:
   fpm:
@@ -30,12 +35,14 @@ services:
       - personal-network
 
   web:
-    image: nginx:1.27-alpine
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      target: web
+    image: expense-tracker-web:latest
     container_name: ${APP_CONTAINER_NAME:-expense-tracker}-web
     depends_on:
       - fpm
-    volumes_from:
-      - fpm:ro
     ports:
       - '127.0.0.1:${EXPENSE_PORT:-8010}:80'
     restart: unless-stopped

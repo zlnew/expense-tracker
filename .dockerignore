@@ -1,0 +1,29 @@
+# Source control
+.git
+.gitignore
+
+# Dependencies — MUST NOT be copied into the build stage (the stage does its
+# own --no-dev composer install; the host dev vendor would corrupt it).
+vendor
+node_modules
+
+# Build output
+public/build
+public/hot
+storage/logs/*
+!storage/logs/.gitignore
+
+# Environment + secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS cruft
+.idea
+.vscode
+*.log
+.DS_Store
+
+# Tests artifacts (kept out of the prod image)
+.coverage
+.phpunit.cache

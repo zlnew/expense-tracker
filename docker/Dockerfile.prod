@@ -35,8 +35,14 @@ RUN npm ci
 # App source
 COPY . .
 
-# Wayfinder needs the bootstrap app + routes; generate before vite build
-RUN composer dump-autoload --no-dev --optimize \
+# Stale dev manifests (bootstrap/cache/packages.php, services.php) reference
+# dev-only providers and break --no-dev boots — clear before artisan runs.
+RUN rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
+
+# Wayfinder needs the bootstrap app + routes; generate before vite build.
+# --no-scripts skips package:discover (it references dev-only providers
+# that were excluded with --no-dev).
+RUN composer dump-autoload --no-dev --optimize --no-scripts \
     && php artisan wayfinder:generate \
     && npm run build
 
@@ -51,8 +57,9 @@ RUN chown -R www-data:www-data storage bootstrap/cache
 # ---- Stage 2: php-fpm runtime ---------------------------------------------
 FROM php:8.4-fpm-alpine AS fpm
 
-RUN apk add --no-cache libpq \
-    && docker-php-ext-install pdo_pgsql pgsql opcache
+RUN apk add --no-cache libpq postgresql-dev \
+    && docker-php-ext-install pdo_pgsql pgsql opcache \
+    && apk del postgresql-dev
 
 COPY --from=build /app /app
 WORKDIR /app
