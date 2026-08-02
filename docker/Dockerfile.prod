@@ -1,0 +1,77 @@
+# Production image for Expense Tracker (Laravel 13 + Inertia Vue 3 + Wayfinder).
+# Three stages:
+#   1. build  — PHP + Node + composer: install deps, generate Wayfinder routes,
+#               build frontend assets, run artisan optimize.
+#   2. fpm    — php:8.4-fpm-alpine runtime with the built app (no Node, no dev deps).
+#   3. web    — nginx serving public/ and proxying PHP to fpm.
+#
+# Runtime env (set via HorizonX env vars / .env):
+#   APP_ENV, APP_KEY, APP_URL, DB_CONNECTION/DB_HOST/DB_PORT/DB_DATABASE/
+#   DB_USERNAME/DB_PASSWORD, REDIS_HOST/REDIS_PASSWORD, SESSION_DRIVER, CACHE_STORE
+
+# ---- Stage 1: build -------------------------------------------------------
+FROM php:8.4-cli AS build
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq-dev unzip git curl ca-certificates \
+    && docker-php-ext-install pdo_pgsql pgsql \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+
+# Composer deps (cache layer; code changes don't re-fetch)
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-progress --prefer-dist \
+    --no-scripts --no-autoloader
+
+# Node deps
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# App source
+COPY . .
+
+# Wayfinder needs the bootstrap app + routes; generate before vite build
+RUN composer dump-autoload --no-dev --optimize \
+    && php artisan wayfinder:generate \
+    && npm run build
+
+# Runtime optimizations (caches config/routes/views for prod)
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+# Permissions for fpm user
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+# ---- Stage 2: php-fpm runtime ---------------------------------------------
+FROM php:8.4-fpm-alpine AS fpm
+
+RUN apk add --no-cache libpq \
+    && docker-php-ext-install pdo_pgsql pgsql opcache
+
+COPY --from=build /app /app
+WORKDIR /app
+
+# fpm runs as www-data by default; make storage writable
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+# Entrypoint: run migrations (idempotent), then exec fpm.
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 9000
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]
+
+# ---- Stage 3: nginx --------------------------------------------------------
+FROM nginx:1.27-alpine AS web
+
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/public /app/public
+
+EXPOSE 80
