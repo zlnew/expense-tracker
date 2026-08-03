@@ -6,11 +6,16 @@ use App\Enums\CategoryType;
 use App\Models\BudgetItem;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\BudgetCycle;
 use Illuminate\Support\Facades\Http;
 
 /**
  * Check a freshly-saved expense against its budget items and push a Discord
  * webhook notification when an item crosses 80% or 100% of its planned amount.
+ *
+ * Spend is scoped to the CURRENT budget cycle (cutoff-day aware) — last
+ * cycle's expenses must not inflate this cycle's percentage. Alerts re-arm
+ * each cycle: alert_cycle_key records the cycle the flags were set in.
  *
  * Deliberately fire-and-forget: webhook failures never affect the save.
  */
@@ -38,27 +43,39 @@ class CheckBudgetAlerts extends Action
             return;
         }
 
+        [$start, $end] = BudgetCycle::currentCycleRange($budgetItem->budget);
+
         $spent = Transaction::query()
             ->where('user_id', $this->user->id)
             ->where('budget_item_id', $budgetItem->id)
             ->where('type', CategoryType::EXPENSE)
+            ->whereBetween('date', [$start, $end])
             ->sum('amount');
 
         $percentage = round(($spent / $budgetItem->planned_amount) * 100);
 
+        $cycleKey = $start->toDateString();
+
+        // Flags are per-cycle: a new cycle re-arms both alerts.
+        $alertsFiredThisCycle = $budgetItem->alert_cycle_key === $cycleKey;
+
         $messages = [];
 
-        if ($percentage >= 100 && ! $budgetItem->alert_100_sent) {
+        if ($percentage >= 100 && (! $alertsFiredThisCycle || ! $budgetItem->alert_100_sent)) {
             $messages[] = $this->message($budgetItem, $spent, $percentage, '🔴');
             // Crossing 100% implies the 80% threshold was crossed too —
             // mark both so the 80% alert never fires afterwards.
             $budgetItem->update([
                 'alert_80_sent' => true,
                 'alert_100_sent' => true,
+                'alert_cycle_key' => $cycleKey,
             ]);
-        } elseif ($percentage >= 80 && ! $budgetItem->alert_80_sent) {
+        } elseif ($percentage >= 80 && (! $alertsFiredThisCycle || ! $budgetItem->alert_80_sent)) {
             $messages[] = $this->message($budgetItem, $spent, $percentage, '🟠');
-            $budgetItem->update(['alert_80_sent' => true]);
+            $budgetItem->update([
+                'alert_80_sent' => true,
+                'alert_cycle_key' => $cycleKey,
+            ]);
         }
 
         if ($messages === []) {
