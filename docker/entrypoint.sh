@@ -1,11 +1,11 @@
 #!/bin/sh
 set -e
 
-# Run pending migrations (idempotent — safe on every boot).
-php artisan migrate --force
+php artisan config:clear
 
-# Clear + repopulate caches in case the image was built without them.
 php artisan config:cache
 php artisan route:cache
+
+php artisan migrate --force
 
 exec "$@"
