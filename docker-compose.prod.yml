@@ -26,13 +26,15 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-production}
       APP_DEBUG: ${APP_DEBUG:-false}
-      DB_CONNECTION: pgsql
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
       DB_HOST: ${DB_HOST:-personal-postgres}
-      DB_PORT: '5432'
+      DB_PORT: ${DB_PORT:-5432}
       DB_DATABASE: ${DB_DATABASE:-expense_tracker}
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-secret}
       REDIS_HOST: ${REDIS_HOST:-personal-redis}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      REDIS_PORT: ${REDIS_PORT:-6379}
     restart: unless-stopped
     networks:
       - default
@@ -48,7 +50,7 @@ services:
     depends_on:
       - fpm
     ports:
-      - '127.0.0.1:${EXPENSE_PORT:-8010}:80'
+      - '${APP_HOST}:${APP_PORT:-8000}:80'
     restart: unless-stopped
     networks:
       - default
