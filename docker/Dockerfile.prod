@@ -46,9 +46,8 @@ RUN composer dump-autoload --no-dev --optimize --no-scripts \
     && php artisan wayfinder:generate \
     && npm run build
 
-# Runtime optimizations (caches config/routes/views for prod)
-RUN php artisan config:cache \
-    && php artisan route:cache \
+# Runtime optimizations (caches routes/views for prod)
+RUN php artisan route:cache \
     && php artisan view:cache
 
 # Permissions for fpm user
