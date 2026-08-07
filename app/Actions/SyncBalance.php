@@ -19,21 +19,18 @@ class SyncBalance extends Action
 
     public function handle(): void
     {
-        $incomes = Transaction::query()
+        $totals = Transaction::query()
             ->where('balance_id', $this->balance->id)
-            ->where('type', CategoryType::INCOME)
-            ->get();
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS incomes,
+                COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS expenses
+            ", [CategoryType::INCOME->value, CategoryType::EXPENSE->value])
+            ->first();
 
-        $expenses = Transaction::query()
-            ->where('balance_id', $this->balance->id)
-            ->where('type', CategoryType::EXPENSE)
-            ->get();
+        $this->balance->final_amount = ($this->balance->initial_amount ?? 0)
+            + (int) $totals->incomes
+            - (int) $totals->expenses;
 
-        $initialAmount = $this->balance->initial_amount ?? 0;
-        $incomesAmount = (int) $incomes->sum('amount');
-        $expensesAmount = (int) $expenses->sum('amount');
-
-        $this->balance->final_amount = $initialAmount + $incomesAmount - $expensesAmount;
         $this->balance->save();
     }
 }
