@@ -2,11 +2,11 @@
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { Plus, Repeat, SquarePen, Trash2 } from 'lucide-vue-next'
 import { ref } from 'vue'
-import Heading from '@/components/Heading.vue'
 import RecurringTransactionDeleteDialog from '@/components/dialogs/RecurringTransactionDeleteDialog.vue'
 import RecurringTransactionFormDialog from '@/components/dialogs/RecurringTransactionFormDialog.vue'
-import { Button } from '@/components/ui/button'
+import Heading from '@/components/Heading.vue'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,

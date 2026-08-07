@@ -28,8 +28,6 @@ import recurringTransactions from '@/routes/recurring-transactions'
 import transactions from '@/routes/transactions'
 import type { NavGroup, NavItem } from '@/types'
 
-defineProps()
-
 const { __ } = useLang()
 
 const mainNavItems: NavGroup[] = [

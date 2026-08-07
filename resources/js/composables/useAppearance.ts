@@ -1,6 +1,6 @@
+import { useMediaQuery } from '@vueuse/core'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, onMounted, ref } from 'vue'
-import { useMediaQuery } from '@vueuse/core'
 import type { Appearance, ResolvedAppearance } from '@/types'
 
 export type { Appearance, ResolvedAppearance }

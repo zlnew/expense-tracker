@@ -125,11 +125,14 @@ monthly_spending_trend_description,"See how your income and expenses change over
 multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
+new_version_available,"New version available","Versi baru tersedia"
+new_version_reload,Reload,"Muat ulang"
 next_run_date,"Next Run","Berjalan Berikutnya"
 no_data_found,"No :data found",":data tidak ditemukan"
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
+offline,"You're offline","Anda sedang offline"
 optional,Optional,Opsional
 overspent,Overspent,Melebihi
 password,Password,"Kata Sandi"

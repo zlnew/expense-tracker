@@ -32,7 +32,13 @@ function openDialog() {
     loadingRef.value = true
 
     router.reload({
-      only: ['balances', 'budgets', 'categories', 'primaryBalanceId', 'activeBudgetId'],
+      only: [
+        'balances',
+        'budgets',
+        'categories',
+        'primaryBalanceId',
+        'activeBudgetId',
+      ],
       onFinish: () => {
         loadingRef.value = false
       },
