@@ -5,10 +5,30 @@ use App\Enums\CategoryType;
 use App\Models\Balance;
 use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
+
+/**
+ * Laravel 13's SQLiteGrammar::compileLock() returns '' — sqlite strips
+ * FOR UPDATE from the emitted SQL entirely (and would reject it at
+ * execution). To prove the lock is *requested*, record compileLock calls
+ * instead of grepping the query log for a clause that can never appear.
+ */
+final class RecordingLockGrammar extends SQLiteGrammar
+{
+    public bool $lockRequested = false;
+
+    protected function compileLock(Builder $query, $value): string
+    {
+        $this->lockRequested = true;
+
+        return parent::compileLock($query, $value);
+    }
+}
 
 it('computes the balance with a single aggregate query', function () {
     $user = User::factory()->create();
@@ -42,4 +62,18 @@ it('computes the balance with a single aggregate query', function () {
     foreach ($selects as $q) {
         expect(strtolower($q['query']))->toContain('sum(');
     }
+});
+
+it('locks the balance row while recomputing', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 0]);
+
+    $grammar = new RecordingLockGrammar(DB::connection());
+    DB::connection()->setQueryGrammar($grammar);
+
+    DB::transaction(fn () => SyncBalance::run($balance->id));
+
+    expect($grammar->lockRequested)->toBeTrue(
+        'SyncBalance must request SELECT ... FOR UPDATE on the balance row before writing final_amount'
+    );
 });
