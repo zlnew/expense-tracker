@@ -11,13 +11,17 @@ use Illuminate\Database\Query\Grammars\SQLiteGrammar;
  * execution). To prove a lock is *requested*, record compileLock calls
  * instead of grepping the query log for a clause that can never appear.
  *
- * Also records which ids are locked together in a single query so a test
- * can tell the transfer's dual-account lock apart from SyncBalance's
- * single-row lock (both run during a transfer).
+ * Also records which tables are locked and which ids are locked together
+ * in a single query, so a test can distinguish the transfer's dual-account
+ * lock or the recurring row's lock from SyncBalance's single-row lock
+ * (all three can run in the same flow).
  */
 final class RecordingLockGrammar extends SQLiteGrammar
 {
     public bool $lockRequested = false;
+
+    /** @var list<string> tables locked via lockForUpdate(), in query order */
+    public array $lockedTables = [];
 
     /** @var array<int, list<int>> id sets locked per query, in query order */
     public array $lockedIdSets = [];
@@ -25,6 +29,11 @@ final class RecordingLockGrammar extends SQLiteGrammar
     protected function compileLock(Builder $query, $value): string
     {
         $this->lockRequested = true;
+
+        $table = is_array($query->from) ? $query->from[0] ?? null : $query->from;
+        if ($table !== null) {
+            $this->lockedTables[] = $table;
+        }
 
         $ids = $this->extractWhereInIds($query);
         if ($ids !== []) {
