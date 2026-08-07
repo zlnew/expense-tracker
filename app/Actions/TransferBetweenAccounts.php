@@ -39,15 +39,30 @@ class TransferBetweenAccounts extends Action
             ]);
         }
 
-        if ($sourceAccount->final_amount < $this->data->amount) {
-            throw ValidationException::withMessages([
-                'account' => __('insufficient_balance'),
-            ]);
-        }
-
         $transferGroupId = Str::uuid()->toString();
 
         DB::transaction(function () use ($destinationAccount, $sourceAccount, $transferGroupId) {
+            // Lock both accounts in a deterministic order (ascending id) so two
+            // concurrent transfers between the same pair can never deadlock.
+            $ids = [$sourceAccount->id, $destinationAccount->id];
+            sort($ids);
+
+            $locked = Balance::query()
+                ->whereIn('id', $ids)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            $lockedSource = $locked[$sourceAccount->id];
+
+            // Re-check under lock: the value read before the transaction may be stale.
+            if ($lockedSource->final_amount < $this->data->amount) {
+                throw ValidationException::withMessages([
+                    'account' => __('insufficient_balance'),
+                ]);
+            }
+
             SaveTransaction::run(new Transaction, TransactionData::from([
                 'balance_id' => $sourceAccount->id,
                 'type' => CategoryType::EXPENSE->value,

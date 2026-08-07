@@ -19,21 +19,32 @@ class SyncBalance extends Action
 
     public function handle(): void
     {
-        $incomes = Transaction::query()
-            ->where('balance_id', $this->balance->id)
-            ->where('type', CategoryType::INCOME)
-            ->get();
+        // Lock the balance row so two concurrent writes can't both read the
+        // pre-write state and clobber each other's final_amount.
+        $locked = Balance::query()
+            ->whereKey($this->balance->id)
+            ->lockForUpdate()
+            ->first();
 
-        $expenses = Transaction::query()
-            ->where('balance_id', $this->balance->id)
-            ->where('type', CategoryType::EXPENSE)
-            ->get();
+        if (! $locked) {
+            return;
+        }
 
-        $initialAmount = $this->balance->initial_amount ?? 0;
-        $incomesAmount = (int) $incomes->sum('amount');
-        $expensesAmount = (int) $expenses->sum('amount');
+        $totals = Transaction::query()
+            ->where('balance_id', $locked->id)
+            ->selectRaw('
+                COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS incomes,
+                COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS expenses
+            ', [CategoryType::INCOME->value, CategoryType::EXPENSE->value])
+            ->first();
 
-        $this->balance->final_amount = $initialAmount + $incomesAmount - $expensesAmount;
-        $this->balance->save();
+        $locked->final_amount = ($locked->initial_amount ?? 0)
+            + (int) $totals->incomes
+            - (int) $totals->expenses;
+
+        $locked->save();
+
+        // Keep the caller's in-memory instance consistent with what was written.
+        $this->balance->final_amount = $locked->final_amount;
     }
 }

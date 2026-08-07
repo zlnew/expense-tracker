@@ -32,7 +32,7 @@ class TransferBetweenAccountsRequest extends FormRequest
                 Rule::exists('balances', 'id')->where('user_id', $this->user()?->id),
             ],
             'date' => ['required', 'date'],
-            'amount' => ['required', 'integer'],
+            'amount' => ['required', 'integer', 'min:1'],
             'description' => ['nullable', 'string'],
         ];
     }
