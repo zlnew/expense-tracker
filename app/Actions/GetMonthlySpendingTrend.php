@@ -7,6 +7,7 @@ use App\Models\Budget;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Support\BudgetCycle;
+use Illuminate\Support\Facades\DB;
 
 class GetMonthlySpendingTrend extends Action
 {
@@ -26,12 +27,12 @@ class GetMonthlySpendingTrend extends Action
             ->first();
     }
 
-    public function handle(): array
+    /**
+     * Build the trend query without executing it (extracted for testability:
+     * the SQL is Postgres-only, so tests assert on the compiled SQL shape).
+     */
+    public function buildTrendQuery()
     {
-        if ($this->activeBudget === null) {
-            return [];
-        }
-
         $cutoffDay = $this->activeBudget->cutoff_day;
         $currentYear = now()->year;
         $cycleDateSql = BudgetCycle::cycleDateSql('date', '?');
@@ -46,7 +47,11 @@ class GetMonthlySpendingTrend extends Action
             ->where('user_id', $this->user->id)
             ->where('budget_id', $this->activeBudget->id);
 
-        $transactions = Transaction::query()
+        // Plain DB builder: Transaction::query() would re-apply the SoftDeletes
+        // scope against the outer FROM (the aliased subquery), producing
+        // "missing FROM-clause entry for table transactions" on Postgres.
+        // The inner subquery already filters deleted rows.
+        return DB::query()
             ->fromSub($subquery, 'txn')
             ->selectRaw('
                 CAST(EXTRACT(MONTH FROM cycle_date) AS INTEGER) AS month,
@@ -54,8 +59,16 @@ class GetMonthlySpendingTrend extends Action
                 SUM(amount) AS total_amount
             ')
             ->whereRaw('CAST(EXTRACT(YEAR FROM cycle_date) AS INTEGER) = ?', [$currentYear])
-            ->groupBy('month', 'type')
-            ->get();
+            ->groupBy('month', 'type');
+    }
+
+    public function handle(): array
+    {
+        if ($this->activeBudget === null) {
+            return [];
+        }
+
+        $transactions = $this->buildTrendQuery()->get();
 
         $grouped = $transactions->groupBy('month');
 
