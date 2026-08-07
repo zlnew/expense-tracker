@@ -63,9 +63,10 @@
         ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
-            "npm run lint:check",
-            "npm run format:check",
-            "npm run types:check",
+            "npm run lint-check",
+            "npm run format-check",
+            "npm run type-check",
+            "npm run test:unit",
             "@test"
         ],
         "test": [
