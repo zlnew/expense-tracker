@@ -2,6 +2,7 @@
 
 use App\Actions\DeleteTransaction;
 use App\Actions\SaveBudget;
+use App\Actions\SyncBalance;
 use App\Actions\TransferBetweenAccounts;
 use App\DTO\BudgetData;
 use App\DTO\TransferBetweenAccountsData;
@@ -13,7 +14,9 @@ use App\Models\Transaction;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Tests\Support\RecordingLockGrammar;
 
 uses(RefreshDatabase::class);
 
@@ -60,6 +63,41 @@ test('transfer rejects insufficient funds', function () {
         description: 'overdraft',
     ));
 })->throws(ValidationException::class, 'Insufficient balance');
+
+test('transfer re-checks the source balance under lock inside the transaction', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $source = Balance::factory()->for($user)->create(['initial_amount' => 100_000]);
+    $dest = Balance::factory()->for($user)->create(['initial_amount' => 0]);
+
+    SyncBalance::run($source->id);
+    SyncBalance::run($dest->id);
+
+    $grammar = new RecordingLockGrammar(DB::connection());
+    DB::connection()->setQueryGrammar($grammar);
+
+    TransferBetweenAccounts::run(TransferBetweenAccountsData::from([
+        'from_account_id' => $source->id,
+        'to_account_id' => $dest->id,
+        'date' => now()->toDateString(),
+        'amount' => 50_000,
+        'description' => 'lock check',
+    ]));
+
+    // The source balance must be read with a lock before the guard decides.
+    expect($grammar->lockRequested)->toBeTrue(
+        'the overdraft guard must read the source balance FOR UPDATE inside the transaction'
+    );
+
+    // And the transfer must lock BOTH accounts together (whereIn id IN (a,b)),
+    // not just rely on SyncBalance's per-write single-row lock — otherwise a
+    // concurrent transfer between the same pair could still interleave.
+    expect($grammar->lockedIdSets)->toContain([$source->id, $dest->id]);
+
+    expect($source->fresh()->final_amount)->toBe(50_000);
+    expect($dest->fresh()->final_amount)->toBe(50_000);
+});
 
 test('deleting one transfer leg deletes the pair and resyncs both balances', function () {
     $user = User::factory()->create();
