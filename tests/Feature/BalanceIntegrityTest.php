@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\DeleteTransaction;
 use App\Actions\SyncBalance;
 use App\Enums\CategoryType;
 use App\Models\Balance;
@@ -57,4 +58,30 @@ it('locks the balance row while recomputing', function () {
     expect($grammar->lockRequested)->toBeTrue(
         'SyncBalance must request SELECT ... FOR UPDATE on the balance row before writing final_amount'
     );
+});
+
+it('soft-deletes transactions and excludes them from the balance', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 0]);
+
+    $keep = Transaction::factory()->for($user)->for($balance)->create([
+        'type' => CategoryType::INCOME,
+        'amount' => 30_000,
+    ]);
+    $remove = Transaction::factory()->for($user)->for($balance)->create([
+        'type' => CategoryType::INCOME,
+        'amount' => 70_000,
+    ]);
+
+    SyncBalance::run($balance->id);
+    expect($balance->fresh()->final_amount)->toBe(100_000);
+
+    DeleteTransaction::run($remove);
+
+    // Row still exists for audit...
+    expect(Transaction::withTrashed()->find($remove->id))->not->toBeNull();
+    expect(Transaction::find($remove->id))->toBeNull();
+
+    // ...but no longer counts toward the balance.
+    expect($balance->fresh()->final_amount)->toBe(30_000);
 });
