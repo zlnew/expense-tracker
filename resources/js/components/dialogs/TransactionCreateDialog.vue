@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
@@ -36,6 +37,7 @@ const props = defineProps<{
   categories: Category[]
   primaryBalanceId?: number
   activeBudgetId?: number
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -158,7 +160,8 @@ const submit = () => {
             {{ __('balance') }}
             <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.balance_id" :disabled="form.processing">
+          <Skeleton v-if="loading" class="h-11 w-full md:h-9" />
+          <Select v-else v-model="form.balance_id" :disabled="form.processing">
             <SelectTrigger>
               <SelectValue
                 :placeholder="__('select_data', { data: __('balance') })"
@@ -177,7 +180,8 @@ const submit = () => {
             {{ __('budget') }}
             <span class="text-destructive">*</span>
           </Label>
-          <Select v-model="form.budget_id" :disabled="form.processing">
+          <Skeleton v-if="loading" class="h-11 w-full md:h-9" />
+          <Select v-else v-model="form.budget_id" :disabled="form.processing">
             <SelectTrigger>
               <SelectValue
                 :placeholder="__('select_data', { data: __('budget') })"
@@ -197,7 +201,9 @@ const submit = () => {
             {{ __('category') }}
             <span class="text-destructive">*</span>
           </Label>
+          <Skeleton v-if="loading" class="h-11 w-full md:h-9" />
           <Select
+            v-else
             v-model="form.category_id"
             :disabled="form.processing || !form.budget_id"
           >

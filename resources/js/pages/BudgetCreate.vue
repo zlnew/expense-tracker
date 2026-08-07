@@ -4,7 +4,6 @@ import { Check, X } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
-import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -145,7 +144,7 @@ const goBack = () => {
 <template>
   <Head :title="__('create_data', { data: __('budget') })" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <Heading
         :title="__('create_data', { data: __('budget') })"
@@ -432,5 +431,5 @@ const goBack = () => {
         </div>
       </form>
     </div>
-  </AppContent>
+  </div>
 </template>

@@ -2,7 +2,6 @@
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { Plus, Repeat, SquarePen, Trash2 } from 'lucide-vue-next'
 import { ref } from 'vue'
-import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
 import RecurringTransactionDeleteDialog from '@/components/dialogs/RecurringTransactionDeleteDialog.vue'
 import RecurringTransactionFormDialog from '@/components/dialogs/RecurringTransactionFormDialog.vue'
@@ -86,7 +85,7 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
 <template>
   <Head :title="__('recurring_transactions')" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -259,7 +258,7 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
         </Table>
       </div>
     </div>
-  </AppContent>
+  </div>
 
   <RecurringTransactionFormDialog
     v-model:open="createDialogOpen"

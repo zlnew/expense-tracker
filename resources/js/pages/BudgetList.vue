@@ -3,7 +3,6 @@ import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
 import { CheckCircle2, Info, Plus, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
-import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import BudgetDeleteDialog from '@/components/dialogs/BudgetDeleteDialog.vue'
 import Heading from '@/components/Heading.vue'
@@ -75,7 +74,7 @@ const setActive = (budget: Budget) => {
 <template>
   <Head :title="__('budgets')" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -304,7 +303,7 @@ const setActive = (budget: Budget) => {
         :links="budgets.links"
       />
     </div>
-  </AppContent>
+  </div>
 
   <!-- Mobile FAB removed: header CTA is the single budget-add; the bottom nav
        center FAB covers transaction create. No redundant floating buttons. -->

@@ -1,5 +1,6 @@
 import type { ComputedRef, Ref } from 'vue'
 import { computed, onMounted, ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import type { Appearance, ResolvedAppearance } from '@/types'
 
 export type { Appearance, ResolvedAppearance }
@@ -56,14 +57,6 @@ const getStoredAppearance = () => {
   return localStorage.getItem('appearance') as Appearance | null
 }
 
-const prefersDark = (): boolean => {
-  if (typeof window === 'undefined') {
-    return false
-  }
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
 const handleSystemThemeChange = () => {
   const currentAppearance = getStoredAppearance()
 
@@ -96,9 +89,13 @@ export function useAppearance(): UseAppearanceReturn {
     }
   })
 
+  // Reactive dark-mode query: matchMedia().matches is non-reactive, so a raw
+  // call inside the computed would never re-evaluate when the OS theme flips.
+  const isDarkMedia = useMediaQuery('(prefers-color-scheme: dark)')
+
   const resolvedAppearance = computed<ResolvedAppearance>(() => {
     if (appearance.value === 'system') {
-      return prefersDark() ? 'dark' : 'light'
+      return isDarkMedia.value ? 'dark' : 'light'
     }
 
     return appearance.value

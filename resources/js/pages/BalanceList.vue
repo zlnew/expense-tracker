@@ -11,7 +11,6 @@ import {
 } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
-import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import BalanceDeleteDialog from '@/components/dialogs/BalanceDeleteDialog.vue'
 import BalanceSaveDialog from '@/components/dialogs/BalanceSaveDialog.vue'
@@ -121,7 +120,7 @@ const setPrimary = (balance: Balance) => {
 <template>
   <Head :title="__('balances')" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -262,7 +261,7 @@ const setPrimary = (balance: Balance) => {
         :links="balances.links"
       />
     </div>
-  </AppContent>
+  </div>
 
   <BalanceSaveDialog v-model:open="saveDialogOpen" :balance="targetData" />
   <BalanceDeleteDialog v-model:open="deleteDialogOpen" :balance="targetData" />

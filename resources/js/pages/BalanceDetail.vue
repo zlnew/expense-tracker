@@ -7,7 +7,6 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-vue-next'
-import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import Heading from '@/components/Heading.vue'
 import { Badge } from '@/components/ui/badge'
@@ -52,7 +51,7 @@ setLayoutProps({
 <template>
   <Head :title="balance.name" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div class="flex items-center gap-4">
         <Button
@@ -241,5 +240,5 @@ setLayoutProps({
         />
       </div>
     </div>
-  </AppContent>
+  </div>
 </template>

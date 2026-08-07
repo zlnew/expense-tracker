@@ -3,7 +3,6 @@ import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 import { Plus, Search, SquarePen, Tags, Trash2 } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
-import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import CategoryCreateDialog from '@/components/dialogs/CategoryCreateDialog.vue'
 import CategoryDeleteDialog from '@/components/dialogs/CategoryDeleteDialog.vue'
@@ -108,7 +107,7 @@ const openDeleteDialog = (data: Data) => {
 <template>
   <Head :title="__('categories')" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -297,7 +296,7 @@ const openDeleteDialog = (data: Data) => {
         :links="categories.links"
       />
     </div>
-  </AppContent>
+  </div>
 
   <CategoryCreateDialog v-model:open="createDialogOpen" :types="types" />
   <CategoryUpdateDialog

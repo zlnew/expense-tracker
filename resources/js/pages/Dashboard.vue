@@ -22,7 +22,6 @@ import {
   X,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
-import AppContent from '@/components/AppContent.vue'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -198,7 +197,7 @@ const {
 <template>
   <Head :title="__('dashboard')" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <!-- Header -->
       <div class="flex flex-col gap-1">
@@ -807,5 +806,5 @@ const {
         </Button>
       </div>
     </div>
-  </AppContent>
+  </div>
 </template>

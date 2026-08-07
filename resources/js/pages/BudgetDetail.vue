@@ -3,7 +3,6 @@ import { Head, Link, router, setLayoutProps, useHttp } from '@inertiajs/vue3'
 import { AlertTriangle, CheckCircle2, CalendarDays, SquarePen } from 'lucide-vue-next'
 import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
-import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
 import ListSkeleton from '@/components/ListSkeleton.vue'
 import { Badge } from '@/components/ui/badge'
@@ -276,7 +275,7 @@ const setActive = () => {
 <template>
   <Head :title="__('detail_data', { data: __('budget') })" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 pt-6 pb-22 md:px-8">
       <div class="flex items-start justify-between">
         <Heading
@@ -620,7 +619,7 @@ const setActive = () => {
         </Card>
       </div>
     </div>
-  </AppContent>
+  </div>
 
   <div
     class="fixed right-4 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)] z-50 flex gap-2 md:right-8 md:bottom-8"
