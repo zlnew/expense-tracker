@@ -59,7 +59,7 @@ test('transfer rejects insufficient funds', function () {
         amount: 200_000,
         description: 'overdraft',
     ));
-})->throws(ValidationException::class, 'Saldo tidak mencukupi');
+})->throws(ValidationException::class, 'Insufficient balance');
 
 test('deleting one transfer leg deletes the pair and resyncs both balances', function () {
     $user = User::factory()->create();
