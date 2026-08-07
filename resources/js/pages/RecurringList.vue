@@ -79,7 +79,8 @@ const amountFmt = (amount: number) =>
     maximumFractionDigits: 0,
   }).format(amount)
 
-const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID') : '—')
+const fmtDate = (d: string | null) =>
+  d ? new Date(d).toLocaleDateString('id-ID') : '—'
 </script>
 
 <template>
@@ -131,9 +132,7 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
               <p
                 class="mb-1 text-[10px] font-bold tracking-wider uppercase"
                 :class="
-                  r.type === 'income'
-                    ? 'text-emerald-600'
-                    : 'text-rose-600'
+                  r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
                 "
               >
                 {{ __(r.type) }} · {{ __(r.frequency) }}
@@ -149,7 +148,9 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
               {{ r.is_active ? __('active') : __('inactive') }}
             </Badge>
           </div>
-          <div class="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+          <div
+            class="mt-3 flex items-center justify-between text-sm text-muted-foreground"
+          >
             <span>
               {{ __('next_run_date') }}:
               {{ fmtDate(r.next_run_date) }}
@@ -169,7 +170,9 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
                 size="icon"
                 class="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 @click="openDeleteDialog(r)"
-                :title="__('delete_data', { data: __('recurring_transaction') })"
+                :title="
+                  __('delete_data', { data: __('recurring_transaction') })
+                "
               >
                 <Trash2 class="size-4" />
               </Button>
@@ -179,7 +182,9 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
       </div>
 
       <!-- Desktop View: Table -->
-      <div class="hidden overflow-hidden rounded-md border bg-background md:block">
+      <div
+        class="hidden overflow-hidden rounded-md border bg-background md:block"
+      >
         <Table>
           <TableHeader>
             <TableRow>
@@ -190,13 +195,17 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
               <TableHead>{{ __('category') }}</TableHead>
               <TableHead>{{ __('next_run_date') }}</TableHead>
               <TableHead>{{ __('status') }}</TableHead>
-              <TableHead class="w-[110px] text-right">{{ __('actions') }}</TableHead>
+              <TableHead class="w-[110px] text-right">{{
+                __('actions')
+              }}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow v-if="recurrings.length === 0">
               <TableCell colspan="8" class="h-24 text-center">
-                {{ __('no_data_found', { data: __('recurring_transactions') }) }}
+                {{
+                  __('no_data_found', { data: __('recurring_transactions') })
+                }}
               </TableCell>
             </TableRow>
             <template v-else>
@@ -206,7 +215,9 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
                 </TableCell>
                 <TableCell
                   class="capitalize"
-                  :class="r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
+                  :class="
+                    r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
+                  "
                 >
                   {{ __(r.type) }}
                 </TableCell>
@@ -237,7 +248,9 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
                       variant="ghost"
                       size="icon"
                       @click="openEditDialog(r)"
-                      :title="__('edit_data', { data: __('recurring_transaction') })"
+                      :title="
+                        __('edit_data', { data: __('recurring_transaction') })
+                      "
                     >
                       <SquarePen class="size-4" />
                     </Button>
@@ -246,7 +259,9 @@ const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID
                       size="icon"
                       class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                       @click="openDeleteDialog(r)"
-                      :title="__('delete_data', { data: __('recurring_transaction') })"
+                      :title="
+                        __('delete_data', { data: __('recurring_transaction') })
+                      "
                     >
                       <Trash2 class="size-4" />
                     </Button>

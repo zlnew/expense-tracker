@@ -95,10 +95,15 @@ onUnmounted(() => {
     <!-- Desktop: sidebar trigger + breadcrumbs -->
     <SidebarTrigger class="-ml-1 hidden md:flex" />
     <div class="hidden min-w-0 md:flex md:items-center md:gap-2">
-      <Breadcrumbs v-if="breadcrumbs && breadcrumbs.length > 0" :breadcrumbs="breadcrumbs" />
+      <Breadcrumbs
+        v-if="breadcrumbs && breadcrumbs.length > 0"
+        :breadcrumbs="breadcrumbs"
+      />
       <template v-else>
         <AppLogoIcon class="size-5 shrink-0 fill-current text-primary" />
-        <span class="truncate text-sm font-semibold">{{ page.props.name }}</span>
+        <span class="truncate text-sm font-semibold">{{
+          page.props.name
+        }}</span>
       </template>
     </div>
 
@@ -113,7 +118,6 @@ onUnmounted(() => {
       <Button
         variant="ghost"
         size="icon"
-        class="h-10 w-10"
         :aria-label="__('show_hide_balances')"
         :title="__('show_hide_balances')"
         @click="toggleMask"
@@ -124,11 +128,15 @@ onUnmounted(() => {
       <DropdownMenu v-if="user">
         <DropdownMenuTrigger as-child>
           <button
-            class="flex size-10 items-center justify-center rounded-full outline-none transition-colors hover:bg-sidebar-accent"
+            class="flex size-10 items-center justify-center rounded-full transition-colors outline-none hover:bg-sidebar-accent"
             :aria-label="__('profile')"
           >
             <Avatar class="size-8 rounded-full">
-              <AvatarImage v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+              <AvatarImage
+                v-if="user.avatar"
+                :src="user.avatar"
+                :alt="user.name"
+              />
               <AvatarFallback
                 class="rounded-full bg-neutral-200 text-[10px] font-semibold text-black dark:bg-neutral-700 dark:text-white"
               >

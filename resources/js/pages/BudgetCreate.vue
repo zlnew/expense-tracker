@@ -6,7 +6,6 @@ import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Card,
   CardAction,
@@ -14,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -227,12 +227,13 @@ const goBack = () => {
             v-if="form.carry_over && carryOverPreviewTotal > 0"
             class="text-sm font-medium text-primary"
           >
-            {{ __('carry_over_preview', { amount: formatNumber(carryOverPreviewTotal) }) }}
+            {{
+              __('carry_over_preview', {
+                amount: formatNumber(carryOverPreviewTotal),
+              })
+            }}
           </p>
-          <p
-            v-else-if="form.carry_over"
-            class="text-sm text-muted-foreground"
-          >
+          <p v-else-if="form.carry_over" class="text-sm text-muted-foreground">
             {{ __('carry_over_no_previous') }}
           </p>
 

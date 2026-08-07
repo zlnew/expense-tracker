@@ -215,7 +215,7 @@ const {
       <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <!-- Total Balance -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
+          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-blue-500/5 blur-xl dark:bg-blue-400/5"
@@ -256,7 +256,7 @@ const {
 
         <!-- Monthly Incomes -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
+          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-emerald-500/5 blur-xl dark:bg-emerald-400/5"
@@ -291,7 +291,7 @@ const {
 
         <!-- Monthly Expenses -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
+          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-rose-500/5 blur-xl dark:bg-rose-400/5"
@@ -326,7 +326,7 @@ const {
 
         <!-- Budget Remaining -->
         <Card
-          class="relative overflow-hidden border border-border/50 bg-card shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md py-3 gap-3 sm:gap-6 sm:py-6"
+          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
         >
           <div
             class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-violet-500/5 blur-xl dark:bg-violet-400/5"
@@ -409,7 +409,7 @@ const {
               </div>
             </div>
 
-            <div class="h-[220px] min-w-0 w-full overflow-hidden sm:h-[300px]">
+            <div class="h-[220px] w-full min-w-0 overflow-hidden sm:h-[300px]">
               <ChartContainer :config="lineChartConfig" class="h-full w-full">
                 <VisXYContainer
                   :data="monthly_spending_trend"
@@ -486,7 +486,9 @@ const {
 
             <div v-else class="flex flex-col gap-6">
               <!-- Donut Chart Wrapper -->
-              <div class="relative mx-auto h-[160px] w-[160px] max-w-[180px] sm:h-[200px] sm:w-[200px]">
+              <div
+                class="relative mx-auto h-[160px] w-[160px] max-w-[180px] sm:h-[200px] sm:w-[200px]"
+              >
                 <ChartContainer :config="donutConfig" class="h-full w-full">
                   <VisSingleContainer
                     :data="expense_breakdown"
@@ -534,9 +536,9 @@ const {
                     }}</span>
                   </div>
                   <div class="shrink-0 pl-2 text-right">
-                    <span class="font-mono font-semibold text-foreground"
-                      >{{ formatAmount(item.amount) }}</span
-                    >
+                    <span class="font-mono font-semibold text-foreground">{{
+                      formatAmount(item.amount)
+                    }}</span>
                     <span class="ml-1 font-mono text-muted-foreground"
                       >({{ item.percentage }}%)</span
                     >
@@ -566,8 +568,8 @@ const {
             <Link :href="transactionIndex.url()">
               <Button
                 variant="link"
-                size="sm"
-                class="flex h-8 items-center gap-1 px-0! text-xs font-semibold"
+                size="inline"
+                class="flex items-center gap-1 text-xs font-semibold"
               >
                 {{ __('all_data', { data: __('transactions') }) }}
                 <ChevronRight class="size-4" />
@@ -633,7 +635,8 @@ const {
                         : 'text-rose-600 dark:text-rose-400'
                     "
                   >
-                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                    {{ t.type === 'income' ? '+' : '-'
+                    }}{{ formatAmount(t.amount) }}
                   </span>
                   <p class="text-[10px] text-muted-foreground">
                     {{ formatDate(t.date) }}
@@ -660,8 +663,8 @@ const {
             <Link :href="budgetIndex.url()">
               <Button
                 variant="ghost"
-                size="sm"
-                class="flex h-8 items-center gap-1 px-0! text-xs font-semibold"
+                size="inline"
+                class="flex items-center gap-1 text-xs font-semibold"
               >
                 {{ __('all_data', { data: __('budgets') }) }}
                 <ChevronRight class="size-4" />
@@ -745,7 +748,8 @@ const {
                   class="flex justify-between font-mono text-[11px] text-muted-foreground"
                 >
                   <span>
-                    {{ formatAmount(bi.actual_amount ?? 0) }} / {{ formatAmount(bi.planned_amount) }}
+                    {{ formatAmount(bi.actual_amount ?? 0) }} /
+                    {{ formatAmount(bi.planned_amount) }}
                   </span>
                   <span
                     v-if="bi.actual_amount !== undefined"

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps, useHttp } from '@inertiajs/vue3'
-import { AlertTriangle, CheckCircle2, CalendarDays, SquarePen } from 'lucide-vue-next'
+import {
+  AlertTriangle,
+  CheckCircle2,
+  CalendarDays,
+  SquarePen,
+} from 'lucide-vue-next'
 import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import Heading from '@/components/Heading.vue'
@@ -357,11 +362,7 @@ const setActive = () => {
             <CardTitle>{{ __('monthly_expenses') }}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ListSkeleton
-              v-if="transactionsLoading"
-              :rows="4"
-              :icon="false"
-            />
+            <ListSkeleton v-if="transactionsLoading" :rows="4" :icon="false" />
 
             <!-- Budget progress style (mobile + desktop), matching Dashboard -->
             <div v-if="!transactionsLoading" class="space-y-4">
@@ -398,7 +399,12 @@ const setActive = () => {
                       )
                     "
                   >
-                    {{ getProgressPercent(exp.planned_amount, exp.actual_amount ?? 0) }}% {{ __('spent') }}
+                    {{
+                      getProgressPercent(
+                        exp.planned_amount,
+                        exp.actual_amount ?? 0,
+                      )
+                    }}% {{ __('spent') }}
                   </span>
                 </div>
 
@@ -406,13 +412,19 @@ const setActive = () => {
                 <div
                   class="h-2 w-full overflow-hidden rounded-full"
                   :class="
-                    getProgressBgColor(exp.planned_amount, exp.actual_amount ?? 0)
+                    getProgressBgColor(
+                      exp.planned_amount,
+                      exp.actual_amount ?? 0,
+                    )
                   "
                 >
                   <div
                     class="h-full rounded-full transition-all duration-500 ease-out"
                     :class="
-                      getProgressColor(exp.planned_amount, exp.actual_amount ?? 0)
+                      getProgressColor(
+                        exp.planned_amount,
+                        exp.actual_amount ?? 0,
+                      )
                     "
                     :style="{
                       width: `${getProgressPercent(exp.planned_amount, exp.actual_amount ?? 0)}%`,
@@ -425,13 +437,12 @@ const setActive = () => {
                   class="flex justify-between font-mono text-[11px] text-muted-foreground"
                 >
                   <span>
-                    {{ formatAmount(exp.actual_amount ?? 0) }} / {{ formatAmount(exp.planned_amount) }}
+                    {{ formatAmount(exp.actual_amount ?? 0) }} /
+                    {{ formatAmount(exp.planned_amount) }}
                   </span>
                   <span
                     :class="
-                      exp.diff_amount < 0
-                        ? 'text-rose-500'
-                        : 'text-emerald-500'
+                      exp.diff_amount < 0 ? 'text-rose-500' : 'text-emerald-500'
                     "
                   >
                     {{
@@ -452,7 +463,8 @@ const setActive = () => {
                   <span class="text-muted-foreground">{{ __('total') }}</span>
                   <div class="flex flex-col items-end">
                     <span>
-                      {{ __('planned') }}: {{ formatAmount(plannedExpenseTotal) }}
+                      {{ __('planned') }}:
+                      {{ formatAmount(plannedExpenseTotal) }}
                     </span>
                     <span>
                       {{ __('actual') }}: {{ formatAmount(actualExpenseTotal) }}
@@ -478,11 +490,7 @@ const setActive = () => {
             <CardTitle>{{ __('monthly_incomes') }}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ListSkeleton
-              v-if="transactionsLoading"
-              :rows="4"
-              :icon="false"
-            />
+            <ListSkeleton v-if="transactionsLoading" :rows="4" :icon="false" />
 
             <!-- Mobile view for incomes -->
             <div v-if="!transactionsLoading" class="space-y-4 md:hidden">
@@ -513,10 +521,12 @@ const setActive = () => {
                   class="mt-1 flex items-center justify-between text-sm text-muted-foreground"
                 >
                   <span
-                    >{{ __('planned') }}: {{ formatAmount(inc.planned_amount) }}</span
+                    >{{ __('planned') }}:
+                    {{ formatAmount(inc.planned_amount) }}</span
                   >
                   <span
-                    >{{ __('actual') }}: {{ formatAmount(inc.actual_amount) }}</span
+                    >{{ __('actual') }}:
+                    {{ formatAmount(inc.actual_amount) }}</span
                   >
                 </div>
               </div>
@@ -528,7 +538,8 @@ const setActive = () => {
                   <span class="text-muted-foreground">{{ __('total') }}</span>
                   <div class="flex flex-col items-end">
                     <span>
-                      {{ __('planned') }}: {{ formatAmount(plannedIncomeTotal) }}
+                      {{ __('planned') }}:
+                      {{ formatAmount(plannedIncomeTotal) }}
                     </span>
                     <span>
                       {{ __('actual') }}: {{ formatAmount(actualIncomeTotal) }}
