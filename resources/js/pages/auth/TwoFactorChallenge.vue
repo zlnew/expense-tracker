@@ -113,7 +113,6 @@ const code = ref<string>('')
           placeholder="Enter recovery code"
           :autofocus="showRecoveryInput"
           required
-          class="h-11 md:h-9"
         />
         <InputError :message="errors.recovery_code" />
         <Button type="submit" class="h-11 w-full md:h-9" :disabled="processing"

@@ -569,8 +569,8 @@ const {
             <Link :href="transactionIndex.url()">
               <Button
                 variant="link"
-                size="sm"
-                class="flex h-8 items-center gap-1 px-0! text-xs font-semibold"
+                size="inline"
+                class="flex items-center gap-1 text-xs font-semibold"
               >
                 {{ __('all_data', { data: __('transactions') }) }}
                 <ChevronRight class="size-4" />
@@ -664,8 +664,8 @@ const {
             <Link :href="budgetIndex.url()">
               <Button
                 variant="ghost"
-                size="sm"
-                class="flex h-8 items-center gap-1 px-0! text-xs font-semibold"
+                size="inline"
+                class="flex items-center gap-1 text-xs font-semibold"
               >
                 {{ __('all_data', { data: __('budgets') }) }}
                 <ChevronRight class="size-4" />
