@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\RecordingLockGrammar;
+
 uses(RefreshDatabase::class);
 
 it('computes the balance with a single aggregate query', function () {

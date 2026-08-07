@@ -32,10 +32,10 @@ class SyncBalance extends Action
 
         $totals = Transaction::query()
             ->where('balance_id', $locked->id)
-            ->selectRaw("
+            ->selectRaw('
                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS incomes,
                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS expenses
-            ", [CategoryType::INCOME->value, CategoryType::EXPENSE->value])
+            ', [CategoryType::INCOME->value, CategoryType::EXPENSE->value])
             ->first();
 
         $locked->final_amount = ($locked->initial_amount ?? 0)
