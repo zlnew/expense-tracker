@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\RecordingLockGrammar;
-
 uses(RefreshDatabase::class);
 
 it('computes the balance with a single aggregate query', function () {
@@ -84,4 +83,18 @@ it('soft-deletes transactions and excludes them from the balance', function () {
 
     // ...but no longer counts toward the balance.
     expect($balance->fresh()->final_amount)->toBe(30_000);
+});
+
+it('paginates transactions on the balance detail page', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create();
+
+    Transaction::factory()->count(75)->for($user)->for($balance)->create();
+
+    $this->actingAs($user)
+        ->get(route('balances.show', $balance))
+        ->assertInertia(fn ($page) => $page
+            ->has('transactions.data', 25)
+            ->has('transactions.meta')
+        );
 });

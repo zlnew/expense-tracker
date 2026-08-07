@@ -6,6 +6,7 @@ use App\Actions\DeleteBalance;
 use App\Actions\SaveBalance;
 use App\Actions\SetPrimaryBalance;
 use App\DTO\BalanceData;
+use App\DTO\TransactionData;
 use App\Http\Requests\BalanceSaveRequest;
 use App\Models\Balance;
 use App\Queries\BalanceQuery;
@@ -29,12 +30,16 @@ class BalanceController extends Controller
         ]);
     }
 
-    public function show(Balance $balance): Response
+    public function show(Balance $balance, Request $request): Response
     {
-        $balance->load('transactions');
+        $transactions = $balance->transactions()
+            ->with(['category'])
+            ->latest('date')
+            ->paginate(25);
 
         return Inertia::render('BalanceDetail', [
             'balance' => BalanceData::from($balance),
+            'transactions' => TransactionData::collect($transactions, PaginatedDataCollection::class),
         ]);
     }
 

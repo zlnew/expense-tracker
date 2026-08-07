@@ -8,6 +8,7 @@ import {
   Wallet,
 } from 'lucide-vue-next'
 import AppContent from '@/components/AppContent.vue'
+import AppPagination from '@/components/AppPagination.vue'
 import Heading from '@/components/Heading.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,10 +25,11 @@ import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { index as balanceIndex } from '@/routes/balances'
-import type { Balance } from '@/types'
+import type { Balance, Paginate, Transaction } from '@/types'
 
 const props = defineProps<{
   balance: Balance
+  transactions: Paginate<Transaction>
 }>()
 
 const { __ } = useLang()
@@ -137,13 +139,13 @@ setLayoutProps({
         <!-- Mobile view for transactions -->
         <div class="space-y-4 md:hidden">
           <div
-            v-if="!balance.transactions || balance.transactions.length === 0"
+            v-if="!transactions.data || transactions.data.length === 0"
             class="py-8 text-center text-muted-foreground"
           >
             {{ __('no_data_found', { data: __('transactions') }) }}
           </div>
           <div
-            v-for="t in balance.transactions"
+            v-for="t in transactions.data"
             :key="t.id"
             class="rounded-lg border bg-background p-4"
           >
@@ -193,7 +195,7 @@ setLayoutProps({
             <TableBody>
               <TableRow
                 v-if="
-                  !balance.transactions || balance.transactions.length === 0
+                  !transactions.data || transactions.data.length === 0
                 "
               >
                 <TableCell colspan="5" class="h-24 text-center">
@@ -201,7 +203,7 @@ setLayoutProps({
                 </TableCell>
               </TableRow>
               <template v-else>
-                <TableRow v-for="t in balance.transactions" :key="t.id">
+                <TableRow v-for="t in transactions.data" :key="t.id">
                   <TableCell class="font-medium">
                     {{ formatDate(t.date, 'DD MMM YYYY') }}
                   </TableCell>
@@ -231,6 +233,12 @@ setLayoutProps({
             </TableBody>
           </Table>
         </div>
+
+        <AppPagination
+          v-if="transactions.meta"
+          :meta="transactions.meta"
+          :links="transactions.links"
+        />
       </div>
     </div>
   </AppContent>
