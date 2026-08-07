@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\DTO\TransactionData;
 use App\DTO\TransactionsData;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class StoreTransactions extends Action
             $transactions = $this->data->items;
 
             return collect($transactions)->map(function ($t) {
-                return SaveTransaction::run(new Transaction, $t);
+                return SaveTransaction::run(new Transaction, TransactionData::from($t));
             });
         });
 
