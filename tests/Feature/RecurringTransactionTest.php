@@ -9,6 +9,8 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Tests\Support\RecordingLockGrammar;
 
 uses(RefreshDatabase::class);
 
@@ -108,4 +110,41 @@ test('user cannot update or delete another user recurring', function () {
         ->assertForbidden();
 
     expect($recurring->fresh()->description)->toBe('mine');
+});
+
+test('does not double-process a recurring transaction', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create();
+
+    $recurring = RecurringTransaction::factory()->for($user)->for($balance)->create([
+        'is_active' => true,
+        'frequency' => 'monthly',
+        'amount' => 250_000,
+        'next_run_date' => now()->subDay()->toDateString(),
+    ]);
+
+    // Two sequential runs simulate scheduler + dashboard catch-up.
+    // The first advances next_run_date; the second must find nothing due.
+    ProcessRecurringTransactions::run();
+    ProcessRecurringTransactions::run();
+
+    expect(Transaction::where('balance_id', $balance->id)->count())->toBe(1);
+});
+
+test('locks the recurring row before advancing its schedule', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create();
+
+    RecurringTransaction::factory()->for($user)->for($balance)->create([
+        'is_active' => true,
+        'frequency' => 'monthly',
+        'next_run_date' => now()->subDay()->toDateString(),
+    ]);
+
+    $grammar = new RecordingLockGrammar(DB::connection());
+    DB::connection()->setQueryGrammar($grammar);
+
+    ProcessRecurringTransactions::run();
+
+    expect($grammar->lockedTables)->toContain('recurring_transactions');
 });

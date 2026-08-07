@@ -45,7 +45,7 @@ class TransactionSaveRequest extends FormRequest
             ],
             'type' => ['required', new Enum(CategoryType::class)],
             'date' => ['required', 'date'],
-            'amount' => ['required', 'integer'],
+            'amount' => ['required', 'integer', 'min:1'],
             'description' => ['nullable', 'string'],
             'transfer_group_id' => ['nullable', 'string', 'max:36'],
         ];

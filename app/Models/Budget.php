@@ -57,6 +57,7 @@ class Budget extends Model
             'period_start' => 'date',
             'period_end' => 'date',
             'is_active' => 'boolean',
+            'carry_over' => 'boolean',
         ];
     }
 

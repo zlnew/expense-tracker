@@ -59,28 +59,45 @@ class ProcessRecurringTransactions extends Action
     private function runOnce(RecurringTransaction $recurring): bool
     {
         return DB::transaction(function () use ($recurring) {
-            $runDate = $recurring->next_run_date;
+            // Re-read under lock: another process (scheduler vs dashboard
+            // catch-up) may have already advanced this schedule between our
+            // due-query and now.
+            $locked = RecurringTransaction::query()
+                ->whereKey($recurring->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $locked || ! $locked->is_active) {
+                return false;
+            }
+
+            // Re-check the due condition against the locked row, not the stale one.
+            if ($locked->next_run_date->gt(now()->startOfDay())) {
+                return false;
+            }
+
+            $runDate = $locked->next_run_date;
 
             SaveTransaction::run(new Transaction, TransactionData::from([
-                'balance_id' => $recurring->balance_id,
+                'balance_id' => $locked->balance_id,
                 'budget_id' => null,
                 'budget_item_id' => null,
-                'category_id' => $recurring->category_id,
-                'type' => $recurring->type->value,
+                'category_id' => $locked->category_id,
+                'type' => $locked->type->value,
                 'date' => $runDate,
-                'amount' => $recurring->amount,
-                'description' => $recurring->description,
+                'amount' => $locked->amount,
+                'description' => $locked->description,
             ]));
 
-            $next = $this->advance($recurring->frequency, $runDate);
+            $next = $this->advance($locked->frequency, $runDate);
 
-            if ($recurring->end_date && $next->greaterThan($recurring->end_date)) {
-                $recurring->update(['is_active' => false]);
+            if ($locked->end_date && $next->greaterThan($locked->end_date)) {
+                $locked->update(['is_active' => false]);
 
                 return true;
             }
 
-            $recurring->update(['next_run_date' => $next]);
+            $locked->update(['next_run_date' => $next]);
 
             return true;
         });
