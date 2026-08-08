@@ -41,14 +41,15 @@ const pageTitle = computed(() => {
 })
 
 // Hide-on-scroll-down / show-on-scroll-up (modern mobile app bar behavior).
-// Direction-based state machine: the header only changes state on real scroll
-// motion — stopping mid-page keeps it hidden (does not re-show on delta≈0).
+// Mobile-only: the desktop sidebar already provides its own chrome, and
+// hiding the desktop trigger/breadcrumbs on scroll is jarring.
+const isMobile = window.matchMedia('(max-width: 767.98px)')
 const hidden = ref(false)
 let lastScrollY = 0
 let ticking = false
 
 function onScroll() {
-  if (ticking) {
+  if (ticking || !isMobile.matches) {
     return
   }
 
@@ -86,16 +87,23 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
+    class="sticky top-0 z-header flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
+    <!-- Mobile: sidebar drawer trigger -->
+    <SidebarTrigger class="md:hidden" />
     <!-- Desktop: sidebar trigger + breadcrumbs -->
     <SidebarTrigger class="-ml-1 hidden md:flex" />
     <div class="hidden min-w-0 md:flex md:items-center md:gap-2">
-      <Breadcrumbs v-if="breadcrumbs && breadcrumbs.length > 0" :breadcrumbs="breadcrumbs" />
+      <Breadcrumbs
+        v-if="breadcrumbs && breadcrumbs.length > 0"
+        :breadcrumbs="breadcrumbs"
+      />
       <template v-else>
         <AppLogoIcon class="size-5 shrink-0 fill-current text-primary" />
-        <span class="truncate text-sm font-semibold">{{ page.props.name }}</span>
+        <span class="truncate text-sm font-semibold">{{
+          page.props.name
+        }}</span>
       </template>
     </div>
 
@@ -110,7 +118,6 @@ onUnmounted(() => {
       <Button
         variant="ghost"
         size="icon"
-        class="h-10 w-10"
         :aria-label="__('show_hide_balances')"
         :title="__('show_hide_balances')"
         @click="toggleMask"
@@ -121,11 +128,15 @@ onUnmounted(() => {
       <DropdownMenu v-if="user">
         <DropdownMenuTrigger as-child>
           <button
-            class="flex size-10 items-center justify-center rounded-full outline-none transition-colors hover:bg-sidebar-accent"
+            class="flex size-10 items-center justify-center rounded-full transition-colors outline-none hover:bg-sidebar-accent"
             :aria-label="__('profile')"
           >
             <Avatar class="size-8 rounded-full">
-              <AvatarImage v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+              <AvatarImage
+                v-if="user.avatar"
+                :src="user.avatar"
+                :alt="user.name"
+              />
               <AvatarFallback
                 class="rounded-full bg-neutral-200 text-[10px] font-semibold text-black dark:bg-neutral-700 dark:text-white"
               >

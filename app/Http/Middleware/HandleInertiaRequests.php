@@ -9,6 +9,7 @@ use App\Models\Balance;
 use App\Models\Budget;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -51,22 +52,23 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'success' => fn () => $request->session()->get('success'),
             // Shared everywhere so the global quick-add FAB (mobile bottom nav)
-            // can open the transaction create dialog from any page.
-            'balances' => fn () => $request->user()
+            // can open the transaction create dialog from any page. Optional()
+            // so it's only evaluated when the client actually requests them.
+            'balances' => Inertia::optional(fn () => $request->user()
                 ? BalanceData::collect(Balance::where('user_id', $request->user()->id)->get())
-                : [],
-            'budgets' => fn () => $request->user()
+                : []),
+            'budgets' => Inertia::optional(fn () => $request->user()
                 ? BudgetData::collect(Budget::where('user_id', $request->user()->id)->with('items.category')->get())
-                : [],
-            'categories' => fn () => $request->user()
+                : []),
+            'categories' => Inertia::optional(fn () => $request->user()
                 ? CategoryData::collect(Category::where('user_id', $request->user()->id)->get())
-                : [],
-            'primaryBalanceId' => fn () => $request->user()
+                : []),
+            'primaryBalanceId' => Inertia::optional(fn () => $request->user()
                 ? (Balance::where('user_id', $request->user()->id)->where('is_primary', true)->value('id'))
-                : null,
-            'activeBudgetId' => fn () => $request->user()
+                : null),
+            'activeBudgetId' => Inertia::optional(fn () => $request->user()
                 ? (Budget::where('user_id', $request->user()->id)->where('is_active', true)->value('id'))
-                : null,
+                : null),
         ];
     }
 }
