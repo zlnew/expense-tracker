@@ -5,6 +5,7 @@ import { toQuery } from '@/lib/utils'
 
 export const FILTER_KEYS = [
   'search',
+  'type',
   'balance',
   'category',
   'dateFrom',
@@ -28,6 +29,7 @@ export type UseFiltersOptions = {
 
 const fallbackDefaults: Record<FilterKey, string> = {
   search: '',
+  type: 'all',
   balance: 'all',
   category: 'all',
   dateFrom: '',
@@ -55,12 +57,13 @@ export function useFilters(options: UseFiltersOptions) {
   )
 
   const search = ref(initialParams.get('search') ?? defaults.search)
+  const type = ref(initialParams.get('type') ?? defaults.type)
   const balance = ref(initialParams.get('balance') ?? defaults.balance)
   const category = ref(initialParams.get('category') ?? defaults.category)
   const dateFrom = ref(initialParams.get('dateFrom') ?? defaults.dateFrom)
   const dateTo = ref(initialParams.get('dateTo') ?? defaults.dateTo)
 
-  const filters = { search, balance, category, dateFrom, dateTo }
+  const filters = { search, type, balance, category, dateFrom, dateTo }
 
   const activeCount = computed(
     () =>
@@ -110,7 +113,7 @@ export function useFilters(options: UseFiltersOptions) {
     )
   }, options.debounceMs ?? 300)
 
-  watch([search, balance, category, dateFrom, dateTo], () => {
+  watch([search, type, balance, category, dateFrom, dateTo], () => {
     if (adopting) {
       return
     }
@@ -133,6 +136,7 @@ export function useFilters(options: UseFiltersOptions) {
 
     adopting = true
     search.value = params.get('search') ?? defaults.search
+    type.value = params.get('type') ?? defaults.type
     balance.value = params.get('balance') ?? defaults.balance
     category.value = params.get('category') ?? defaults.category
     dateFrom.value = params.get('dateFrom') ?? defaults.dateFrom
@@ -162,6 +166,7 @@ export function useFilters(options: UseFiltersOptions) {
 
   return {
     search,
+    type,
     balance,
     category,
     dateFrom,
