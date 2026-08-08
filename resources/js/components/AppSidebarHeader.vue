@@ -41,14 +41,15 @@ const pageTitle = computed(() => {
 })
 
 // Hide-on-scroll-down / show-on-scroll-up (modern mobile app bar behavior).
-// Direction-based state machine: the header only changes state on real scroll
-// motion — stopping mid-page keeps it hidden (does not re-show on delta≈0).
+// Mobile-only: the desktop sidebar already provides its own chrome, and
+// hiding the desktop trigger/breadcrumbs on scroll is jarring.
+const isMobile = window.matchMedia('(max-width: 767.98px)')
 const hidden = ref(false)
 let lastScrollY = 0
 let ticking = false
 
 function onScroll() {
-  if (ticking) {
+  if (ticking || !isMobile.matches) {
     return
   }
 
@@ -86,9 +87,11 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
+    class="sticky top-0 z-header flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
+    <!-- Mobile: sidebar drawer trigger -->
+    <SidebarTrigger class="md:hidden" />
     <!-- Desktop: sidebar trigger + breadcrumbs -->
     <SidebarTrigger class="-ml-1 hidden md:flex" />
     <div class="hidden min-w-0 md:flex md:items-center md:gap-2">

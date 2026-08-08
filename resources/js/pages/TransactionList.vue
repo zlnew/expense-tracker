@@ -19,7 +19,6 @@ import {
   TrendingUp,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
-import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
 import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialog.vue'
@@ -223,7 +222,7 @@ const openTransferDialog = () => {
 <template>
   <Head :title="__('transactions')" />
 
-  <AppContent>
+  <div>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -741,7 +740,7 @@ const openTransferDialog = () => {
         :links="transactions.links"
       />
     </div>
-  </AppContent>
+  </div>
 
   <TransactionUpdateDialog
     v-model:open="updateDialogOpen"
