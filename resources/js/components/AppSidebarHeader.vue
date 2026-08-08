@@ -115,7 +115,6 @@ onUnmounted(() => {
       <Button
         variant="ghost"
         size="icon"
-        class="h-10 w-10"
         :aria-label="__('show_hide_balances')"
         :title="__('show_hide_balances')"
         @click="toggleMask"
