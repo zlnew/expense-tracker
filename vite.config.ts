@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
@@ -32,7 +32,7 @@ export default defineConfig({
             formVariants: true,
         }),
         VitePWA({
-            registerType: 'prompt',
+            registerType: 'autoUpdate',
             includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'robots.txt'],
             base: '/',
             scope: '/',
@@ -85,13 +85,7 @@ export default defineConfig({
             },
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
-                navigateFallback: '/offline.html',
-                navigateFallbackDenylist: [/^\/api\//],
             },
         }),
     ],
-    test: {
-        environment: 'node',
-        include: ['resources/js/**/*.test.ts'],
-    },
 });

@@ -120,8 +120,8 @@ onUnmounted(() => clearTwoFactorAuthData())
   <div v-if="canManageTwoFactor" class="space-y-6">
     <Heading
       variant="small"
-      :title="__('two_factor_authentication')"
-      :description="__('two_factor_authentication_description')"
+      title="Two-factor authentication"
+      description="Manage your two-factor authentication settings"
     />
 
     <div
@@ -129,12 +129,14 @@ onUnmounted(() => clearTwoFactorAuthData())
       class="flex flex-col items-start justify-start space-y-4"
     >
       <p class="text-sm text-muted-foreground">
-        {{ __('two_factor_enable_description') }}
+        When you enable two-factor authentication, you will be prompted for a
+        secure pin during login. This pin can be retrieved from a TOTP-supported
+        application on your phone.
       </p>
 
       <div>
         <Button v-if="hasSetupData" @click="showSetupModal = true">
-          <ShieldCheck />{{ __('continue_setup') }}
+          <ShieldCheck />Continue setup
         </Button>
         <Form
           v-else
@@ -142,22 +144,21 @@ onUnmounted(() => clearTwoFactorAuthData())
           @success="showSetupModal = true"
           #default="{ processing }"
         >
-          <Button type="submit" :disabled="processing">
-            {{ __('enable_2fa') }}
-          </Button>
+          <Button type="submit" :disabled="processing"> Enable 2FA </Button>
         </Form>
       </div>
     </div>
 
     <div v-else class="flex flex-col items-start justify-start space-y-4">
       <p class="text-sm text-muted-foreground">
-        {{ __('two_factor_disable_description') }}
+        You will be prompted for a secure, random pin during login, which you
+        can retrieve from the TOTP-supported application on your phone.
       </p>
 
       <div class="relative inline">
         <Form v-bind="disable.form()" #default="{ processing }">
           <Button variant="destructive" type="submit" :disabled="processing">
-            {{ __('disable_2fa') }}
+            Disable 2FA
           </Button>
         </Form>
       </div>

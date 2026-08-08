@@ -10,7 +10,6 @@ import {
   useForwardPropsEmits,
 } from "reka-ui"
 import { cn } from "@/lib/utils"
-import { useLang } from "@/composables/useLang"
 import DialogOverlay from "./dialog/DialogOverlay.vue"
 
 defineOptions({
@@ -30,8 +29,6 @@ const props = withDefaults(
 )
 const emits = defineEmits<DialogContentEmits>()
 
-const { __ } = useLang()
-
 const delegatedProps = reactiveOmit(props, "class")
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
@@ -45,10 +42,10 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       v-bind="{ ...$attrs, ...forwarded }"
       :class="
         cn(
-          'bg-background border fixed z-modal grid w-full gap-4 p-6 shadow-lg duration-200',
+          'bg-background border fixed z-50 grid w-full gap-4 p-6 shadow-lg duration-200',
           // < md: bottom sheet (thumb-reach)
           'inset-x-0 bottom-0 top-auto max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl',
-          'md:left-[50%] md:-translate-x-1/2',
+          'sm:left-[50%] sm:-translate-x-1/2',
           'max-md:pt-4 max-md:pb-[calc(1.5rem+env(safe-area-inset-bottom))]',
           'max-md:data-[state=open]:animate-in max-md:data-[state=closed]:animate-out max-md:data-[state=closed]:fade-out-0 max-md:data-[state=open]:fade-in-0 max-md:data-[state=open]:slide-in-from-bottom max-md:data-[state=closed]:slide-out-to-bottom',
           // md+: centered modal (identical to DialogContent)
@@ -69,10 +66,10 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       <DialogClose
         v-if="showCloseButton"
         data-slot="dialog-close"
-        class="ring-offset-background focus-visible:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 touch-target focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+        class="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
       >
         <X />
-        <span class="sr-only">{{ __('close') }}</span>
+        <span class="sr-only">Close</span>
       </DialogClose>
     </DialogContent>
   </DialogPortal>

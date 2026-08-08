@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /*
   ---break---
 */
@@ -53,14 +55,6 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --color-chart-6: var(--chart-6);
-  --color-chart-7: var(--chart-7);
-  --color-chart-8: var(--chart-8);
-
-  --color-income: var(--income);
-  --color-income-muted: var(--income-muted);
-  --color-expense: var(--expense);
-  --color-expense-muted: var(--expense-muted);
 
   --color-sidebar: var(--sidebar-background);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -70,23 +64,37 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --font-heading: var(--font-sans);
   --radius-xl: calc(var(--radius) + 4px);
-
-  --z-index-sticky: 20;
-  --z-index-header: 30;
-  --z-index-fab: 40;
-  --z-index-bottom-nav: 45;
-  --z-index-overlay: 50;
-  --z-index-modal: 60;
-  --z-index-toast: 70;
 }
 
 /*
-  The default border color changed to `currentColor` in Tailwind v4; the
-  `@layer base` rule at the bottom (`* { @apply border-border }`) sets the
-  token border explicitly, so the old v3 gray-200 shim is removed — it was
-  fighting the token and making borders read grey-not-token in dark mode.
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
 */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer utilities {
+  body,
+  html {
+    --font-sans:
+      'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+      'Noto Color Emoji';
+  }
+}
 
 :root {
   --background: oklch(1 0 0);
@@ -104,31 +112,24 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
+  --destructive-foreground: hsl(0 0% 98%);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.55 0.02 264);
+  --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --chart-6: oklch(0.627 0.265 303.9);
-  --chart-7: oklch(0.645 0.246 16.439);
-  --chart-8: oklch(0.656 0.241 354.308);
-  --income: oklch(0.696 0.17 162.48);
-  --income-muted: oklch(0.696 0.17 162.48 / 20%);
-  --expense: oklch(0.645 0.246 16.439);
-  --expense-muted: oklch(0.645 0.246 16.439 / 20%);
   --radius: 0.625rem;
-  --sidebar-background: oklch(0.985 0 0);
+  --sidebar-background: hsl(0 0% 98%);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.55 0.02 264);
+  --sidebar-ring: oklch(0.708 0 0);
   --sidebar: oklch(0.985 0 0);
 }
 
@@ -148,68 +149,24 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
+  --destructive-foreground: hsl(0 0% 98%);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.7 0.02 264);
+  --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --chart-6: oklch(0.6 0.118 184.704);
-  --chart-7: oklch(0.656 0.241 354.308);
-  --chart-8: oklch(0.828 0.189 84.429);
-  --income: oklch(0.696 0.17 162.48);
-  --income-muted: oklch(0.696 0.17 162.48 / 20%);
-  --expense: oklch(0.704 0.191 22.216);
-  --expense-muted: oklch(0.704 0.191 22.216 / 20%);
-  --sidebar-background: oklch(0.205 0 0);
+  --sidebar-background: hsl(0 0% 7%);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.7 0.02 264);
+  --sidebar-ring: oklch(0.556 0 0);
   --sidebar: oklch(0.205 0 0);
-}
-
-:root {
-  --bottom-nav-height: calc(4rem + env(safe-area-inset-bottom, 0px));
-}
-
-@media (min-width: 48rem) {
-  :root {
-    --bottom-nav-height: 0px;
-  }
-}
-
-@utility touch-target {
-  position: relative;
-
-  @media (pointer: coarse) {
-    &::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      translate: -50% -50%;
-      width: max(100%, 44px);
-      height: max(100%, 44px);
-    }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 @layer base {

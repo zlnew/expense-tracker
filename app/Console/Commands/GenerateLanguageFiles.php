@@ -189,12 +189,6 @@ class GenerateLanguageFiles extends Command
                 ':student',
                 ':activity',
                 ':period',
-                // Longer tokens first so a shorter prefix (:to) can never
-                // corrupt a longer placeholder (:total).
-                ':from',
-                ':total',
-                ':to',
-                ':page',
             ],
             [
                 '{data}',
@@ -203,10 +197,6 @@ class GenerateLanguageFiles extends Command
                 '{student}',
                 '{activity}',
                 '{period}',
-                '{from}',
-                '{total}',
-                '{to}',
-                '{page}',
             ],
             $value
         );

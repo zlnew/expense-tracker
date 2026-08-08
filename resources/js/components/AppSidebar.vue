@@ -28,6 +28,10 @@ import recurringTransactions from '@/routes/recurring-transactions'
 import transactions from '@/routes/transactions'
 import type { NavGroup, NavItem } from '@/types'
 
+defineProps<{
+  className?: string
+}>()
+
 const { __ } = useLang()
 
 const mainNavItems: NavGroup[] = [
@@ -78,7 +82,7 @@ const footerNavItems: NavItem[] = [
 </script>
 
 <template>
-  <Sidebar collapsible="icon" variant="inset">
+  <Sidebar collapsible="icon" variant="inset" :class="className">
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>

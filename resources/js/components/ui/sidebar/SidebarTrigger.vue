@@ -3,14 +3,12 @@ import type { HTMLAttributes } from "vue"
 import { PanelLeftClose, PanelLeftOpen } from "lucide-vue-next"
 import { cn } from "@/lib/utils"
 import { Button } from '@/components/ui/button'
-import { useLang } from '@/composables/useLang'
 import { useSidebar } from "./utils"
 
 const props = defineProps<{
   class?: HTMLAttributes["class"]
 }>()
 
-const { __ } = useLang()
 const { isMobile, state, toggleSidebar } = useSidebar()
 </script>
 
@@ -25,6 +23,6 @@ const { isMobile, state, toggleSidebar } = useSidebar()
   >
     <PanelLeftOpen v-if="isMobile || state === 'collapsed'" />
     <PanelLeftClose v-else />
-    <span class="sr-only">{{ __('toggle_sidebar') }}</span>
+    <span class="sr-only">Toggle sidebar</span>
   </Button>
 </template>

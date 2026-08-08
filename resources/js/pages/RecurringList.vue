@@ -2,35 +2,31 @@
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
 import { Plus, Repeat, SquarePen, Trash2 } from 'lucide-vue-next'
 import { ref } from 'vue'
-import AppPagination from '@/components/AppPagination.vue'
-import DataListState from '@/components/DataListState.vue'
+import AppContent from '@/components/AppContent.vue'
+import Heading from '@/components/Heading.vue'
 import RecurringTransactionDeleteDialog from '@/components/dialogs/RecurringTransactionDeleteDialog.vue'
 import RecurringTransactionFormDialog from '@/components/dialogs/RecurringTransactionFormDialog.vue'
-import Heading from '@/components/Heading.vue'
-import ResponsiveTable from '@/components/ResponsiveTable.vue'
-import RowActions from '@/components/RowActions.vue'
-import SearchInput from '@/components/SearchInput.vue'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { useDate } from '@/composables/useDate'
-import { useFilters } from '@/composables/useFilters'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { useLang } from '@/composables/useLang'
-import { useNumber } from '@/composables/useNumber'
-import { index as recurringIndex } from '@/routes/recurring-transactions'
 import { update as updateRecurring } from '@/routes/recurring-transactions'
-import type { Balance, Category, Paginate, RecurringTransaction } from '@/types'
+import type { Balance, Category, RecurringTransaction } from '@/types'
 
 defineProps<{
-  recurrings: Paginate<RecurringTransaction>
+  recurrings: RecurringTransaction[]
   balances: Balance[]
   categories: Category[]
 }>()
 
 const { __ } = useLang()
-const { formatDate } = useDate()
-// The local Intl formatters bypassed and defeated the privacy mask; the
-// shared composables honour it, so amounts/date now mask like every page.
-const { formatAmount } = useNumber()
 
 setLayoutProps({
   breadcrumbs: [
@@ -47,20 +43,6 @@ const createDialogOpen = ref(false)
 const updateDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
 const targetData = ref<RecurringTransaction | null>(null)
-
-const loading = ref(false)
-
-// URL-backed search — server-side via RecurringTransactionQuery.
-const { search } = useFilters({
-  url: recurringIndex.url(),
-  defaults: {},
-  onStart: () => {
-    loading.value = true
-  },
-  onFinish: () => {
-    loading.value = false
-  },
-})
 
 const openEditDialog = (data: RecurringTransaction) => {
   targetData.value = data
@@ -91,70 +73,20 @@ const toggleActive = (data: RecurringTransaction) => {
   )
 }
 
-const fmtDate = (d: string | null) => (d ? formatDate(d, 'DD MMM YYYY') : '—')
+const amountFmt = (amount: number) =>
+  new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+  }).format(amount)
 
-const rowActions = (r: RecurringTransaction) => [
-  {
-    label: __('edit_data', { data: __('recurring_transaction') }),
-    icon: SquarePen,
-    onClick: () => openEditDialog(r),
-  },
-  {
-    label: __('delete_data', { data: __('recurring_transaction') }),
-    icon: Trash2,
-    variant: 'destructive' as const,
-    onClick: () => openDeleteDialog(r),
-  },
-]
-
-const columns = [
-  {
-    header: __('description'),
-    cell: (r: RecurringTransaction) => r.description || '—',
-    cellClass: 'font-medium',
-  },
-  {
-    header: __('type'),
-    cell: (r: RecurringTransaction) => r.type,
-    cellClass: 'capitalize',
-  },
-  {
-    header: __('frequency'),
-    cell: (r: RecurringTransaction) => __(r.frequency),
-    cellClass: 'capitalize',
-  },
-  {
-    header: __('amount'),
-    cell: (r: RecurringTransaction) => formatAmount(r.amount),
-    headerClass: 'text-right',
-    cellClass: 'text-right',
-  },
-  {
-    header: __('category'),
-    cell: (r: RecurringTransaction) => r.category?.name || '—',
-    cellClass: 'text-muted-foreground',
-  },
-  {
-    header: __('next_run_date'),
-    cell: (r: RecurringTransaction) => fmtDate(r.next_run_date),
-  },
-  {
-    header: __('status'),
-    cell: () => '',
-  },
-  {
-    header: __('actions'),
-    cell: () => '',
-    headerClass: 'text-right',
-    cellClass: 'w-[110px] text-right',
-  },
-]
+const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('id-ID') : '—')
 </script>
 
 <template>
   <Head :title="__('recurring_transactions')" />
 
-  <div>
+  <AppContent>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -170,105 +102,164 @@ const columns = [
         </Button>
       </div>
 
-      <div class="flex w-full items-center gap-2 lg:max-w-md">
-        <SearchInput
-          v-model="search"
-          :placeholder="__('search_recurring_placeholder')"
-        />
-      </div>
-
-      <!-- One owner: skeleton / empty / table, any viewport -->
-      <DataListState
-        :loading="loading"
-        :is-empty="!loading && recurrings.data.length === 0"
-        :rows="5"
-        :empty-icon="Repeat"
-        :empty-title="
-          __('no_data_found', { data: __('recurring_transactions') })
-        "
-        :empty-description="__('recurring_transactions_description')"
-      >
-        <template #empty>
+      <!-- Mobile View: Cards -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        <div
+          v-if="recurrings.length === 0"
+          class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
+        >
+          <div class="mb-4 rounded-full bg-muted p-4">
+            <Repeat class="size-8 text-muted-foreground" />
+          </div>
+          <h3 class="text-lg font-semibold">
+            {{ __('no_data_found', { data: __('recurring_transactions') }) }}
+          </h3>
+          <p class="mb-6 text-muted-foreground">
+            {{ __('recurring_transactions_description') }}
+          </p>
           <Button @click="createDialogOpen = true">
             <Plus class="mr-2 size-4" />
             {{ __('add_data', { data: __('recurring_transaction') }) }}
           </Button>
-        </template>
-
-        <ResponsiveTable :columns="columns" :rows="recurrings.data">
-          <template #card="{ row: r }">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <p
-                  class="mb-1 text-[10px] font-bold tracking-wider uppercase"
-                  :class="
-                    r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
-                  "
-                >
-                  {{ __(r.type) }} · {{ __(r.frequency) }}
-                </p>
-                <h3 class="text-lg font-bold">{{ r.description || '—' }}</h3>
-                <p class="text-sm text-muted-foreground">
-                  {{ formatAmount(r.amount) }}
-                  <span class="mx-1">·</span>
-                  {{ r.category?.name || '—' }}
-                </p>
-              </div>
-              <!-- Switch at BOTH breakpoints — the old static Badge made
-                   activating/deactivating impossible on a phone. -->
-              <div class="flex shrink-0 flex-col items-end gap-2">
-                <Switch
-                  :checked="r.is_active"
-                  :aria-label="__('toggle_active')"
-                  @update:checked="toggleActive(r)"
-                />
-                <span class="text-xs text-muted-foreground">
-                  {{ r.is_active ? __('active') : __('inactive') }}
-                </span>
-              </div>
+        </div>
+        <div
+          v-for="r in recurrings"
+          :key="r.id"
+          class="rounded-lg border bg-background p-4 shadow-sm"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p
+                class="mb-1 text-[10px] font-bold tracking-wider uppercase"
+                :class="
+                  r.type === 'income'
+                    ? 'text-emerald-600'
+                    : 'text-rose-600'
+                "
+              >
+                {{ __(r.type) }} · {{ __(r.frequency) }}
+              </p>
+              <h3 class="text-lg font-bold">{{ r.description || '—' }}</h3>
+              <p class="text-sm text-muted-foreground">
+                {{ amountFmt(r.amount) }}
+                <span class="mx-1">·</span>
+                {{ r.category?.name || '—' }}
+              </p>
             </div>
-            <div
-              class="mt-3 flex items-center justify-between text-sm text-muted-foreground"
-            >
-              <span>
-                {{ __('next_run_date') }}: {{ fmtDate(r.next_run_date) }}
-              </span>
-              <RowActions :actions="rowActions(r)" />
-            </div>
-          </template>
-
-          <template #cell-1="{ row: r }">
-            <span
-              class="capitalize"
-              :class="
-                r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
-              "
-            >
-              {{ __(r.type) }}
+            <Badge :variant="r.is_active ? 'default' : 'secondary'">
+              {{ r.is_active ? __('active') : __('inactive') }}
+            </Badge>
+          </div>
+          <div class="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+            <span>
+              {{ __('next_run_date') }}:
+              {{ fmtDate(r.next_run_date) }}
             </span>
-          </template>
-          <template #cell-6="{ row: r }">
-            <Switch
-              :checked="r.is_active"
-              :aria-label="__('toggle_active')"
-              @update:checked="toggleActive(r)"
-            />
-          </template>
-          <template #cell-7="{ row: r }">
-            <div class="flex items-center justify-end gap-2">
-              <RowActions :actions="rowActions(r)" />
+            <div class="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-9 w-9"
+                @click="openEditDialog(r)"
+                :title="__('edit_data', { data: __('recurring_transaction') })"
+              >
+                <SquarePen class="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                @click="openDeleteDialog(r)"
+                :title="__('delete_data', { data: __('recurring_transaction') })"
+              >
+                <Trash2 class="size-4" />
+              </Button>
             </div>
-          </template>
-        </ResponsiveTable>
-      </DataListState>
+          </div>
+        </div>
+      </div>
 
-      <AppPagination
-        v-if="!loading && recurrings.meta"
-        :meta="recurrings.meta"
-        :links="recurrings.links"
-      />
+      <!-- Desktop View: Table -->
+      <div class="hidden overflow-hidden rounded-md border bg-background md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{{ __('description') }}</TableHead>
+              <TableHead>{{ __('type') }}</TableHead>
+              <TableHead>{{ __('frequency') }}</TableHead>
+              <TableHead class="text-right">{{ __('amount') }}</TableHead>
+              <TableHead>{{ __('category') }}</TableHead>
+              <TableHead>{{ __('next_run_date') }}</TableHead>
+              <TableHead>{{ __('status') }}</TableHead>
+              <TableHead class="w-[110px] text-right">{{ __('actions') }}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-if="recurrings.length === 0">
+              <TableCell colspan="8" class="h-24 text-center">
+                {{ __('no_data_found', { data: __('recurring_transactions') }) }}
+              </TableCell>
+            </TableRow>
+            <template v-else>
+              <TableRow v-for="r in recurrings" :key="r.id">
+                <TableCell class="font-medium">
+                  {{ r.description || '—' }}
+                </TableCell>
+                <TableCell
+                  class="capitalize"
+                  :class="r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
+                >
+                  {{ __(r.type) }}
+                </TableCell>
+                <TableCell class="capitalize">{{ __(r.frequency) }}</TableCell>
+                <TableCell class="text-right">
+                  {{ amountFmt(r.amount) }}
+                </TableCell>
+                <TableCell class="text-muted-foreground">
+                  {{ r.category?.name || '—' }}
+                </TableCell>
+                <TableCell>{{ fmtDate(r.next_run_date) }}</TableCell>
+                <TableCell>
+                  <button
+                    class="rounded-full border px-2 py-0.5 text-xs font-medium"
+                    :class="
+                      r.is_active
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                        : 'border-muted bg-muted/40 text-muted-foreground hover:bg-muted'
+                    "
+                    @click="toggleActive(r)"
+                  >
+                    {{ r.is_active ? __('active') : __('inactive') }}
+                  </button>
+                </TableCell>
+                <TableCell class="text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      @click="openEditDialog(r)"
+                      :title="__('edit_data', { data: __('recurring_transaction') })"
+                    >
+                      <SquarePen class="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      @click="openDeleteDialog(r)"
+                      :title="__('delete_data', { data: __('recurring_transaction') })"
+                    >
+                      <Trash2 class="size-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </template>
+          </TableBody>
+        </Table>
+      </div>
     </div>
-  </div>
+  </AppContent>
 
   <RecurringTransactionFormDialog
     v-model:open="createDialogOpen"

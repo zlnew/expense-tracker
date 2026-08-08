@@ -7,13 +7,20 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-vue-next'
+import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
-import DataListState from '@/components/DataListState.vue'
 import Heading from '@/components/Heading.vue'
-import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -40,47 +47,18 @@ setLayoutProps({
     },
   ],
 })
-
-const columns = [
-  {
-    header: __('date'),
-    cell: (t: Transaction) => formatDate(t.date, 'DD MMM YYYY'),
-    cellClass: 'font-medium',
-  },
-  {
-    header: __('type'),
-    cell: (t: Transaction) => t.type,
-  },
-  {
-    header: __('category'),
-    cell: (t: Transaction) => t.category?.name || '-',
-  },
-  {
-    header: __('notes'),
-    cell: (t: Transaction) => t.description || '-',
-    cellClass: 'text-sm text-muted-foreground',
-  },
-  {
-    header: __('total'),
-    cell: (t: Transaction) =>
-      `${t.type === 'income' ? '+' : '-'}${formatAmount(t.amount)}`,
-    headerClass: 'text-right',
-    cellClass: 'text-right font-medium',
-  },
-]
 </script>
 
 <template>
   <Head :title="balance.name" />
 
-  <div>
+  <AppContent>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div class="flex items-center gap-4">
         <Button
           variant="ghost"
           size="icon"
           class="h-10 w-10 md:h-8 md:w-8"
-          :aria-label="__('back')"
           asChild
         >
           <Link :href="balanceIndex.url()">
@@ -158,28 +136,29 @@ const columns = [
 
       <div class="space-y-4">
         <h3 class="text-lg font-semibold">{{ __('transactions') }}</h3>
-
-        <!-- One owner: skeleton / empty / table, any viewport -->
-        <DataListState
-          :loading="false"
-          :is-empty="!transactions.data || transactions.data.length === 0"
-          :rows="5"
-          :empty-icon="Wallet"
-          :empty-title="__('no_data_found', { data: __('transactions') })"
-        >
-          <template #empty>
-            <span class="text-sm text-muted-foreground">{{
-              __('transaction_create_description')
-            }}</span>
-          </template>
-
-          <ResponsiveTable :columns="columns" :rows="transactions.data">
-            <template #cell-1="{ row: t }">
+        <!-- Mobile view for transactions -->
+        <div class="space-y-4 md:hidden">
+          <div
+            v-if="!transactions.data || transactions.data.length === 0"
+            class="py-8 text-center text-muted-foreground"
+          >
+            {{ __('no_data_found', { data: __('transactions') }) }}
+          </div>
+          <div
+            v-for="t in transactions.data"
+            :key="t.id"
+            class="rounded-lg border bg-background p-4"
+          >
+            <div class="mb-2 flex items-center justify-between">
+              <span class="text-sm text-muted-foreground">{{
+                formatDate(t.date, 'DD MMM YYYY')
+              }}</span>
               <Badge :variant="t.type === 'income' ? 'secondary' : 'outline'">
                 {{ __(t.type) }}
               </Badge>
-            </template>
-            <template #cell-4="{ row: t }">
+            </div>
+            <div class="flex items-center justify-between font-bold">
+              <span>{{ t.category?.name || '-' }}</span>
               <span
                 :class="
                   t.type === 'income'
@@ -187,12 +166,73 @@ const columns = [
                     : 'text-red-600 dark:text-red-400'
                 "
               >
-                {{ t.type === 'income' ? '+' : '-'
-                }}{{ formatAmount(t.amount) }}
+                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
               </span>
-            </template>
-          </ResponsiveTable>
-        </DataListState>
+            </div>
+            <div
+              v-if="t.description"
+              class="mt-2 text-sm text-muted-foreground"
+            >
+              {{ t.description }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop View: Table -->
+        <div
+          class="hidden overflow-hidden rounded-md border bg-background md:block"
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{{ __('date') }}</TableHead>
+                <TableHead>{{ __('type') }}</TableHead>
+                <TableHead>{{ __('category') }}</TableHead>
+                <TableHead>{{ __('notes') }}</TableHead>
+                <TableHead class="text-right">{{ __('total') }}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow
+                v-if="
+                  !transactions.data || transactions.data.length === 0
+                "
+              >
+                <TableCell colspan="5" class="h-24 text-center">
+                  {{ __('no_data_found', { data: __('transactions') }) }}
+                </TableCell>
+              </TableRow>
+              <template v-else>
+                <TableRow v-for="t in transactions.data" :key="t.id">
+                  <TableCell class="font-medium">
+                    {{ formatDate(t.date, 'DD MMM YYYY') }}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      :variant="t.type === 'income' ? 'secondary' : 'outline'"
+                    >
+                      {{ __(t.type) }}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{{ t.category?.name || '-' }}</TableCell>
+                  <TableCell class="text-sm text-muted-foreground">{{
+                    t.description || '-'
+                  }}</TableCell>
+                  <TableCell
+                    class="text-right font-medium"
+                    :class="
+                      t.type === 'income'
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    "
+                  >
+                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                  </TableCell>
+                </TableRow>
+              </template>
+            </TableBody>
+          </Table>
+        </div>
 
         <AppPagination
           v-if="transactions.meta"
@@ -201,5 +241,5 @@ const columns = [
         />
       </div>
     </div>
-  </div>
+  </AppContent>
 </template>

@@ -16,7 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useLang } from '@/composables/useLang'
 import { dashboard, login, register } from '@/routes'
 
 withDefaults(
@@ -27,12 +26,10 @@ withDefaults(
     canRegister: true,
   },
 )
-
-const { __ } = useLang()
 </script>
 
 <template>
-  <Head :title="__('welcome')" />
+  <Head title="Welcome" />
 
   <div class="flex min-h-dvh flex-col bg-background text-foreground">
     <!-- Top nav -->
@@ -49,15 +46,15 @@ const { __ } = useLang()
         <div class="flex shrink-0 items-center gap-2">
           <template v-if="$page.props.auth.user">
             <Button asChild>
-              <Link :href="dashboard()">{{ __('dashboard') }}</Link>
+              <Link :href="dashboard()">Dashboard</Link>
             </Button>
           </template>
           <template v-else>
             <Button variant="ghost" asChild>
-              <Link :href="login()">{{ __('log_in') }}</Link>
+              <Link :href="login()">Log in</Link>
             </Button>
             <Button v-if="canRegister" asChild>
-              <Link :href="register()">{{ __('register') }}</Link>
+              <Link :href="register()">Register</Link>
             </Button>
           </template>
         </div>
@@ -72,43 +69,34 @@ const { __ } = useLang()
         <span
           class="mb-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground"
         >
-          {{ __('simple_expense_tracking') }}
+          Simple expense tracking
         </span>
 
         <h1
-          class="max-w-xl text-3xl font-bold tracking-tight text-balance sm:text-5xl"
+          class="max-w-xl text-balance text-3xl font-bold tracking-tight sm:text-5xl"
         >
-          {{ __('track_every_rupiah') }}
+          Track every rupiah
         </h1>
 
         <p
-          class="mt-3 max-w-md text-sm text-pretty text-muted-foreground sm:text-base"
+          class="mt-3 max-w-md text-pretty text-sm text-muted-foreground sm:text-base"
         >
-          {{ __('welcome_hero_description') }}
+          Know exactly where your money goes. Keep balances in check, stick to
+          budgets, and understand your spending at a glance.
         </p>
 
         <div
           class="mt-6 flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row"
         >
           <Button asChild size="lg" class="w-full sm:w-auto">
-            <Link
-              :href="
-                $page.props.auth.user
-                  ? dashboard()
-                  : canRegister
-                    ? register()
-                    : login()
-              "
-            >
-              <template v-if="$page.props.auth.user">{{
-                __('go_to_dashboard')
-              }}</template>
-              <template v-else>{{ __('get_started') }}</template>
+            <Link :href="$page.props.auth.user ? dashboard() : canRegister ? register() : login()">
+              <template v-if="$page.props.auth.user">Go to dashboard</template>
+              <template v-else>Get started</template>
               <ArrowRight class="size-4" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" class="w-full sm:w-auto">
-            <Link :href="login()">{{ __('log_in') }}</Link>
+            <Link :href="login()">Log in</Link>
           </Button>
         </div>
       </section>
@@ -123,13 +111,12 @@ const { __ } = useLang()
               >
                 <Wallet class="size-5" />
               </div>
-              <CardTitle class="text-sm">{{
-                __('multiple_balances')
-              }}</CardTitle>
+              <CardTitle class="text-sm">Multiple balances</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                {{ __('welcome_multiple_balances') }}
+                Track cash, bank accounts, and e-wallets side by side in one
+                place.
               </CardDescription>
             </CardContent>
           </Card>
@@ -141,13 +128,12 @@ const { __ } = useLang()
               >
                 <PiggyBank class="size-5" />
               </div>
-              <CardTitle class="text-sm">{{
-                __('budgets_that_stick')
-              }}</CardTitle>
+              <CardTitle class="text-sm">Budgets that stick</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                {{ __('welcome_budgets_that_stick') }}
+                Set monthly budgets by category and see how much is left before
+                you overspend.
               </CardDescription>
             </CardContent>
           </Card>
@@ -159,11 +145,12 @@ const { __ } = useLang()
               >
                 <BarChart3 class="size-5" />
               </div>
-              <CardTitle class="text-sm">{{ __('clear_reports') }}</CardTitle>
+              <CardTitle class="text-sm">Clear reports</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                {{ __('welcome_clear_reports') }}
+                Understand your spending with charts that show where your money
+                really goes.
               </CardDescription>
             </CardContent>
           </Card>
@@ -175,11 +162,12 @@ const { __ } = useLang()
               >
                 <ArrowLeftRight class="size-5" />
               </div>
-              <CardTitle class="text-sm">{{ __('easy_transfers') }}</CardTitle>
+              <CardTitle class="text-sm">Easy transfers</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                {{ __('welcome_easy_transfers') }}
+                Move money between balances without losing track of where it
+                went.
               </CardDescription>
             </CardContent>
           </Card>

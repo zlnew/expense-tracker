@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 import {
   ArrowLeftRight,
   CircleDollarSign,
@@ -9,7 +9,6 @@ import {
 } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
-import { useCurrentUrl } from '@/composables/useCurrentUrl'
 import { useLang } from '@/composables/useLang'
 import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
@@ -17,32 +16,32 @@ import budgets from '@/routes/budgets'
 import transactions from '@/routes/transactions'
 
 const { __ } = useLang()
-const { isCurrentOrParentUrl, isCurrentUrl } = useCurrentUrl()
+const page = usePage()
 
 const items = [
   {
     title: __('dashboard'),
     href: dashboard.url(),
     icon: LayoutGrid,
-    active: () => isCurrentUrl(dashboard.url()) || isCurrentUrl('/'),
+    active: () => page.url === dashboard.url() || page.url === '/',
   },
   {
     title: __('transactions'),
     href: transactions.index.url(),
     icon: ArrowLeftRight,
-    active: () => isCurrentOrParentUrl(transactions.index.url()),
+    active: () => page.url.startsWith(transactions.index.url()),
   },
   {
     title: __('budgets'),
     href: budgets.index.url(),
     icon: CircleDollarSign,
-    active: () => isCurrentOrParentUrl(budgets.index.url()),
+    active: () => page.url.startsWith(budgets.index.url()),
   },
   {
     title: __('balances'),
     href: balances.index.url(),
     icon: Wallet,
-    active: () => isCurrentOrParentUrl(balances.index.url()),
+    active: () => page.url.startsWith(balances.index.url()),
   },
 ]
 
@@ -57,8 +56,7 @@ function openTransactionCreate() {
 
 <template>
   <nav
-    :aria-label="__('main_navigation')"
-    class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
+    class="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
   >
     <div
       class="relative mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2"
@@ -67,7 +65,6 @@ function openTransactionCreate() {
       <template v-for="item in leftItems" :key="item.href">
         <Link
           :href="item.href"
-          :aria-current="item.active() ? 'page' : undefined"
           class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
           :class="
             item.active()
@@ -84,9 +81,9 @@ function openTransactionCreate() {
       <div class="flex items-center justify-center">
         <Button
           variant="default"
-          size="icon-lg"
-          :aria-label="__('add_transaction')"
-          class="size-14 -translate-y-5 rounded-full shadow-lg ring-4 ring-background transition-transform active:scale-95"
+          size="icon"
+          aria-label="Add transaction"
+          class="z-10 size-12 rounded-full shadow-lg transition-transform active:scale-95"
           @click="openTransactionCreate"
         >
           <Plus class="size-6" />
@@ -97,7 +94,6 @@ function openTransactionCreate() {
       <template v-for="item in rightItems" :key="item.href">
         <Link
           :href="item.href"
-          :aria-current="item.active() ? 'page' : undefined"
           class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
           :class="
             item.active()

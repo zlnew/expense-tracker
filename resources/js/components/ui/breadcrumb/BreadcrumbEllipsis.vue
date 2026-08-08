@@ -2,13 +2,10 @@
 import type { HTMLAttributes } from "vue"
 import { MoreHorizontal } from "lucide-vue-next"
 import { cn } from "@/lib/utils"
-import { useLang } from "@/composables/useLang"
 
 const props = defineProps<{
   class?: HTMLAttributes["class"]
 }>()
-
-const { __ } = useLang()
 </script>
 
 <template>
@@ -21,6 +18,6 @@ const { __ } = useLang()
     <slot>
       <MoreHorizontal class="size-4" />
     </slot>
-    <span class="sr-only">{{ __('more') }}</span>
+    <span class="sr-only">More</span>
   </span>
 </template>

@@ -39,6 +39,7 @@ defineOptions({
           autocomplete="name"
           name="name"
           placeholder="Full name"
+          class="h-11 md:h-9"
         />
         <InputError :message="errors.name" />
       </div>
@@ -53,6 +54,7 @@ defineOptions({
           autocomplete="email"
           name="email"
           placeholder="email@example.com"
+          class="h-11 md:h-9"
         />
         <InputError :message="errors.email" />
       </div>
@@ -66,6 +68,7 @@ defineOptions({
           autocomplete="new-password"
           name="password"
           placeholder="Password"
+          class="h-11 md:h-9"
         />
         <InputError :message="errors.password" />
       </div>
@@ -79,6 +82,7 @@ defineOptions({
           autocomplete="new-password"
           name="password_confirmation"
           placeholder="Confirm password"
+          class="h-11 md:h-9"
         />
         <InputError :message="errors.password_confirmation" />
       </div>

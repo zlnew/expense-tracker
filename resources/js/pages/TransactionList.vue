@@ -1,35 +1,39 @@
 <script setup lang="ts">
 import { Head, router, setLayoutProps } from '@inertiajs/vue3'
+import { useDebounceFn } from '@vueuse/core'
 import {
   ArrowRightLeft,
   ChevronDown,
-  Download,
-  Filter,
   ListPlus,
-  ListTodoIcon,
-  MinusIcon,
   Plus,
+  Search,
   SquarePen,
   Trash2,
+  Filter,
+  Download,
+  Repeat,
+  WalletIcon,
+  ListTodoIcon,
+  MinusIcon,
   TrendingDown,
   TrendingUp,
-  WalletIcon,
 } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
-import DataListState from '@/components/DataListState.vue'
 import TransactionBulkCreateDialog from '@/components/dialogs/TransactionBulkCreateDialog.vue'
 import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialog.vue'
 import TransactionTransferDialog from '@/components/dialogs/TransactionTransferDialog.vue'
 import TransactionUpdateDialog from '@/components/dialogs/TransactionUpdateDialog.vue'
-import FilterSheet from '@/components/FilterSheet.vue'
 import Heading from '@/components/Heading.vue'
-import ResponsiveTable from '@/components/ResponsiveTable.vue'
-import RowActions from '@/components/RowActions.vue'
-import SearchInput from '@/components/SearchInput.vue'
-import { Badge } from '@/components/ui/badge'
+import ListSkeleton from '@/components/ListSkeleton.vue'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import {
   DropdownMenu,
@@ -38,7 +42,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -48,16 +51,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { useDate } from '@/composables/useDate'
-import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
-import { toQuery } from '@/lib/utils'
+import { useParam } from '@/composables/useParam'
+import { exportMethod as transactionExport, index as transactionIndex } from '@/routes/transactions'
 import recurringTransactions from '@/routes/recurring-transactions'
-import {
-  exportMethod as transactionExport,
-  index as transactionIndex,
-} from '@/routes/transactions'
 import type { Balance, Budget, Category, Paginate, Transaction } from '@/types'
 
 const props = defineProps<{
@@ -72,6 +79,7 @@ const props = defineProps<{
 const { __ } = useLang()
 const { formatDate } = useDate()
 const { formatAmount } = useNumber()
+const param = useParam()
 
 setLayoutProps({
   breadcrumbs: [
@@ -88,36 +96,16 @@ const deleteDialogOpen = ref(false)
 const addSheetOpen = ref(false)
 const targetData = ref<Transaction | null>(null)
 
-const loading = ref(false)
-
-// Single source of filter truth: reactive refs synced to the URL query
-// string (reload restores, back/forward round-trips, debounced visits).
-const {
-  search,
-  balance: balanceFilter,
-  category: categoryFilter,
-  dateFrom: dateFromFilter,
-  dateTo: dateToFilter,
-  activeCount,
-  buildParams,
-  apply,
-} = useFilters({
-  url: transactionIndex.url(),
-  defaults: { balance: 'all', category: 'all' },
-  onStart: () => {
-    loading.value = true
-  },
-  onFinish: () => {
-    loading.value = false
-  },
-})
+const search = ref(param.get('search') || '')
+const balanceFilter = ref(param.get('balance') || 'all')
+const categoryFilter = ref(param.get('category') || 'all')
+const dateFromFilter = ref(param.get('dateFrom') || '')
+const dateToFilter = ref(param.get('dateTo') || '')
 
 const filterSheetOpen = ref(false)
 
-// Which tab the segmented control shows. 'recurring' navigates away, so the
-// local state is only ever 'transactions' in practice; kept as a ref so the
-// control can reflect a pressed state before the visit.
-const viewMode = ref<'transactions' | 'recurring'>('transactions')
+// True while a debounced search/filter visit is in flight — shows the skeleton.
+const loading = ref(false)
 
 const groupedCategories = computed(() => {
   const items = props.categories
@@ -142,13 +130,66 @@ const currentCategory = computed(() =>
   props.categories.find((c) => c.id.toString() === categoryFilter.value),
 )
 
+watch(
+  [search, balanceFilter, categoryFilter, dateFromFilter, dateToFilter],
+  () => {
+    fetchData()
+  },
+)
+
+const buildFilterParams = (): Record<string, any> => {
+  const params: Record<string, any> = {}
+
+  params.search = search.value
+
+  if (balanceFilter.value !== 'all') {
+    params.balance = balanceFilter.value
+  }
+
+  if (categoryFilter.value !== 'all') {
+    params.category = categoryFilter.value
+  }
+
+  if (dateFromFilter.value) {
+    params.dateFrom = dateFromFilter.value
+  }
+
+  if (dateToFilter.value) {
+    params.dateTo = dateToFilter.value
+  }
+
+  return params
+}
+
 // Download the current filter view as CSV (full download, not Inertia visit).
 const exportCsv = () => {
+  const params = buildFilterParams()
+
   const url = new URL(transactionExport.url(), window.location.origin)
-  url.search = toQuery(buildParams())
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== '' && value !== undefined) {
+      url.searchParams.set(key, String(value))
+    }
+  })
 
   window.location.href = url.toString()
 }
+
+const fetchData = useDebounceFn(() => {
+  const params = buildFilterParams()
+
+  router.get(transactionIndex.url(), params, {
+    preserveState: true,
+    preserveScroll: true,
+    replace: true,
+    onStart: () => {
+      loading.value = true
+    },
+    onFinish: () => {
+      loading.value = false
+    },
+  })
+}, 300)
 
 // The global quick-add FAB (mobile bottom nav) and this page's "Single
 // Transaction" action both open the shared create dialog mounted in the
@@ -174,26 +215,12 @@ const openBulkCreateDialog = () => {
 const openTransferDialog = () => {
   transferDialogOpen.value = true
 }
-
-const rowActions = (t: Transaction) => [
-  {
-    label: __('edit'),
-    icon: SquarePen,
-    onClick: () => openUpdateDialog(t),
-  },
-  {
-    label: __('delete'),
-    icon: Trash2,
-    variant: 'destructive' as const,
-    onClick: () => openDeleteDialog(t),
-  },
-]
 </script>
 
 <template>
   <Head :title="__('transactions')" />
 
-  <div>
+  <AppContent>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -245,10 +272,14 @@ const rowActions = (t: Transaction) => [
 
       <div class="flex flex-col items-center gap-4 lg:flex-row lg:items-end">
         <div class="flex w-full items-center gap-2 lg:max-w-md">
-          <div class="w-full">
-            <SearchInput
+          <div class="relative w-full">
+            <Search
+              class="absolute top-2.5 left-2.5 size-4 text-muted-foreground"
+            />
+            <Input
               v-model="search"
               :placeholder="__('search_transactions_placeholder')"
+              class="w-full bg-background pl-8"
             />
           </div>
           <Button
@@ -259,13 +290,16 @@ const rowActions = (t: Transaction) => [
             @click="filterSheetOpen = true"
           >
             <Filter class="size-4" />
-            <Badge
-              v-if="activeCount > 0"
-              variant="secondary"
-              class="absolute -top-1 -right-1 size-4 p-0 text-[9px]"
-            >
-              {{ activeCount }}
-            </Badge>
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            class="h-10 w-10 shrink-0"
+            :aria-label="__('recurring_transactions')"
+            :title="__('recurring_transactions')"
+            @click="router.visit(recurringTransactions.index().url)"
+          >
+            <Repeat class="size-4" />
           </Button>
           <Button
             variant="outline"
@@ -279,40 +313,6 @@ const rowActions = (t: Transaction) => [
           </Button>
         </div>
 
-        <!-- Segmented [ Transaksi | Berulang ] — the old Repeat icon had no
-             label, so on mobile it was a mystery button. -->
-        <div
-          class="grid w-full grid-cols-2 gap-1 rounded-lg border bg-muted/40 p-1 lg:hidden"
-        >
-          <button
-            type="button"
-            class="touch-target rounded-md px-3 py-2 text-sm font-medium transition-colors"
-            :class="
-              viewMode === 'transactions'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground'
-            "
-            :aria-pressed="viewMode === 'transactions'"
-            @click="viewMode = 'transactions'"
-          >
-            {{ __('transactions') }}
-          </button>
-          <button
-            type="button"
-            class="touch-target rounded-md px-3 py-2 text-sm font-medium transition-colors"
-            :class="
-              viewMode === 'recurring'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground'
-            "
-            :aria-pressed="viewMode === 'recurring'"
-            @click="router.visit(recurringTransactions.index().url)"
-          >
-            {{ __('recurring_transactions') }}
-          </button>
-        </div>
-
-        <!-- Desktop: inline filter controls (lg+) -->
         <div class="hidden w-full gap-4 lg:flex lg:w-auto">
           <div class="space-y-2">
             <Select v-model="balanceFilter">
@@ -392,32 +392,19 @@ const rowActions = (t: Transaction) => [
         </div>
       </div>
 
-      <!-- Mobile: filter bottom sheet with real Reset/Apply -->
-      <FilterSheet
-        v-model:open="filterSheetOpen"
-        :model="{
-          search: search,
-          balance: balanceFilter,
-          category: categoryFilter,
-          dateFrom: dateFromFilter,
-          dateTo: dateToFilter,
-        }"
-        :defaults="{
-          search: '',
-          balance: 'all',
-          category: 'all',
-          dateFrom: '',
-          dateTo: '',
-        }"
-        :active-count="activeCount"
-        :trigger-label="__('filter_transactions')"
-        @apply="apply"
-      >
-        <template #default="{ draft }">
+      <!-- Mobile: filter bottom sheet (md-) / centered dialog (md+) -->
+      <Dialog v-model:open="filterSheetOpen">
+        <SheetDialogContent class="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle class="flex items-center gap-2">
+              <Filter class="size-4" />
+              {{ __('filter_transactions') }}
+            </DialogTitle>
+          </DialogHeader>
+
           <div class="grid gap-4 py-2">
             <div class="space-y-2">
-              <Label>{{ __('balance') }}</Label>
-              <Select v-model="draft.balance">
+              <Select v-model="balanceFilter">
                 <SelectTrigger>
                   <WalletIcon />
                   <SelectValue :placeholder="__('balance')" />
@@ -438,10 +425,15 @@ const rowActions = (t: Transaction) => [
             </div>
 
             <div class="space-y-2">
-              <Label>{{ __('category') }}</Label>
-              <Select v-model="draft.category">
+              <Select v-model="categoryFilter">
                 <SelectTrigger>
                   <ListTodoIcon />
+                  <span
+                    v-if="currentCategory?.type"
+                    class="text-muted-foreground"
+                  >
+                    {{ __(currentCategory.type) }}
+                  </span>
                   <SelectValue :placeholder="__('category')" />
                 </SelectTrigger>
                 <SelectContent>
@@ -468,19 +460,40 @@ const rowActions = (t: Transaction) => [
                       {{ c.name }}
                     </SelectItem>
                   </SelectGroup>
+                  <div
+                    v-if="
+                      groupedCategories.income.length === 0 &&
+                      groupedCategories.expense.length === 0
+                    "
+                    class="p-4 text-center text-sm text-muted-foreground"
+                  >
+                    {{ __('no_data_found', { data: __('category') }) }}
+                  </div>
                 </SelectContent>
               </Select>
             </div>
 
             <div class="grid gap-2">
-              <Label>{{ __('date_from') }}</Label>
-              <Input type="date" v-model="draft.dateFrom" />
-              <Label>{{ __('date_to') }}</Label>
-              <Input type="date" v-model="draft.dateTo" />
+              <Input
+                type="date"
+                v-model="dateFromFilter"
+                :aria-label="__('date_from')"
+              />
+              <Input
+                type="date"
+                v-model="dateToFilter"
+                :aria-label="__('date_to')"
+              />
             </div>
           </div>
-        </template>
-      </FilterSheet>
+
+          <DialogFooter>
+            <Button class="w-full" @click="filterSheetOpen = false">
+              {{ __('save') }}
+            </Button>
+          </DialogFooter>
+        </SheetDialogContent>
+      </Dialog>
 
       <!-- Mobile: add-transaction action sheet (sm:hidden equivalent via content) -->
       <Dialog v-model:open="addSheetOpen">
@@ -521,52 +534,37 @@ const rowActions = (t: Transaction) => [
         </SheetDialogContent>
       </Dialog>
 
-      <!-- Skeleton / empty / table chain — one owner, no double render -->
-      <DataListState
-        :loading="loading"
-        :is-empty="!loading && transactions.data.length === 0"
-        :rows="5"
-        :empty-icon="ArrowRightLeft"
-        :empty-title="__('no_data_found', { data: __('transactions') })"
-        :empty-description="__('transaction_create_description')"
-      >
-        <template #empty>
-          <Button @click="openCreateDialog">
-            <Plus class="mr-2 size-4" />
-            {{ __('add_data', { data: __('transaction') }) }}
-          </Button>
-        </template>
+      <!-- Loading skeleton while a search/filter visit is in flight -->
+      <ListSkeleton v-if="loading" :rows="5" />
 
-        <!-- ResponsiveTable: mobile cards + desktop table -->
-        <ResponsiveTable
-          :columns="[
-            { header: '#', cell: (row, i) => i + 1, cellClass: 'w-[60px]' },
-            {
-              header: __('date'),
-              cell: (t) => formatDate(t.date),
-              cellClass: 'w-[120px] font-medium',
-            },
-            { header: __('category'), cell: (t) => t.category?.name ?? '-' },
-            { header: __('balance'), cell: (t) => t.balance?.name ?? '-' },
-            { header: __('description'), cell: (t) => t.description || '-' },
-            {
-              header: __('amount'),
-              cell: (t) =>
-                t.type === 'income'
-                  ? '+' + formatAmount(t.amount)
-                  : '-' + formatAmount(t.amount),
-              cellClass: 'text-right font-medium',
-            },
-            {
-              header: __('actions'),
-              cell: () => '',
-              cellClass: 'w-[100px] text-right',
-            },
-          ]"
-          :rows="transactions.data"
-        >
-          <!-- Mobile card -->
-          <template #card="{ row: t }">
+      <!-- Empty state -->
+      <div
+        v-if="!loading && transactions.data.length === 0"
+        class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
+      >
+        <div class="mb-4 rounded-full bg-muted p-4">
+          <ArrowRightLeft class="size-8 text-muted-foreground" />
+        </div>
+        <h3 class="text-lg font-semibold">
+          {{ __('no_data_found', { data: __('transactions') }) }}
+        </h3>
+        <p class="mb-6 text-muted-foreground">
+          {{ __('transaction_create_description') }}
+        </p>
+        <Button @click="openCreateDialog">
+          <Plus class="mr-2 size-4" />
+          {{ __('add_data', { data: __('transaction') }) }}
+        </Button>
+      </div>
+
+      <template v-else>
+        <!-- Mobile View: Cards -->
+        <div class="grid grid-cols-1 gap-4 md:hidden">
+          <div
+            v-for="t in transactions.data"
+            :key="t.id"
+            class="rounded-lg border bg-background p-4 shadow-sm"
+          >
             <div class="mb-3 flex items-center justify-between gap-2">
               <span
                 class="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
@@ -595,7 +593,9 @@ const rowActions = (t: Transaction) => [
                   "
                 >
                   <component
-                    :is="t.type === 'income' ? TrendingUp : TrendingDown"
+                    :is="
+                      t.type === 'income' ? TrendingUp : TrendingDown
+                    "
                     class="size-5"
                   />
                 </div>
@@ -623,46 +623,114 @@ const rowActions = (t: Transaction) => [
                       : 'text-red-600 dark:text-red-400'
                   "
                 >
-                  {{ t.type === 'income' ? '+' : '-'
-                  }}{{ formatAmount(t.amount) }}
+                  {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
                 </p>
                 <div class="mt-2 flex items-center justify-end gap-1">
-                  <RowActions :actions="rowActions(t)" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10"
+                    @click="openUpdateDialog(t)"
+                  >
+                    <SquarePen class="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10 text-destructive"
+                    @click="openDeleteDialog(t)"
+                  >
+                    <Trash2 class="size-4" />
+                  </Button>
                 </div>
               </div>
             </div>
-          </template>
+          </div>
+        </div>
+      </template>
 
-          <!-- Desktop cells -->
-          <template #cell-2="{ row: t }">
-            <div class="flex items-center gap-2">
-              <span class="text-muted-foreground">{{ __(t.type) }}</span>
-              <span class="font-medium">{{ t.category?.name }}</span>
-            </div>
-          </template>
-          <template #cell-4="{ row: t }">
-            <div class="max-w-md truncate wrap-anywhere">
-              {{ t.description || '-' }}
-            </div>
-          </template>
-          <template #cell-5="{ row: t }">
-            <span
-              :class="
-                t.type === 'income'
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              "
-            >
-              {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
-            </span>
-          </template>
-          <template #cell-6="{ row: t }">
-            <div class="flex items-center justify-end gap-2">
-              <RowActions :actions="rowActions(t)" />
-            </div>
-          </template>
-        </ResponsiveTable>
-      </DataListState>
+      <!-- Desktop View: Table -->
+      <div
+        v-if="!loading"
+        class="hidden overflow-hidden rounded-md border bg-background md:block"
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead class="w-[60px]">#</TableHead>
+              <TableHead class="w-[120px]">{{ __('date') }}</TableHead>
+              <TableHead>{{ __('category') }}</TableHead>
+              <TableHead>{{ __('balance') }}</TableHead>
+              <TableHead>{{ __('description') }}</TableHead>
+              <TableHead class="text-right">{{ __('amount') }}</TableHead>
+              <TableHead class="w-[100px] text-right">
+                {{ __('actions') }}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="(t, index) in transactions.data" :key="t.id">
+              <TableCell>
+                {{
+                  (transactions.meta.current_page - 1) *
+                    transactions.meta.per_page +
+                  index +
+                  1
+                }}.
+              </TableCell>
+              <TableCell class="font-medium">
+                {{ formatDate(t.date) }}
+              </TableCell>
+              <TableCell>
+                <div class="flex items-center gap-2">
+                  <span class="text-muted-foreground">
+                    {{ __(t.type) }}
+                  </span>
+                  <span class="font-medium">
+                    {{ t.category?.name }}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>{{ t.balance?.name }}</TableCell>
+              <TableCell class="text-sm text-muted-foreground">
+                <div class="max-w-md truncate wrap-anywhere">
+                  {{ t.description || '-' }}
+                </div>
+              </TableCell>
+              <TableCell
+                class="text-right font-medium"
+                :class="
+                  t.type === 'income'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
+                "
+              >
+                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+              </TableCell>
+              <TableCell class="text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10"
+                    @click="openUpdateDialog(t)"
+                  >
+                    <SquarePen class="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-10 w-10 text-destructive"
+                    @click="openDeleteDialog(t)"
+                  >
+                    <Trash2 class="size-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
 
       <AppPagination
         v-if="!loading && transactions.meta"
@@ -670,7 +738,7 @@ const rowActions = (t: Transaction) => [
         :links="transactions.links"
       />
     </div>
-  </div>
+  </AppContent>
 
   <TransactionUpdateDialog
     v-model:open="updateDialogOpen"

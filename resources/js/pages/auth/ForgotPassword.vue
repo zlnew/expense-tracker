@@ -42,6 +42,7 @@ defineProps<{
           autocomplete="off"
           autofocus
           placeholder="email@example.com"
+          class="h-11 md:h-9"
         />
         <InputError :message="errors.email" />
       </div>

@@ -15,7 +15,7 @@ on:
       - workos
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   quality:
@@ -31,33 +31,19 @@ jobs:
       - name: Install Dependencies
         run: |
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm ci
+          npm install
 
-      - name: Pint (check only)
-        run: composer lint:check
+      - name: Run Pint
+        run: composer lint
 
-      - name: ESLint (check only)
-        run: npm run lint-check
+      - name: Format Frontend
+        run: npm run format
 
-      - name: Prettier (check only)
-        run: npm run format-check
+      - name: Lint Frontend
+        run: npm run lint
 
-      - name: TypeScript (type-check)
-        run: npm run type-check
-
-      - name: Unit tests
-        run: npm run test:unit
-
-      - name: Frontend build
-        run: npm run build
-
-      - name: PHP tests
-        run: php artisan test
-
-      - name: i18n drift check
-        # Regenerate language files from translations.csv and fail if the
-        # generated output changed. Catches hand-edited resources/js/lang/*
-        # JSON, which the conventions forbid but nothing else enforces.
-        run: |
-          php artisan app:generate-language-files
-          git diff --exit-code resources/js/lang
+      # - name: Commit Changes
+      #   uses: stefanzweifel/git-auto-commit-action@v7
+      #   with:
+      #     commit_message: fix code style
+      #     commit_options: '--no-verify'

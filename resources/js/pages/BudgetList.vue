@@ -1,26 +1,29 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
-import { CheckCircle2, Plus, Wallet } from 'lucide-vue-next'
+import { CheckCircle2, Info, Plus, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
+import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
-import DataListState from '@/components/DataListState.vue'
 import BudgetDeleteDialog from '@/components/dialogs/BudgetDeleteDialog.vue'
 import Heading from '@/components/Heading.vue'
-import ResponsiveTable from '@/components/ResponsiveTable.vue'
-import RowActions from '@/components/RowActions.vue'
-import SearchInput from '@/components/SearchInput.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { useDate } from '@/composables/useDate'
-import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
 import {
   create as budgetCreate,
   edit as budgetEdit,
-  index as budgetListUrl,
-  setActive as budgetSetActive,
   show as budgetShow,
+  setActive as budgetSetActive,
 } from '@/routes/budgets'
 import type { Budget, Paginate } from '@/types'
 
@@ -47,22 +50,6 @@ setLayoutProps({
 const deleteDialogOpen = ref(false)
 const targetData = ref<Data | null>(null)
 
-const loading = ref(false)
-
-// URL-backed search — BudgetQuery gained $searchable = ['notes'] so the
-// server filters; the list was paginated with no search and no loading
-// state, so finding "March 2024" meant paging with prev/next.
-const { search } = useFilters({
-  url: budgetListUrl.url(),
-  defaults: {},
-  onStart: () => {
-    loading.value = true
-  },
-  onFinish: () => {
-    loading.value = false
-  },
-})
-
 const openDeleteDialog = (data: Data) => {
   targetData.value = data
   deleteDialogOpen.value = true
@@ -83,74 +70,12 @@ const setActive = (budget: Budget) => {
     },
   )
 }
-
-const rowActions = (b: Data) => [
-  {
-    label: __('view_detail'),
-    icon: undefined,
-    onClick: () => router.visit(budgetShow.url({ budget: b })),
-  },
-  ...(b.is_active
-    ? []
-    : [
-        {
-          label: __('set_as_active'),
-          icon: CheckCircle2,
-          onClick: () => setActive(b),
-        },
-      ]),
-  {
-    label: __('edit_data', { data: __('budget') }),
-    icon: undefined,
-    onClick: () => router.visit(budgetEdit.url({ budget: b })),
-  },
-  {
-    label: __('delete_data', { data: __('budget') }),
-    icon: undefined,
-    variant: 'destructive' as const,
-    onClick: () => openDeleteDialog(b),
-  },
-]
-
-const columns = [
-  {
-    header: '#',
-    cell: (_row: Data, index: number) => index + 1,
-    cellClass: 'w-[60px]',
-  },
-  {
-    header: __('period_start'),
-    cell: (b: Data) => formatDate(b.period_start, 'DD MMM YYYY'),
-    cellClass: 'w-[150px] font-medium',
-  },
-  {
-    header: __('period_end'),
-    cell: (b: Data) => formatDate(b.period_end, 'DD MMM YYYY'),
-    cellClass: 'w-[150px] font-medium',
-  },
-  {
-    header: __('notes'),
-    cell: (b: Data) => b.notes ?? '-',
-    cellClass: 'text-sm text-muted-foreground',
-  },
-  {
-    header: '',
-    cell: (b: Data) => (b.is_active ? __('active') : ''),
-    cellClass: 'w-[100px]',
-  },
-  {
-    header: __('actions'),
-    cell: () => '',
-    headerClass: 'text-right',
-    cellClass: 'w-[100px] text-right',
-  },
-]
 </script>
 
 <template>
   <Head :title="__('budgets')" />
 
-  <div>
+  <AppContent>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div
         class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
@@ -168,95 +93,221 @@ const columns = [
         </Button>
       </div>
 
-      <div class="flex w-full items-center gap-2 lg:max-w-md">
-        <SearchInput
-          v-model="search"
-          :placeholder="__('search_budgets_placeholder')"
-        />
-      </div>
-
-      <!-- One owner: skeleton / empty / table, any viewport -->
-      <DataListState
-        :loading="loading"
-        :is-empty="!loading && budgets.data.length === 0"
-        :rows="5"
-        :empty-icon="Wallet"
-        :empty-title="__('no_data_found', { data: __('budgets') })"
-        :empty-description="__('budget_list_description')"
-      >
-        <template #empty>
+      <!-- Mobile View: Cards -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        <div
+          v-if="budgets.data.length === 0"
+          class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
+        >
+          <div class="mb-4 rounded-full bg-muted p-4">
+            <Wallet class="size-8 text-muted-foreground" />
+          </div>
+          <h3 class="text-lg font-semibold">
+            {{ __('no_data_found', { data: __('budgets') }) }}
+          </h3>
+          <p class="mb-6 text-muted-foreground">
+            {{ __('budget_list_description') }}
+          </p>
           <Button asChild>
             <Link :href="budgetCreate.url()">
               <Plus class="mr-2 size-4" />
               {{ __('add_data', { data: __('budget') }) }}
             </Link>
           </Button>
-        </template>
+        </div>
+        <div
+          v-for="b in budgets.data"
+          :key="b.id"
+          class="rounded-lg border bg-background p-4 shadow-sm"
+        >
+          <div class="mb-3 flex items-center justify-between border-b pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold">{{
+                formatDate(b.period_start, 'MMM YYYY')
+              }}</span>
+              <Badge
+                v-if="b.is_active"
+                variant="default"
+                class="px-2.5 py-1 text-xs"
+                >{{ __('active') }}</Badge
+              >
+            </div>
+            <div class="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-10 w-10"
+                :title="__('view_detail')"
+                asChild
+              >
+                <Link :href="budgetShow.url({ budget: b })">
+                  <Info class="size-4" />
+                </Link>
+              </Button>
+              <Button
+                v-if="!b.is_active"
+                variant="ghost"
+                size="icon"
+                class="h-10 w-10"
+                @click="setActive(b)"
+                :title="__('set_as_active')"
+              >
+                <CheckCircle2 class="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-10 w-10"
+                :title="__('edit_data', { data: __('budget') })"
+                asChild
+              >
+                <Link :href="budgetEdit.url({ budget: b })">
+                  <SquarePen class="size-4" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-10 w-10 text-destructive"
+                @click="openDeleteDialog(b)"
+                :title="__('delete_data', { data: __('budget') })"
+              >
+                <Trash2 class="size-4" />
+              </Button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-xs text-muted-foreground">
+                {{ __('period_start') }}
+              </p>
+              <p class="font-medium">
+                {{ formatDate(b.period_start, 'DD MMM YYYY') }}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground">
+                {{ __('period_end') }}
+              </p>
+              <p class="font-medium">
+                {{ formatDate(b.period_end, 'DD MMM YYYY') }}
+              </p>
+            </div>
+          </div>
+          <p
+            v-if="b.notes"
+            class="mt-3 line-clamp-2 text-sm text-muted-foreground italic"
+          >
+            "{{ b.notes }}"
+          </p>
+        </div>
+      </div>
 
-        <ResponsiveTable :columns="columns" :rows="budgets.data">
-          <template #card="{ row: b }">
-            <div class="mb-3 flex items-center justify-between border-b pb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold">{{
-                  formatDate(b.period_start, 'MMM YYYY')
-                }}</span>
-                <Badge
-                  v-if="b.is_active"
-                  variant="default"
-                  class="px-2.5 py-1 text-xs"
-                  >{{ __('active') }}</Badge
-                >
-              </div>
-              <RowActions :actions="rowActions(b)" />
-            </div>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p class="text-xs text-muted-foreground">
-                  {{ __('period_start') }}
-                </p>
-                <p class="font-medium">
+      <!-- Desktop View: Table -->
+      <div
+        class="hidden overflow-hidden rounded-md border bg-background md:block"
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead class="w-[60px]">#</TableHead>
+              <TableHead class="w-[150px]">{{ __('period_start') }}</TableHead>
+              <TableHead class="w-[150px]">{{ __('period_end') }}</TableHead>
+              <TableHead>{{ __('notes') }}</TableHead>
+              <TableHead class="w-[100px]"></TableHead>
+              <TableHead class="w-[100px] text-right">
+                {{ __('actions') }}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-if="budgets.data.length === 0">
+              <TableCell colspan="7" class="h-24 text-center">
+                {{ __('no_data_found', { data: __('budgets') }) }}
+              </TableCell>
+            </TableRow>
+            <template v-else>
+              <TableRow v-for="(b, index) in budgets.data" :key="b.id">
+                <TableCell>
+                  {{
+                    (budgets.meta.current_page - 1) * budgets.meta.per_page +
+                    index +
+                    1
+                  }}.
+                </TableCell>
+                <TableCell class="font-medium">
                   {{ formatDate(b.period_start, 'DD MMM YYYY') }}
-                </p>
-              </div>
-              <div>
-                <p class="text-xs text-muted-foreground">
-                  {{ __('period_end') }}
-                </p>
-                <p class="font-medium">
+                </TableCell>
+                <TableCell class="font-medium">
                   {{ formatDate(b.period_end, 'DD MMM YYYY') }}
-                </p>
-              </div>
-            </div>
-            <p
-              v-if="b.notes"
-              class="mt-3 line-clamp-2 text-sm text-muted-foreground italic"
-            >
-              "{{ b.notes }}"
-            </p>
-          </template>
-          <template #cell-4="{ row: b }">
-            <div class="max-w-md truncate wrap-anywhere">
-              {{ b.notes ?? '-' }}
-            </div>
-          </template>
-          <template #cell-5="{ row: b }">
-            <Badge v-if="b.is_active">{{ __('active') }}</Badge>
-          </template>
-          <template #cell-6="{ row: b }">
-            <div class="flex items-center justify-end gap-2">
-              <RowActions :actions="rowActions(b)" />
-            </div>
-          </template>
-        </ResponsiveTable>
-      </DataListState>
+                </TableCell>
+                <TableCell class="text-sm text-muted-foreground">
+                  <div class="max-w-md truncate wrap-anywhere">
+                    {{ b.notes ?? '-' }}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge v-if="b.is_active">{{ __('active') }}</Badge>
+                </TableCell>
+
+                <TableCell class="text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      :title="__('view_detail')"
+                      asChild
+                    >
+                      <Link :href="budgetShow.url({ budget: b })">
+                        <Info class="size-4" />
+                      </Link>
+                    </Button>
+                    <Button
+                      v-if="!b.is_active"
+                      variant="ghost"
+                      size="icon"
+                      @click="setActive(b)"
+                      :title="__('set_as_active')"
+                    >
+                      <CheckCircle2 class="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      :title="__('edit_data', { data: __('budget') })"
+                      asChild
+                    >
+                      <Link :href="budgetEdit.url({ budget: b })">
+                        <SquarePen class="size-4" />
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      @click="openDeleteDialog(b)"
+                      :title="__('delete_data', { data: __('budget') })"
+                    >
+                      <Trash2 class="size-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </template>
+          </TableBody>
+        </Table>
+      </div>
 
       <AppPagination
-        v-if="!loading && budgets.meta"
+        v-if="budgets.meta"
         :meta="budgets.meta"
         :links="budgets.links"
       />
     </div>
-  </div>
+  </AppContent>
+
+  <!-- Mobile FAB removed: header CTA is the single budget-add; the bottom nav
+       center FAB covers transaction create. No redundant floating buttons. -->
 
   <BudgetDeleteDialog v-model:open="deleteDialogOpen" :budget="targetData" />
 </template>
