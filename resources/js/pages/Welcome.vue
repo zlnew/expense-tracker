@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { useLang } from '@/composables/useLang'
 import { dashboard, login, register } from '@/routes'
 
 withDefaults(
@@ -26,10 +27,12 @@ withDefaults(
     canRegister: true,
   },
 )
+
+const { __ } = useLang()
 </script>
 
 <template>
-  <Head title="Welcome" />
+  <Head :title="__('welcome')" />
 
   <div class="flex min-h-dvh flex-col bg-background text-foreground">
     <!-- Top nav -->
@@ -46,15 +49,15 @@ withDefaults(
         <div class="flex shrink-0 items-center gap-2">
           <template v-if="$page.props.auth.user">
             <Button asChild>
-              <Link :href="dashboard()">Dashboard</Link>
+              <Link :href="dashboard()">{{ __('dashboard') }}</Link>
             </Button>
           </template>
           <template v-else>
             <Button variant="ghost" asChild>
-              <Link :href="login()">Log in</Link>
+              <Link :href="login()">{{ __('log_in') }}</Link>
             </Button>
             <Button v-if="canRegister" asChild>
-              <Link :href="register()">Register</Link>
+              <Link :href="register()">{{ __('register') }}</Link>
             </Button>
           </template>
         </div>
@@ -69,20 +72,19 @@ withDefaults(
         <span
           class="mb-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground"
         >
-          Simple expense tracking
+          {{ __('simple_expense_tracking') }}
         </span>
 
         <h1
           class="max-w-xl text-3xl font-bold tracking-tight text-balance sm:text-5xl"
         >
-          Track every rupiah
+          {{ __('track_every_rupiah') }}
         </h1>
 
         <p
           class="mt-3 max-w-md text-sm text-pretty text-muted-foreground sm:text-base"
         >
-          Know exactly where your money goes. Keep balances in check, stick to
-          budgets, and understand your spending at a glance.
+          {{ __('welcome_hero_description') }}
         </p>
 
         <div
@@ -98,13 +100,15 @@ withDefaults(
                     : login()
               "
             >
-              <template v-if="$page.props.auth.user">Go to dashboard</template>
-              <template v-else>Get started</template>
+              <template v-if="$page.props.auth.user">{{
+                __('go_to_dashboard')
+              }}</template>
+              <template v-else>{{ __('get_started') }}</template>
               <ArrowRight class="size-4" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" class="w-full sm:w-auto">
-            <Link :href="login()">Log in</Link>
+            <Link :href="login()">{{ __('log_in') }}</Link>
           </Button>
         </div>
       </section>
@@ -119,12 +123,13 @@ withDefaults(
               >
                 <Wallet class="size-5" />
               </div>
-              <CardTitle class="text-sm">Multiple balances</CardTitle>
+              <CardTitle class="text-sm">{{
+                __('multiple_balances')
+              }}</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                Track cash, bank accounts, and e-wallets side by side in one
-                place.
+                {{ __('welcome_multiple_balances') }}
               </CardDescription>
             </CardContent>
           </Card>
@@ -136,12 +141,13 @@ withDefaults(
               >
                 <PiggyBank class="size-5" />
               </div>
-              <CardTitle class="text-sm">Budgets that stick</CardTitle>
+              <CardTitle class="text-sm">{{
+                __('budgets_that_stick')
+              }}</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                Set monthly budgets by category and see how much is left before
-                you overspend.
+                {{ __('welcome_budgets_that_stick') }}
               </CardDescription>
             </CardContent>
           </Card>
@@ -153,12 +159,11 @@ withDefaults(
               >
                 <BarChart3 class="size-5" />
               </div>
-              <CardTitle class="text-sm">Clear reports</CardTitle>
+              <CardTitle class="text-sm">{{ __('clear_reports') }}</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                Understand your spending with charts that show where your money
-                really goes.
+                {{ __('welcome_clear_reports') }}
               </CardDescription>
             </CardContent>
           </Card>
@@ -170,12 +175,11 @@ withDefaults(
               >
                 <ArrowLeftRight class="size-5" />
               </div>
-              <CardTitle class="text-sm">Easy transfers</CardTitle>
+              <CardTitle class="text-sm">{{ __('easy_transfers') }}</CardTitle>
             </CardHeader>
             <CardContent class="px-5">
               <CardDescription class="text-xs leading-relaxed">
-                Move money between balances without losing track of where it
-                went.
+                {{ __('welcome_easy_transfers') }}
               </CardDescription>
             </CardContent>
           </Card>

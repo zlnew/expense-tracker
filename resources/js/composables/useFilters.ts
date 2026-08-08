@@ -129,13 +129,16 @@ export function useFilters(options: UseFiltersOptions) {
     )
   }, options.debounceMs ?? 300)
 
-  watch([search, type, balance, category, dateFrom, dateTo, month, year], () => {
-    if (adopting) {
-      return
-    }
+  watch(
+    [search, type, balance, category, dateFrom, dateTo, month, year],
+    () => {
+      if (adopting) {
+        return
+      }
 
-    syncToUrl()
-  })
+      syncToUrl()
+    },
+  )
 
   const offNavigate = router.on('navigate', (event) => {
     // Echo of our own visit — the URL already reflects what we pushed.

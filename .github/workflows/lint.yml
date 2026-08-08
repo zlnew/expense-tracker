@@ -53,3 +53,11 @@ jobs:
 
       - name: PHP tests
         run: php artisan test
+
+      - name: i18n drift check
+        # Regenerate language files from translations.csv and fail if the
+        # generated output changed. Catches hand-edited resources/js/lang/*
+        # JSON, which the conventions forbid but nothing else enforces.
+        run: |
+          php artisan app:generate-language-files
+          git diff --exit-code resources/js/lang
