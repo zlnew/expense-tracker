@@ -17,7 +17,7 @@ const uniqueErrors = computed(() => Array.from(new Set(props.errors)))
 </script>
 
 <template>
-  <Alert variant="destructive">
+  <Alert variant="destructive" role="alert">
     <AlertCircle class="size-4" />
     <AlertTitle>{{ title ?? __('something_went_wrong') }}</AlertTitle>
     <AlertDescription>

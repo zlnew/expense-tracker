@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import type { ComponentPublicInstance } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
+import InputError from '@/components/InputError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -21,10 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 import { useLang } from '@/composables/useLang'
 import { store as storeCategory } from '@/routes/categories'
 
-defineProps<{
+const props = defineProps<{
   open: boolean
   types: string[]
 }>()
@@ -40,6 +44,21 @@ const form = useForm({
   name: '',
 })
 
+const firstFieldRef = ref<ComponentPublicInstance | null>(null)
+
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen) {
+      form.reset()
+      form.clearErrors()
+      nextTick(() => {
+        ;(firstFieldRef.value?.$el as HTMLElement | undefined)?.focus()
+      })
+    }
+  },
+)
+
 const submit = () => {
   form.post(storeCategory.url(), {
     preserveScroll: true,
@@ -48,13 +67,20 @@ const submit = () => {
       emit('update:open', false)
       toast.success(res.props.success as string)
     },
+    onError: () => {
+      nextTick(() => {
+        document
+          .querySelector('[aria-invalid="true"]')
+          ?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      })
+    },
   })
 }
 </script>
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[425px]">
+    <SheetDialogContent class="sm:max-w-[425px]" @open-auto-focus.prevent>
       <DialogHeader>
         <DialogTitle>
           {{ __('add_data', { data: __('category') }) }}
@@ -75,8 +101,12 @@ const submit = () => {
             <Label for="create_type">
               {{ __('type') }} <span class="text-destructive">*</span>
             </Label>
-            <Select v-model="form.type" required>
-              <SelectTrigger id="create_type">
+            <Select v-model="form.type" required :disabled="form.processing">
+              <SelectTrigger
+                id="create_type"
+                ref="firstFieldRef"
+                :aria-invalid="!!form.errors.type"
+              >
                 <SelectValue
                   :placeholder="__('select_data', { data: __('type') })"
                 />
@@ -93,6 +123,7 @@ const submit = () => {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <InputError :message="form.errors.type" />
           </div>
 
           <div class="grid gap-2">
@@ -104,7 +135,10 @@ const submit = () => {
               v-model="form.name"
               placeholder="e.g. Food"
               required
+              :disabled="form.processing"
+              :aria-invalid="!!form.errors.name"
             />
+            <InputError :message="form.errors.name" />
           </div>
         </div>
 
@@ -113,10 +147,12 @@ const submit = () => {
             type="button"
             variant="outline"
             @click="$emit('update:open', false)"
+            :disabled="form.processing"
           >
             {{ __('cancel') }}
           </Button>
           <Button type="submit" :disabled="form.processing">
+            <Spinner v-if="form.processing" class="size-4" />
             {{ form.processing ? __('saving') : __('save') }}
           </Button>
         </DialogFooter>
