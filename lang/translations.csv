@@ -48,6 +48,7 @@ category_list_description,"Manage your buget categories","Kelola kategori anggar
 category_update_description,"Update budget category","Perbarui kategori anggaran"
 clear_filters,"Clear all","Bersihkan semua"
 close,Close,Tutup
+collected,Collected,Terkumpul
 confirm_delete_recurring,"Are you sure you want to delete this recurring transaction?","Apakah Anda yakin ingin menghapus transaksi berulang ini?"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
 create,Create,Buat

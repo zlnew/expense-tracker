@@ -50,6 +50,7 @@ return [
     'category_update_description' => 'Update budget category',
     'clear_filters' => 'Clear all',
     'close' => 'Close',
+    'collected' => 'Collected',
     'confirm_delete_recurring' => 'Are you sure you want to delete this recurring transaction?',
     'confirm_password' => 'Confirm Password',
     'create' => 'Create',

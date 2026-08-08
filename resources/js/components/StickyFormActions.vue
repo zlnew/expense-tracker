@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3'
 import { LoaderCircle } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { useLang } from '@/composables/useLang'
@@ -33,8 +34,12 @@ const { __ } = useLang()
         type="button"
         variant="outline"
         :disabled="props.processing"
+        :as-child="Boolean(props.cancelHref)"
       >
-        {{ __('cancel') }}
+        <Link v-if="props.cancelHref" :href="props.cancelHref">
+          {{ __('cancel') }}
+        </Link>
+        <template v-else>{{ __('cancel') }}</template>
       </Button>
       <Button type="submit" :disabled="props.processing">
         <LoaderCircle
