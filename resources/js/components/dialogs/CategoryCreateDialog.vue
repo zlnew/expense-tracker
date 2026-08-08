@@ -133,7 +133,7 @@ const submit = () => {
             <Input
               id="create_name"
               v-model="form.name"
-              placeholder="e.g. Food"
+              :placeholder="__('category_name_placeholder')"
               required
               :disabled="form.processing"
               :aria-invalid="!!form.errors.name"

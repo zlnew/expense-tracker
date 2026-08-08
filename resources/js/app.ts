@@ -1,4 +1,4 @@
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import { createApp, h } from 'vue'
 import { initializeTheme } from '@/composables/useAppearance'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
@@ -61,3 +61,14 @@ initializeTheme()
 
 // This will listen for flash toast data from the server...
 initializeFlashToast()
+
+// Focus reset on every Inertia navigation. Without this, SPA navigation
+// strands screen-reader / keyboard focus wherever it was — every page
+// change should start focus at the top of the main content region
+// (tabindex="-1" makes it focusable without adding it to the tab order).
+router.on('navigate', () => {
+  const main = document.getElementById('main-content')
+  if (main && document.activeElement !== main) {
+    main.focus({ preventScroll: true })
+  }
+})

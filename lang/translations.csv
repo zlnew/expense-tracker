@@ -34,6 +34,7 @@ budget_progress,"Budget Progress","Progress Anggaran Pengeluaran"
 budget_progress_description,"Track how much of your budget has been used and how much remains.","Pantau seberapa banyak anggaran yang sudah digunakan dan yang masih tersisa."
 budget_update_description,"Update and adjust your monthly budget plans","Perbarui dan sesuaikan perencanaan anggaran bulanan Anda"
 budgets,Budgets,Anggaran
+budgets_that_stick,"Budgets that stick","Anggaran yang Terjaga"
 cancel,Cancel,Batal
 cannot_delete_active_budget,"Cannot delete active budget.","Tidak dapat menghapus anggaran aktif."
 cannot_delete_primary_balance,"Cannot delete primary balance.","Tidak dapat menghapus saldo utama."
@@ -46,12 +47,15 @@ category,Category,Kategori
 category_create_description,"Create a new budget category","Buat kategori anggaran baru"
 category_delete_description,"Are you sure you want to delete this budget category permanently?","Apakah Anda yakin ingin menghapus kategori anggaran ini secara permanen?"
 category_list_description,"Manage your buget categories","Kelola kategori anggaran Anda"
+category_name_placeholder,"e.g. Food","mis. Makanan"
 category_update_description,"Update budget category","Perbarui kategori anggaran"
 clear_filters,"Clear all","Bersihkan semua"
+clear_reports,"Clear reports","Laporan Jelas"
 close,Close,Tutup
 collected,Collected,Terkumpul
 confirm_delete_recurring,"Are you sure you want to delete this recurring transaction?","Apakah Anda yakin ingin menghapus transaksi berulang ini?"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
+continue_setup,"Continue setup","Lanjutkan pengaturan"
 create,Create,Buat
 create_data,"Create :data","Buat :data"
 created_data,":data Created",":data Dibuat"
@@ -79,12 +83,16 @@ description,Description,Deskripsi
 detail,Detail,Detail
 detail_data,":data Detail","Detail :data"
 diff,Diff,Diff
+disable_2fa,"Disable 2FA","Nonaktifkan 2FA"
 discord_webhook_url,"Discord webhook URL","URL webhook Discord"
 discord_webhook_url_description,"Receive a Discord notification when a budget category reaches 80% or 100% of its planned amount.","Dapatkan notifikasi Discord saat kategori anggaran mencapai 80% atau 100% dari jumlah yang direncanakan."
 discord_webhook_url_placeholder,https://discord.com/api/webhooks/...,https://discord.com/api/webhooks/...
+easy_transfers,"Easy transfers","Transfer Mudah"
 edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
+email_unverified,"Your email address is unverified.","Alamat email Anda belum diverifikasi."
+enable_2fa,"Enable 2FA","Aktifkan 2FA"
 end_date,"End Date","Tanggal Selesai"
 expense,Expense,Pengeluaran
 expense_breakdown,"Expense Breakdown","Proporsi Pengeluaran"
@@ -100,6 +108,8 @@ final_amount,"Final Amount","Saldo Akhir"
 frequency,Frequency,Frekuensi
 from_account,"From Account","Dari Akun"
 full_name,"Full Name","Nama Lengkap"
+get_started,"Get started","Mulai Sekarang"
+go_to_dashboard,"Go to dashboard","Buka Dasbor"
 go_to_next_page,"Go to next page","Buka halaman berikutnya"
 go_to_page,"Go to page :page","Buka halaman :page"
 go_to_previous_page,"Go to previous page","Buka halaman sebelumnya"
@@ -121,6 +131,8 @@ july,July,Juli
 june,June,Juni
 last_updated_at,"Last Updated At","Terakhir Diperbarui"
 list,List,List
+loading,Loading,Memuat
+log_in,"Log in",Masuk
 log_out,"Log Out",Keluar
 main_navigation,"Main Navigation","Navigasi Utama"
 march,March,Maret
@@ -132,6 +144,8 @@ monthly_expenses,"Monthly Expenses","Pengeluaran Bulanan"
 monthly_incomes,"Monthly Incomes","Pendapatan Bulanan"
 monthly_spending_trend,"Monthly Spending Trend","Tren Pengeluaran & Pemasukan Bulanan"
 monthly_spending_trend_description,"See how your income and expenses change over time each month.","Lihat perubahan pemasukan dan pengeluaran Anda setiap bulan."
+more,More,Lainnya
+multiple_balances,"Multiple balances","Banyak Saldo"
 multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 new_password,"New Password","Kata Sandi Baru"
@@ -169,8 +183,10 @@ recurring_transactions,"Recurring Transactions","Transaksi Berulang"
 recurring_transactions_create_description,"Create a recurring transaction that repeats automatically","Buat transaksi berulang yang berulang secara otomatis"
 recurring_transactions_description,"Manage automatic recurring income and expenses","Kelola pemasukan dan pengeluaran berulang otomatis"
 recurring_transactions_update_description,"Update the recurring transaction schedule","Perbarui jadwal transaksi berulang"
+register,Register,Daftar
 remaining,Remaining,Sisa
 remaining_budget,"Remaining Budget","Sisa Anggaran"
+resend_verification_email,"Click here to resend the verification email.","Klik di sini untuk mengirim ulang email verifikasi."
 reset,Reset,"Atur Ulang"
 resume_recurring,"Resume Recurring","Lanjutkan Berulang"
 retry,Retry,"Coba Lagi"
@@ -193,7 +209,9 @@ settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
 show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
+simple_expense_tracking,"Simple expense tracking","Pelacakan pengeluaran sederhana"
 single_transaction,"Single Transaction","Satu Transaksi"
+skip_to_content,"Skip to content","Langsung ke konten"
 something_went_wrong,"Something went wrong.","Terjadi kesalahan."
 spent,Spent,Terpakai
 start_date,"Start Date","Tanggal Mulai"
@@ -202,11 +220,13 @@ stop_recurring,"Stop Recurring","Hentikan Berulang"
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
 toggle_active,"Toggle active",Aktifkan/Nonaktifkan
+toggle_sidebar,"Toggle sidebar","Buka/tutup menu samping"
 total,Total,Total
 total_balance,"Total Balance","Total Saldo"
 total_expense,"Total Expense","Total Pengeluaran"
 total_income,"Total Income","Total Pemasukan"
 total_items,"Total Items","Total Item"
+track_every_rupiah,"Track every rupiah","Lacak setiap rupiah"
 transaction,Transaction,Transaksi
 transaction_bulk_create_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 transaction_create_description,"Create a new transaction record.","Buat catatan transaksi baru."
@@ -217,14 +237,25 @@ transactions,Transactions,Transaksi
 transfer,Transfer,Transfer
 transfer_description,"Transfer between accounts","Transfer antar akun"
 transfer_same_account_error,"Source and destination accounts must be different","Akun sumber dan tujuan harus berbeda"
+two_factor_authentication,"Two-factor authentication","Autentikasi dua faktor"
+two_factor_authentication_description,"Manage your two-factor authentication settings","Kelola pengaturan autentikasi dua faktor Anda"
+two_factor_disable_description,"You will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.","Anda akan diminta memasukkan pin acak yang aman saat masuk, yang dapat diambil dari aplikasi yang mendukung TOTP di ponsel Anda."
+two_factor_enable_description,"When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.","Saat Anda mengaktifkan autentikasi dua faktor, Anda akan diminta memasukkan pin aman saat masuk. Pin ini dapat diambil dari aplikasi yang mendukung TOTP di ponsel Anda."
 type,Type,Jenis
 types,Types,Jenis
 unknown,Unknown,"Tidak diketahui"
 update,Update,Perbarui
 updated_data,":data Updated",":data Diperbarui"
 updating,Updating...,Memperbarui...
+verification_link_sent,"A new verification link has been sent to your email address.","Tautan verifikasi baru telah dikirim ke alamat email Anda."
 view_detail,"View Detail","Lihat Detail"
 warning,Warning,Peringatan
 weekly,Weekly,Mingguan
+welcome,Welcome,"Selamat Datang"
+welcome_budgets_that_stick,"Set monthly budgets by category and see how much is left before you overspend.","Atur anggaran bulanan per kategori dan lihat sisa sebelum Anda membengkak."
+welcome_clear_reports,"Understand your spending with charts that show where your money really goes.","Pahami pengeluaran Anda dengan grafik yang menunjukkan ke mana uang Anda benar-benar pergi."
+welcome_easy_transfers,"Move money between balances without losing track of where it went.","Pindahkan uang antar saldo tanpa kehilangan jejak ke mana perginya."
+welcome_hero_description,"Know exactly where your money goes. Keep balances in check, stick to budgets, and understand your spending at a glance.","Ketahui persis ke mana uang Anda pergi. Jaga saldo tetap terkendali, patuhi anggaran, dan pahami pengeluaran Anda sekilas."
+welcome_multiple_balances,"Track cash, bank accounts, and e-wallets side by side in one place.","Lacak uang tunai, rekening bank, dan e-wallet secara berdampingan dalam satu tempat."
 year,Year,Tahun
 yearly,Yearly,Tahunan

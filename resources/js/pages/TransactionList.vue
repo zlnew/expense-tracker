@@ -9,7 +9,6 @@ import {
   ListTodoIcon,
   MinusIcon,
   Plus,
-  Repeat,
   SquarePen,
   Trash2,
   TrendingDown,
@@ -267,16 +266,6 @@ const rowActions = (t: Transaction) => [
             >
               {{ activeCount }}
             </Badge>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            class="h-10 w-10 shrink-0"
-            :aria-label="__('recurring_transactions')"
-            :title="__('recurring_transactions')"
-            @click="router.visit(recurringTransactions.index().url)"
-          >
-            <Repeat class="size-4" />
           </Button>
           <Button
             variant="outline"
