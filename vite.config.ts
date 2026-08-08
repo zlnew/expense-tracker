@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
@@ -88,4 +88,8 @@ export default defineConfig({
             },
         }),
     ],
+    test: {
+        environment: 'node',
+        include: ['resources/js/**/*.test.ts'],
+    },
 });

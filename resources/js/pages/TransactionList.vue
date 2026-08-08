@@ -63,8 +63,11 @@ import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { useParam } from '@/composables/useParam'
-import { exportMethod as transactionExport, index as transactionIndex } from '@/routes/transactions'
 import recurringTransactions from '@/routes/recurring-transactions'
+import {
+  exportMethod as transactionExport,
+  index as transactionIndex,
+} from '@/routes/transactions'
 import type { Balance, Budget, Category, Paginate, Transaction } from '@/types'
 
 const props = defineProps<{
@@ -593,9 +596,7 @@ const openTransferDialog = () => {
                   "
                 >
                   <component
-                    :is="
-                      t.type === 'income' ? TrendingUp : TrendingDown
-                    "
+                    :is="t.type === 'income' ? TrendingUp : TrendingDown"
                     class="size-5"
                   />
                 </div>
@@ -623,7 +624,8 @@ const openTransferDialog = () => {
                       : 'text-red-600 dark:text-red-400'
                   "
                 >
-                  {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                  {{ t.type === 'income' ? '+' : '-'
+                  }}{{ formatAmount(t.amount) }}
                 </p>
                 <div class="mt-2 flex items-center justify-end gap-1">
                   <Button
@@ -705,7 +707,8 @@ const openTransferDialog = () => {
                     : 'text-red-600 dark:text-red-400'
                 "
               >
-                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                {{ t.type === 'income' ? '+' : '-'
+                }}{{ formatAmount(t.amount) }}
               </TableCell>
               <TableCell class="text-right">
                 <div class="flex items-center justify-end gap-2">

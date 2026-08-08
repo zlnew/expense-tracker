@@ -32,8 +32,13 @@ defineProps<{
 <template>
   <div v-if="meta.total > 0" class="flex items-center justify-between px-2">
     <div class="flex-1 text-sm text-muted-foreground">
-      <span class="sm:hidden">{{ meta.from }}–{{ meta.to }} of {{ meta.total }}</span>
-      <span class="hidden sm:inline">Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} results</span>
+      <span class="sm:hidden"
+        >{{ meta.from }}–{{ meta.to }} of {{ meta.total }}</span
+      >
+      <span class="hidden sm:inline"
+        >Showing {{ meta.from }} to {{ meta.to }} of
+        {{ meta.total }} results</span
+      >
     </div>
     <div class="flex items-center space-x-6 lg:space-x-8">
       <div class="flex items-center space-x-2">
