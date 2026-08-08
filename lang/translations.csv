@@ -49,6 +49,7 @@ category_list_description,"Manage your buget categories","Kelola kategori anggar
 category_update_description,"Update budget category","Perbarui kategori anggaran"
 clear_filters,"Clear all","Bersihkan semua"
 close,Close,Tutup
+collected,Collected,Terkumpul
 confirm_delete_recurring,"Are you sure you want to delete this recurring transaction?","Apakah Anda yakin ingin menghapus transaksi berulang ini?"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
 create,Create,Buat
@@ -137,12 +138,14 @@ new_password,"New Password","Kata Sandi Baru"
 new_version_available,"New version available","Versi baru tersedia"
 new_version_reload,Reload,"Muat ulang"
 next_run_date,"Next Run","Berjalan Berikutnya"
+no_active_budget,"No active budget for this cycle","Belum ada anggaran aktif untuk siklus ini"
 no_data_found,"No :data found",":data tidak ditemukan"
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
 offline,"You're offline","Anda sedang offline"
 optional,Optional,Opsional
+others,Others,Lainnya
 overspent,Overspent,Melebihi
 pagination_of,":from–:to of :total",":from–:to dari :total"
 pagination_showing,"Showing :from to :to of :total results","Menampilkan :from sampai :to dari :total hasil"

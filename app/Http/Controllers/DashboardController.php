@@ -30,15 +30,16 @@ class DashboardController extends Controller
 
         $summaryCards = GetSummaryCardsData::run($userId);
         $budgetProgress = GetBudgetProgress::run($userId);
-        $expenseBreakdown = GetExpenseBreakdown::run($userId);
-        $monthlySpendingTrend = GetMonthlySpendingTrend::run($userId);
         $recentTransactions = GetRecentTransactions::run($userId);
 
         return Inertia::render('Dashboard', [
             'summary_cards' => $summaryCards,
             'budget_progress' => $budgetProgress,
-            'expense_breakdown' => $expenseBreakdown,
-            'monthly_spending_trend' => $monthlySpendingTrend,
+            // Heaviest queries, lowest-priority blocks: defer so the
+            // above-the-fold content paints before they resolve (skeletons
+            // replace them while loading).
+            'expense_breakdown' => Inertia::defer(fn () => GetExpenseBreakdown::run($userId)),
+            'monthly_spending_trend' => Inertia::defer(fn () => GetMonthlySpendingTrend::run($userId)),
             'recent_transactions' => $recentTransactions,
         ]);
     }
