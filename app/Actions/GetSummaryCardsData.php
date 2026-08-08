@@ -40,6 +40,12 @@ class GetSummaryCardsData extends Action
             'current_month_expenses' => $currentMonthExpenses,
             'current_month_incomes' => $currentMonthIncomes,
             'budget_remaining' => $budgetRemaining,
+            // The frontend needs to tell "no active budget" apart from
+            // "spent nothing" — every empty state on the dashboard branches on this.
+            'has_active_budget' => $this->activeBudget !== null,
+            'active_budget_id' => $this->activeBudget?->id,
+            'period_start' => $this->activeBudget?->period_start->format('Y-m-d'),
+            'period_end' => $this->activeBudget?->period_end->format('Y-m-d'),
         ];
     }
 

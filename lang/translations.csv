@@ -134,12 +134,14 @@ new_password,"New Password","Kata Sandi Baru"
 new_version_available,"New version available","Versi baru tersedia"
 new_version_reload,Reload,"Muat ulang"
 next_run_date,"Next Run","Berjalan Berikutnya"
+no_active_budget,"No active budget for this cycle","Belum ada anggaran aktif untuk siklus ini"
 no_data_found,"No :data found",":data tidak ditemukan"
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
 offline,"You're offline","Anda sedang offline"
 optional,Optional,Opsional
+others,Others,Lainnya
 overspent,Overspent,Melebihi
 password,Password,"Kata Sandi"
 password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
