@@ -1,33 +1,56 @@
-# Dev compose for Expense Tracker (Laravel 12 + Inertia/Vue 3).
-# Uses docker/Dockerfile (php:8.4-cli + pdo_pgsql + composer) and runs
-# `artisan serve`. First run: composer install, php artisan key:generate, migrate.
 services:
-  app:
+  fpm:
     build:
       context: .
-      dockerfile: docker/Dockerfile
-    image: expense-tracker:local
-    container_name: expense-tracker
-    working_dir: /app
-    command: ['php', 'artisan', 'serve', '--host=0.0.0.0', '--port=8000']
+      dockerfile: docker/Dockerfile.prod
+      target: fpm
+    image: ${APP_IMAGE:-expense-tracker:latest}-fpm
+    container_name: ${APP_CONTAINER_NAME:-expense-tracker}-fpm
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
     env_file:
       - path: .env
         required: false
     environment:
-      DB_CONNECTION: pgsql
-      DB_HOST: ${EXPENSE_DB_HOST:-personal-postgres}
-      DB_PORT: '5432'
-      DB_DATABASE: ${EXPENSE_DB_DATABASE:-expense_tracker}
-      DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
-      REDIS_HOST: ${EXPENSE_REDIS_HOST:-personal-redis}
-    volumes:
-      - .:/app
-    ports:
-      - '127.0.0.1:${EXPENSE_PORT:-8000}:8000'
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY}
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+      DB_HOST: ${DB_HOST:-personal-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_DATABASE: ${DB_DATABASE:-expense_tracker}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      REDIS_HOST: ${REDIS_HOST:-personal-redis}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
+      REDIS_PORT: ${REDIS_PORT:-6379}
     restart: unless-stopped
     networks:
+      - default
       - personal-network
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      target: web
+    image: ${APP_IMAGE:-expense-tracker:latest}-web
+    container_name: ${APP_CONTAINER_NAME:-expense-tracker}-web
+    depends_on:
+      - fpm
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    ports:
+      - '${APP_HOST:-127.0.0.1}:${APP_PORT:-8000}:80'
+    restart: unless-stopped
+    networks:
+      - default
 
 networks:
   personal-network:
