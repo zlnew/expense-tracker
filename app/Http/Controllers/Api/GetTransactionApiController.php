@@ -14,7 +14,7 @@ class GetTransactionApiController extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $data = TransactionQuery::make($request->all())
-            ->forUser($request->user()?->id)
+            ->forUser($request->user()->id)
             ->result();
 
         $isPaginated = $request->boolean('is_paginate');
