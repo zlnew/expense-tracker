@@ -50,7 +50,9 @@ class TransactionQuery extends BaseQuery
 
     public function user(mixed $value): static
     {
-        $this->query->where('user_id', $value);
+        // Qualify — see applyUserScope(): the budgets join makes a bare
+        // user_id ambiguous on pgsql once month/year cycle filters are used.
+        $this->query->where('transactions.user_id', $value);
 
         return $this;
     }
