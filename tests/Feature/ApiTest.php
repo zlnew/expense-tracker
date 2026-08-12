@@ -2,6 +2,8 @@
 
 use App\Enums\CategoryType;
 use App\Models\Balance;
+use App\Models\Budget;
+use App\Models\BudgetItem;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\User;
@@ -21,6 +23,7 @@ test('unauthenticated requests to every api endpoint return 401', function () {
     $this->postJson('/api/transactions', [])->assertUnauthorized();
     $this->getJson('/api/categories')->assertUnauthorized();
     $this->getJson('/api/balances')->assertUnauthorized();
+    $this->getJson('/api/budgets')->assertUnauthorized();
 });
 
 test('a token only sees its own transactions, categories, and balances', function () {
@@ -84,6 +87,84 @@ test('token abilities are enforced per endpoint', function () {
 
     Sanctum::actingAs($user, ['transactions:write']);
     $this->getJson('/api/transactions')->assertForbidden();
+
+    Sanctum::actingAs($user, ['transactions:read']);
+    $this->getJson('/api/budgets')->assertForbidden();
+});
+
+test('a token only sees its own budgets with items, limits, and categories', function () {
+    $owner = User::factory()->create();
+    $intruder = User::factory()->create();
+
+    $ownerCategory = Category::factory()->for($owner)->create(['name' => 'Owner Food', 'type' => CategoryType::EXPENSE]);
+    $ownerBudget = Budget::factory()->for($owner)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    BudgetItem::factory()->for($ownerBudget)->for($ownerCategory)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+
+    $intruderCategory = Category::factory()->for($intruder)->create(['name' => 'Intruder Food', 'type' => CategoryType::EXPENSE]);
+    $intruderBudget = Budget::factory()->for($intruder)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    BudgetItem::factory()->for($intruderBudget)->for($intruderCategory)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 900_000,
+    ]);
+
+    $token = apiToken($owner, 'budgets:read');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->getJson('/api/budgets')
+        ->assertOk()
+        ->assertJsonCount(1)
+        ->assertJsonPath('0.period_start', $ownerBudget->period_start->toDateString())
+        ->assertJsonPath('0.cutoff_day', 25)
+        ->assertJsonPath('0.is_active', true)
+        ->assertJsonPath('0.items.0.category_id', $ownerCategory->id)
+        ->assertJsonPath('0.items.0.planned_amount', 500_000)
+        ->assertJsonPath('0.items.0.category.id', $ownerCategory->id)
+        ->assertJsonPath('0.items.0.category.name', 'Owner Food')
+        ->assertJsonMissing(['id' => $intruderBudget->id]);
+});
+
+test('budget items include spent-to-date within the budget cycle', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->for($user)->create(['name' => 'Food', 'type' => CategoryType::EXPENSE]);
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 0, 'final_amount' => 0]);
+    $budget = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    $item = BudgetItem::factory()->for($budget)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+
+    Transaction::factory()->for($user)->for($balance)->for($budget)->for($item, 'budgetItem')->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'amount' => 125_000,
+        'date' => now(),
+    ]);
+
+    $token = apiToken($user, 'budgets:read');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->getJson('/api/budgets')
+        ->assertOk()
+        ->assertJsonPath('0.items.0.planned_amount', 500_000)
+        ->assertJsonPath('0.items.0.actual_amount', 125_000)
+        ->assertJsonPath('0.items.0.diff_amount', 375_000);
 });
 
 test('posting a transaction creates it, syncs the balance, and it shows in the web query path', function () {
