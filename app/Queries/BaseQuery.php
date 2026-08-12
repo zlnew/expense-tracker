@@ -92,7 +92,12 @@ abstract class BaseQuery
     protected function applyUserScope(): void
     {
         if ($this->userId !== null) {
-            $this->query->where('user_id', $this->userId);
+            // Qualify the column: TransactionQuery left-joins budgets for the
+            // budget-cycle month/year filters, and budgets also has user_id —
+            // an unqualified column becomes ambiguous on pgsql.
+            $table = $this->query->getModel()->getTable();
+
+            $this->query->where("{$table}.user_id", $this->userId);
         }
     }
 

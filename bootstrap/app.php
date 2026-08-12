@@ -8,7 +8,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schedule;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'ownership' => EnsureOwnership::class,
+            'abilities' => CheckAbilities::class,
         ]);
 
         $middleware->web(append: [
@@ -34,6 +37,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             TrustProxies::class,
         ]);
+
+        $middleware->throttleApi();
     })
     ->withSchedule(function (): void {
         // Create transactions for due recurring schedules (runs hourly so a
@@ -41,5 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
         Schedule::command('recurring:process')->hourly();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // API clients (and headless automation) must get JSON error bodies
+        // even when they omit the Accept header.
+        $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
     })->create();
