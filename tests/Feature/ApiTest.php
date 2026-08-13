@@ -315,6 +315,60 @@ test('patching a transaction derives a missing budget id from its budget item', 
     ]);
 });
 
+test('patching with explicit null budget fields detaches the budget link', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 100_000, 'final_amount' => 100_000]);
+    $category = Category::factory()->for($user)->create(['name' => 'Food', 'type' => CategoryType::EXPENSE]);
+    $budget = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    $item = BudgetItem::factory()->for($budget)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+
+    // A June-style historical row that IS linked to the active budget + item.
+    $transaction = Transaction::factory()->for($user)->for($balance)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'amount' => 25_000,
+        'date' => now()->subMonths(2),
+    ]);
+    $transaction->forceFill(['budget_id' => $budget->id, 'budget_item_id' => $item->id])->save();
+
+    $token = apiToken($user, 'transactions:write');
+
+    // Explicit null + null = detach (spec §8.1): the reclassification recipe.
+    // Must NOT resurrect the active budget onto this historical row.
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson("/api/transactions/{$transaction->id}", [
+            'budget_id' => null,
+            'budget_item_id' => null,
+        ])
+        ->assertOk()
+        ->assertJsonPath('budget_id', null)
+        ->assertJsonPath('budget_item_id', null);
+
+    $this->assertDatabaseHas('transactions', [
+        'id' => $transaction->id,
+        'budget_id' => null,
+        'budget_item_id' => null,
+    ]);
+
+    // A later patch WITHOUT explicit nulls re-links via rule b (nulls
+    // resurrect the active budget) — the amendment only protects the explicit
+    // detach body, exactly as the data-fix recipe requires.
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson("/api/transactions/{$transaction->id}", [
+            'description' => 'still linked',
+        ])
+        ->assertOk()
+        ->assertJsonPath('budget_id', $budget->id)
+        ->assertJsonPath('budget_item_id', $item->id);
+});
+
 test('a token cannot patch another user\'s transaction', function () {
     $owner = User::factory()->create();
     $intruder = User::factory()->create();

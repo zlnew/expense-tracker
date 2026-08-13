@@ -36,15 +36,34 @@ class UpdateTransactionApiController extends Controller
             $request->validated(),
         ));
 
-        ['budget_id' => $budgetId, 'budget_item_id' => $budgetItemId] = ResolveTransactionBudgetLink::run(
-            $request->user()->id,
-            $data->category_id,
-            $data->budget_id,
-            $data->budget_item_id,
-        );
+        // Explicit null + null = detach (spec §8.1): when the caller
+        // deliberately clears BOTH budget fields, save the nulls as-is and
+        // skip the auto-link resolver. Without this, a category-only change
+        // keeps the stale item (item wins over category), and explicit nulls
+        // resurrect the active budget onto a historical row — both corrupt
+        // budget actuals. The data-fix reclassification depends on this.
+        $validated = $request->validated();
+        $explicitDetach = array_key_exists('budget_id', $validated)
+            && array_key_exists('budget_item_id', $validated)
+            && $validated['budget_id'] === null
+            && $validated['budget_item_id'] === null;
 
-        $data->budget_id = $budgetId;
-        $data->budget_item_id = $budgetItemId;
+        if ($explicitDetach) {
+            $transaction->budget()->dissociate();
+            $transaction->budgetItem()->dissociate();
+            $data->budget_id = null;
+            $data->budget_item_id = null;
+        } else {
+            ['budget_id' => $budgetId, 'budget_item_id' => $budgetItemId] = ResolveTransactionBudgetLink::run(
+                $request->user()->id,
+                $data->category_id,
+                $data->budget_id,
+                $data->budget_item_id,
+            );
+
+            $data->budget_id = $budgetId;
+            $data->budget_item_id = $budgetItemId;
+        }
 
         SaveTransaction::run($transaction, $data);
 
