@@ -166,7 +166,8 @@ setLayoutProps({
                     : 'text-red-600 dark:text-red-400'
                 "
               >
-                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                {{ t.type === 'income' ? '+' : '-'
+                }}{{ formatAmount(t.amount) }}
               </span>
             </div>
             <div
@@ -194,9 +195,7 @@ setLayoutProps({
             </TableHeader>
             <TableBody>
               <TableRow
-                v-if="
-                  !transactions.data || transactions.data.length === 0
-                "
+                v-if="!transactions.data || transactions.data.length === 0"
               >
                 <TableCell colspan="5" class="h-24 text-center">
                   {{ __('no_data_found', { data: __('transactions') }) }}
@@ -226,7 +225,8 @@ setLayoutProps({
                         : 'text-red-600 dark:text-red-400'
                     "
                   >
-                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                    {{ t.type === 'income' ? '+' : '-'
+                    }}{{ formatAmount(t.amount) }}
                   </TableCell>
                 </TableRow>
               </template>

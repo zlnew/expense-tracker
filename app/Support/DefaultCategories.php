@@ -33,6 +33,8 @@ class DefaultCategories
             'Pets',
             'Utilities',
             'Travel',
+            'Maintenance',
+            'Taxes',
         ];
 
         return [

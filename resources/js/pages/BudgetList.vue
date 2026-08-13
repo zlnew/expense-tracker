@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
-import { CheckCircle2, Info, Plus, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
+import {
+  CheckCircle2,
+  Info,
+  Plus,
+  SquarePen,
+  Trash2,
+  Wallet,
+} from 'lucide-vue-next'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'

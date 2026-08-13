@@ -235,7 +235,7 @@ const setPrimary = (balance: Balance) => {
               <Button
                 variant="ghost"
                 size="icon"
-                class="h-10 w-10 md:h-8 md:w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                class="h-10 w-10 text-destructive hover:bg-destructive/10 hover:text-destructive md:h-8 md:w-8"
                 @click="openDeleteDialog(b)"
                 :title="__('delete_data', { data: __('balance') })"
               >
