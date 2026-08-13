@@ -73,13 +73,13 @@ withDefaults(
         </span>
 
         <h1
-          class="max-w-xl text-balance text-3xl font-bold tracking-tight sm:text-5xl"
+          class="max-w-xl text-3xl font-bold tracking-tight text-balance sm:text-5xl"
         >
           Track every rupiah
         </h1>
 
         <p
-          class="mt-3 max-w-md text-pretty text-sm text-muted-foreground sm:text-base"
+          class="mt-3 max-w-md text-sm text-pretty text-muted-foreground sm:text-base"
         >
           Know exactly where your money goes. Keep balances in check, stick to
           budgets, and understand your spending at a glance.
@@ -89,7 +89,15 @@ withDefaults(
           class="mt-6 flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row"
         >
           <Button asChild size="lg" class="w-full sm:w-auto">
-            <Link :href="$page.props.auth.user ? dashboard() : canRegister ? register() : login()">
+            <Link
+              :href="
+                $page.props.auth.user
+                  ? dashboard()
+                  : canRegister
+                    ? register()
+                    : login()
+              "
+            >
               <template v-if="$page.props.auth.user">Go to dashboard</template>
               <template v-else>Get started</template>
               <ArrowRight class="size-4" />

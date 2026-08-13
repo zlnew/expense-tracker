@@ -12,8 +12,12 @@ const open = ref(false)
 const balances = computed(() => (page.props.balances ?? []) as Balance[])
 const budgets = computed(() => (page.props.budgets ?? []) as Budget[])
 const categories = computed(() => (page.props.categories ?? []) as Category[])
-const primaryBalanceId = computed(() => (page.props.primaryBalanceId ?? undefined) as number | undefined)
-const activeBudgetId = computed(() => (page.props.activeBudgetId ?? undefined) as number | undefined)
+const primaryBalanceId = computed(
+  () => (page.props.primaryBalanceId ?? undefined) as number | undefined,
+)
+const activeBudgetId = computed(
+  () => (page.props.activeBudgetId ?? undefined) as number | undefined,
+)
 
 function openDialog() {
   open.value = true

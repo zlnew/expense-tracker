@@ -79,6 +79,25 @@ export type Category = {
   transactions: Transaction[] | null
 }
 
+export type SinkingFund = {
+  id: number
+  user_id: number
+  name: string
+  target_amount: number
+  cadence: 'cycle' | 'monthly'
+  contribution_amount: number | null
+  category_id: number | null
+  next_due: string | null
+  due_interval_months: number
+  notes: string | null
+  accumulated: number
+  percent: number
+  status: 'on_track' | 'due_soon' | 'underfunded' | 'overfunded'
+  auto_contribution: number
+  last_contribution_date: string | null
+  category: Category | null
+}
+
 export type Transaction = {
   id: number
   user_id: number

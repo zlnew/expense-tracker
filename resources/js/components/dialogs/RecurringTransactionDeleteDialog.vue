@@ -29,7 +29,9 @@ const { __ } = useLang()
 const form = useForm({})
 
 const submit = () => {
-  if (!props.recurring) return
+  if (!props.recurring) {
+    return
+  }
 
   form.delete(destroyRecurring.url(props.recurring), {
     preserveScroll: true,

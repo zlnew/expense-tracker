@@ -4,6 +4,7 @@ import { computed, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogDescription,
@@ -14,7 +15,6 @@ import {
 import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -24,7 +24,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useLang } from '@/composables/useLang'
-import { store as storeRecurring, update as updateRecurring } from '@/routes/recurring-transactions'
+import {
+  store as storeRecurring,
+  update as updateRecurring,
+} from '@/routes/recurring-transactions'
 import type { Balance, Category, RecurringTransaction } from '@/types'
 
 const props = defineProps<{
@@ -59,7 +62,9 @@ const isEdit = computed(() => Boolean(props.recurring?.id))
 watch(
   () => props.recurring,
   (r) => {
-    if (!r?.id) return
+    if (!r?.id) {
+      return
+    }
 
     form.clearErrors()
     form.type = r.type
@@ -174,7 +179,9 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
             </Label>
             <Select v-model="form.balance_id" required>
               <SelectTrigger id="rec_balance">
-                <SelectValue :placeholder="__('select_data', { data: __('balance') })" />
+                <SelectValue
+                  :placeholder="__('select_data', { data: __('balance') })"
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
@@ -194,7 +201,9 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
             <Label for="rec_category">{{ __('category') }}</Label>
             <Select v-model="form.category_id">
               <SelectTrigger id="rec_category">
-                <SelectValue :placeholder="__('select_data', { data: __('category') })" />
+                <SelectValue
+                  :placeholder="__('select_data', { data: __('category') })"
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
@@ -234,14 +243,24 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
             <Label for="rec_start">
               {{ __('start_date') }} <span class="text-destructive">*</span>
             </Label>
-            <Input id="rec_start" v-model="form.start_date" type="date" required />
+            <Input
+              id="rec_start"
+              v-model="form.start_date"
+              type="date"
+              required
+            />
           </div>
 
           <div class="grid gap-2">
             <Label for="rec_next">
               {{ __('next_run_date') }} <span class="text-destructive">*</span>
             </Label>
-            <Input id="rec_next" v-model="form.next_run_date" type="date" required />
+            <Input
+              id="rec_next"
+              v-model="form.next_run_date"
+              type="date"
+              required
+            />
           </div>
 
           <div class="grid gap-2">

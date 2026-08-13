@@ -4,6 +4,7 @@ use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FundController;
 use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('transactions/transfer-between-accounts', [TransactionController::class, 'transferBetweenAccounts'])->name('transactions.transfer-between-accounts');
 
         Route::resource('recurring-transactions', RecurringTransactionController::class)->only(['index', 'store', 'update', 'destroy']);
+
+        Route::resource('funds', FundController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::post('funds/{fund}/contributions', [FundController::class, 'storeContribution'])->name('funds.contributions.store');
+        Route::post('funds/{fund}/withdrawals', [FundController::class, 'storeWithdrawal'])->name('funds.withdrawals.store');
     });
 });
 
