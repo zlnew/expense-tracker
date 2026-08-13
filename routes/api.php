@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\BalanceApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\GetTransactionApiController;
 use App\Http\Controllers\Api\StoreTransactionApiController;
+use App\Http\Controllers\Api\UpdateTransactionApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -14,6 +15,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('transactions', StoreTransactionApiController::class)
         ->middleware('abilities:transactions:write')
         ->name('api.transactions.store');
+
+    Route::patch('transactions/{transaction}', UpdateTransactionApiController::class)
+        ->middleware('abilities:transactions:write')
+        ->name('api.transactions.update');
 
     Route::get('categories', CategoryApiController::class)
         ->middleware('abilities:categories:read')

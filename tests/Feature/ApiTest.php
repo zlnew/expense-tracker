@@ -1,7 +1,10 @@
 <?php
 
+use App\Actions\GetBudgetProgress;
 use App\Enums\CategoryType;
 use App\Models\Balance;
+use App\Models\Budget;
+use App\Models\BudgetItem;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\User;
@@ -19,6 +22,7 @@ function apiToken(User $user, string $abilities): string
 test('unauthenticated requests to every api endpoint return 401', function () {
     $this->getJson('/api/transactions')->assertUnauthorized();
     $this->postJson('/api/transactions', [])->assertUnauthorized();
+    $this->patchJson('/api/transactions/1')->assertUnauthorized();
     $this->getJson('/api/categories')->assertUnauthorized();
     $this->getJson('/api/balances')->assertUnauthorized();
 });
@@ -217,4 +221,254 @@ test('is_paginate=true returns the paginator shape', function () {
             'meta' => ['current_page', 'last_page', 'per_page', 'total'],
         ])
         ->assertJsonCount(5, 'data');
+});
+
+test('patching a transaction updates its budget link and budget progress reflects it', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 100_000, 'final_amount' => 100_000]);
+    $category = Category::factory()->for($user)->create(['name' => 'Food', 'type' => CategoryType::EXPENSE]);
+    $budget = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    $item = BudgetItem::factory()->for($budget)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+
+    $transaction = Transaction::factory()->for($user)->for($balance)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'amount' => 25_000,
+        'date' => now(),
+        'description' => 'lunch',
+    ]);
+
+    expect($transaction->budget_id)->toBeNull();
+
+    $token = apiToken($user, 'transactions:write');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson("/api/transactions/{$transaction->id}", [
+            'budget_id' => $budget->id,
+            'budget_item_id' => $item->id,
+        ])
+        ->assertOk()
+        ->assertJsonPath('id', $transaction->id)
+        ->assertJsonPath('budget_id', $budget->id)
+        ->assertJsonPath('budget_item_id', $item->id);
+
+    $this->assertDatabaseHas('transactions', [
+        'id' => $transaction->id,
+        'budget_id' => $budget->id,
+        'budget_item_id' => $item->id,
+    ]);
+
+    // The same spent-to-date computation the budgets endpoint uses now
+    // includes the patched transaction.
+    $progress = GetBudgetProgress::run($user)->items();
+    $foodItem = collect($progress)->firstWhere('category_id', $category->id);
+    expect($foodItem->actual_amount)->toBe(25_000);
+});
+
+test('patching a transaction derives a missing budget id from its budget item', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 100_000, 'final_amount' => 100_000]);
+    $category = Category::factory()->for($user)->create(['name' => 'Food', 'type' => CategoryType::EXPENSE]);
+    $budget = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    $item = BudgetItem::factory()->for($budget)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+
+    $transaction = Transaction::factory()->for($user)->for($balance)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'amount' => 10_000,
+        'date' => now(),
+    ]);
+
+    // The live root cause: budget_item_id set, budget_id still null.
+    $transaction->forceFill(['budget_id' => null, 'budget_item_id' => $item->id])->save();
+
+    $token = apiToken($user, 'transactions:write');
+
+    // A PATCH that touches nothing budget-related still heals the row.
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson("/api/transactions/{$transaction->id}", [
+            'description' => 'fixed',
+        ])
+        ->assertOk()
+        ->assertJsonPath('budget_id', $budget->id)
+        ->assertJsonPath('budget_item_id', $item->id);
+
+    $this->assertDatabaseHas('transactions', [
+        'id' => $transaction->id,
+        'budget_id' => $budget->id,
+        'budget_item_id' => $item->id,
+        'description' => 'fixed',
+    ]);
+});
+
+test('a token cannot patch another user\'s transaction', function () {
+    $owner = User::factory()->create();
+    $intruder = User::factory()->create();
+    $intruderBalance = Balance::factory()->for($intruder)->create(['initial_amount' => 0, 'final_amount' => 0]);
+    $intruderTransaction = Transaction::factory()->for($intruder)->for($intruderBalance)->create();
+
+    $token = apiToken($owner, 'transactions:write');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson("/api/transactions/{$intruderTransaction->id}", [
+            'description' => 'hijacked',
+        ])
+        ->assertNotFound();
+
+    $this->assertDatabaseHas('transactions', [
+        'id' => $intruderTransaction->id,
+        'description' => $intruderTransaction->description,
+    ]);
+});
+
+test('patching a transaction requires the write ability', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 0, 'final_amount' => 0]);
+    $transaction = Transaction::factory()->for($user)->for($balance)->create();
+
+    Sanctum::actingAs($user, ['transactions:read']);
+    $this->patchJson("/api/transactions/{$transaction->id}", ['description' => 'nope'])->assertForbidden();
+});
+
+test('patching a transaction validates scoped foreign keys', function () {
+    $user = User::factory()->create();
+    $intruder = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 0, 'final_amount' => 0]);
+    $transaction = Transaction::factory()->for($user)->for($balance)->create();
+    $intruderBudget = Budget::factory()->for($intruder)->create(['is_active' => true]);
+    $intruderCategory = Category::factory()->for($intruder)->create(['name' => 'Foreign', 'type' => CategoryType::EXPENSE]);
+    $intruderItem = BudgetItem::factory()->for($intruderBudget)->for($intruderCategory)->create(['type' => CategoryType::EXPENSE]);
+
+    $token = apiToken($user, 'transactions:write');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson("/api/transactions/{$transaction->id}", [
+            'budget_item_id' => $intruderItem->id,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('budget_item_id');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->patchJson("/api/transactions/{$transaction->id}", [
+            'budget_id' => $intruderBudget->id,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('budget_id');
+});
+
+test('posting a transaction auto-links the active budget item for its category', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 100_000, 'final_amount' => 100_000]);
+    $category = Category::factory()->for($user)->create(['name' => 'Food', 'type' => CategoryType::EXPENSE]);
+    $budget = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    $item = BudgetItem::factory()->for($budget)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+
+    $token = apiToken($user, 'transactions:write');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/transactions', [
+            'balance_id' => $balance->id,
+            'category_id' => $category->id,
+            'type' => CategoryType::EXPENSE->value,
+            'date' => now()->toDateString(),
+            'amount' => 30_000,
+            'description' => 'auto-linked',
+        ])
+        ->assertCreated()
+        ->assertJsonPath('budget_id', $budget->id)
+        ->assertJsonPath('budget_item_id', $item->id);
+
+    $this->assertDatabaseHas('transactions', [
+        'user_id' => $user->id,
+        'budget_id' => $budget->id,
+        'budget_item_id' => $item->id,
+        'amount' => 30_000,
+        'description' => 'auto-linked',
+    ]);
+
+    // Budget actual_amount for the category now includes the API-created row.
+    $progress = GetBudgetProgress::run($user)->items();
+    $foodItem = collect($progress)->firstWhere('category_id', $category->id);
+    expect($foodItem->actual_amount)->toBe(30_000);
+});
+
+test('posting a transaction with a budget item but no budget id derives the budget', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 100_000, 'final_amount' => 100_000]);
+    $category = Category::factory()->for($user)->create(['name' => 'Transport', 'type' => CategoryType::EXPENSE]);
+    $budget = Budget::factory()->for($user)->create([
+        'period_start' => now()->startOfMonth(),
+        'period_end' => now()->endOfMonth(),
+        'cutoff_day' => 25,
+        'is_active' => true,
+    ]);
+    $item = BudgetItem::factory()->for($budget)->for($category)->create([
+        'type' => CategoryType::EXPENSE,
+        'planned_amount' => 500_000,
+    ]);
+
+    $token = apiToken($user, 'transactions:write');
+
+    // Cogsworth's live bug: sends budget_item_id but no budget_id.
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/transactions', [
+            'balance_id' => $balance->id,
+            'category_id' => $category->id,
+            'budget_item_id' => $item->id,
+            'type' => CategoryType::EXPENSE->value,
+            'date' => now()->toDateString(),
+            'amount' => 48_000,
+        ])
+        ->assertCreated()
+        ->assertJsonPath('budget_id', $budget->id)
+        ->assertJsonPath('budget_item_id', $item->id);
+
+    $this->assertDatabaseHas('transactions', [
+        'user_id' => $user->id,
+        'budget_id' => $budget->id,
+        'budget_item_id' => $item->id,
+        'amount' => 48_000,
+    ]);
+});
+
+test('posting a transaction without an active budget leaves the budget link null', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 100_000, 'final_amount' => 100_000]);
+    $category = Category::factory()->for($user)->create(['name' => 'Food', 'type' => CategoryType::EXPENSE]);
+
+    $token = apiToken($user, 'transactions:write');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/transactions', [
+            'balance_id' => $balance->id,
+            'category_id' => $category->id,
+            'type' => CategoryType::EXPENSE->value,
+            'date' => now()->toDateString(),
+            'amount' => 25_000,
+        ])
+        ->assertCreated()
+        ->assertJsonPath('budget_id', null)
+        ->assertJsonPath('budget_item_id', null);
 });
