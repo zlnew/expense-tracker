@@ -7,7 +7,6 @@ import AlertError from '@/components/AlertError.vue'
 import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Card,
   CardAction,
@@ -15,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {

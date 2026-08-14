@@ -1,4 +1,5 @@
 key,en,id
+accumulated,Accumulated,Terkumpul
 action_warning,"Please proceed with caution, this cannot be undone","Harap berhati-hati, tindakan ini tidak dapat dibatalkan."
 actions,Actions,Aksi
 active,Active,Aktif
@@ -14,6 +15,9 @@ appearance_settings_description,"Update your account's appearance settings","Per
 appearance_settings_title,"Appearance Settings","Pengaturan Tampilan"
 april,April,April
 august,August,Agustus
+auto_contribution,"Auto contribution","Kontribusi otomatis"
+auto_contribution_hint,"Leave empty to auto-calculate","Kosongkan untuk hitung otomatis"
+available_reserve,"Available reserve: :amount","Saldo tersedia: :amount"
 balance,Balance,Saldo
 balance_create_description,"Create a new balance or account to track your money","Buat saldo atau akun baru untuk melacak uang Anda"
 balance_delete_description,"Are you sure you want to delete this balance? All transactions related to this balance will also be deleted.","Apakah Anda yakin ingin menghapus saldo ini? Semua transaksi yang terkait dengan saldo ini juga akan dihapus."
@@ -31,6 +35,7 @@ budget_progress,"Budget Progress","Progress Anggaran Pengeluaran"
 budget_progress_description,"Track how much of your budget has been used and how much remains.","Pantau seberapa banyak anggaran yang sudah digunakan dan yang masih tersisa."
 budget_update_description,"Update and adjust your monthly budget plans","Perbarui dan sesuaikan perencanaan anggaran bulanan Anda"
 budgets,Budgets,Anggaran
+cadence,Cadence,Kadens
 cancel,Cancel,Batal
 cannot_delete_active_budget,"Cannot delete active budget.","Tidak dapat menghapus anggaran aktif."
 cannot_delete_primary_balance,"Cannot delete primary balance.","Tidak dapat menghapus saldo utama."
@@ -53,12 +58,15 @@ current_month_expenses,"Current Month Expenses","Pengeluaran Bulan Ini"
 current_month_incomes,"Current Month Incomes","Pendapatan Bulan Ini"
 current_password,"Current Password","Kata Sandi Saat Ini"
 cutoff_day,"Cutoff Day","Cutoff Day"
+cycle,Cycle,Siklus
 daily,Daily,Harian
 dashboard,Dashboard,Dasbor
 dashboard_description,"Track your financial activity, monitor spending habits, and stay on top of your budgets in one place.","Pantau aktivitas keuangan, kebiasaan pengeluaran, dan progres anggaran Anda dalam satu dashboard."
 date,Date,Tanggal
 date_from,"Date From","Tanggal Mulai"
 date_to,"Date To","Tanggal Selesai"
+days,Days,Hari
+days_overdue,"days overdue","hari terlambat"
 december,December,Desember
 delete,Delete,Hapus
 delete_account,"Delete Account","Hapus Akun"
@@ -76,6 +84,9 @@ diff,Diff,Diff
 discord_webhook_url,"Discord webhook URL","URL webhook Discord"
 discord_webhook_url_description,"Receive a Discord notification when a budget category reaches 80% or 100% of its planned amount.","Dapatkan notifikasi Discord saat kategori anggaran mencapai 80% atau 100% dari jumlah yang direncanakan."
 discord_webhook_url_placeholder,https://discord.com/api/webhooks/...,https://discord.com/api/webhooks/...
+due_in,"Due in","Jatuh tempo dalam"
+due_interval_months,"Due interval (months)","Interval jatuh tempo (bulan)"
+due_soon,"Due soon","Segera jatuh tempo"
 edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
@@ -93,6 +104,16 @@ final_amount,"Final Amount","Saldo Akhir"
 frequency,Frequency,Frekuensi
 from_account,"From Account","Dari Akun"
 full_name,"Full Name","Nama Lengkap"
+fund,Fund,Dana
+fund_contribution,Contribution,Kontribusi
+fund_create_description,"Create a sinking fund to set aside money for a known future bill","Buat dana cadangan untuk menyisihkan uang untuk tagihan masa depan"
+fund_delete_description,"Are you sure you want to delete this fund? Its contribution history will be kept for audit.","Apakah Anda yakin ingin menghapus dana ini? Riwayat kontribusi akan tetap disimpan untuk audit."
+fund_list_description,"Manage funds that set aside money for known future bills","Kelola dana yang menyisihkan uang untuk tagihan masa depan"
+fund_name_placeholder,"e.g. Moto Maintenance","mis. Perawatan Motor"
+fund_update_description,"Update the fund target, cadence, or next due date","Perbarui target dana, kadens, atau tanggal jatuh tempo berikutnya"
+fund_withdrawal,Withdrawal,Penarikan
+funded,funded,terdanai
+funds,Funds,Dana
 inactive,Inactive,"Tidak Aktif"
 income,Income,Pemasukan
 incomes,Incomes,Pemasukan
@@ -102,6 +123,7 @@ install_banner_description,"Add Expense Tracker to your home screen for quick ac
 install_banner_dismiss,"Dismiss install banner","Tutup banner pemasangan"
 install_banner_title,"Install Expense Tracker","Pasang Expense Tracker"
 insufficient_balance,"Insufficient balance","Saldo tidak mencukupi"
+insufficient_fund_reserve,"Insufficient fund reserve","Saldo dana tidak mencukupi"
 invalid_account_destination,"Invalid account destination","Tujuan akun tidak valid"
 invalid_account_source,"Invalid account source","Sumber akun tidak valid"
 is_primary,"Primary Balance","Saldo Utama"
@@ -109,6 +131,7 @@ item,Item,Item
 january,January,Januari
 july,July,Juli
 june,June,Juni
+last_set_aside,"Last set aside","Terakhir menyisihkan"
 last_updated_at,"Last Updated At","Terakhir Diperbarui"
 list,List,List
 log_out,"Log Out",Keluar
@@ -122,17 +145,23 @@ monthly_spending_trend,"Monthly Spending Trend","Tren Pengeluaran & Pemasukan Bu
 monthly_spending_trend_description,"See how your income and expenses change over time each month.","Lihat perubahan pemasukan dan pengeluaran Anda setiap bulan."
 multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
+needs_data,"needs :data","butuh :data"
 new_password,"New Password","Kata Sandi Baru"
+next_due,"Next due","Jatuh tempo berikutnya"
 next_run_date,"Next Run","Berjalan Berikutnya"
 no_data_found,"No :data found",":data tidak ditemukan"
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
+on_track,"On track","Sesuai rencana"
 optional,Optional,Opsional
+overfunded,Overfunded,"Melebihi target"
 overspent,Overspent,Melebihi
 password,Password,"Kata Sandi"
 password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
 password_update_title,"Update Password","Perbarui Kata Sandi"
+pay_from_fund,"Pay from fund","Bayar dari dana"
+pay_from_fund_description,"Creates a real expense in the fund's category and reduces the fund.","Membuat pengeluaran nyata di kategori dana dan mengurangi dana."
 period,Period,Periode
 period_end,"Period End","Periode Akhir"
 period_start,"Period Start","Periode Awal"
@@ -165,15 +194,20 @@ select_data,"Select :data","Pilih :data"
 september,September,September
 set_as_active,"Set as Active","Jadikan Aktif"
 set_as_primary,"Set as Primary","Jadikan Utama"
+set_aside,"Set aside",Sisihkan
+set_aside_description,"Set aside money into :fund without touching your balance.","Sisihkan uang ke :fund tanpa mengubah saldo Anda."
 settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
 show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
 single_transaction,"Single Transaction","Satu Transaksi"
+sinking_funds,"Sinking Funds","Dana Cadangan"
 spent,Spent,Terpakai
 start_date,"Start Date","Tanggal Mulai"
 status,Status,Status
 stop_recurring,"Stop Recurring","Hentikan Berulang"
+suggested_contribution,"Suggested: :amount","Disarankan: :amount"
+target_amount,"Target amount","Jumlah target"
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
 total,Total,Total
@@ -193,6 +227,7 @@ transfer_description,"Transfer between accounts","Transfer antar akun"
 transfer_same_account_error,"Source and destination accounts must be different","Akun sumber dan tujuan harus berbeda"
 type,Type,Jenis
 types,Types,Jenis
+underfunded,Underfunded,"Kurang dari target"
 unknown,Unknown,"Tidak diketahui"
 update,Update,Perbarui
 updated_data,":data Updated",":data Diperbarui"

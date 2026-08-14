@@ -4,6 +4,7 @@ import {
   ArrowLeftRight,
   CircleDollarSign,
   LayoutGrid,
+  PiggyBank,
   Wallet,
 } from 'lucide-vue-next'
 import AppLogo from '@/components/AppLogo.vue'
@@ -24,6 +25,7 @@ import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
 import budgets from '@/routes/budgets'
 import categories from '@/routes/categories'
+import funds from '@/routes/funds'
 import recurringTransactions from '@/routes/recurring-transactions'
 import transactions from '@/routes/transactions'
 import type { NavGroup, NavItem } from '@/types'
@@ -69,6 +71,11 @@ const mainNavItems: NavGroup[] = [
         href: categories.index(),
       },
     ],
+  },
+  {
+    title: __('sinking_funds'),
+    href: funds.index(),
+    icon: PiggyBank,
   },
 ]
 

@@ -183,16 +183,20 @@ class GenerateLanguageFiles extends Command
     {
         return str_replace(
             [
+                ':amount',
                 ':data',
                 ':date',
+                ':fund',
                 ':name',
                 ':student',
                 ':activity',
                 ':period',
             ],
             [
+                '{amount}',
                 '{data}',
                 '{date}',
+                '{fund}',
                 '{name}',
                 '{student}',
                 '{activity}',
