@@ -156,6 +156,8 @@ test('registering a user seeds the default categories', function () {
         'password_confirmation' => 'password',
     ]);
 
-    expect($user->categories()->count())->toBe(14)
-        ->and($user->categories()->where('name', 'Food')->exists())->toBeTrue();
+    expect($user->categories()->count())->toBe(16)
+        ->and($user->categories()->where('name', 'Food')->exists())->toBeTrue()
+        ->and($user->categories()->where('name', 'Maintenance')->exists())->toBeTrue()
+        ->and($user->categories()->where('name', 'Taxes')->exists())->toBeTrue();
 });
