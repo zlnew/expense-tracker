@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BalanceApiController;
+use App\Http\Controllers\Api\BudgetApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\FundApiController;
 use App\Http\Controllers\Api\GetTransactionApiController;
@@ -29,6 +30,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('balances', BalanceApiController::class)
         ->middleware('abilities:balances:read')
         ->name('api.balances');
+  
+    Route::get('budgets', BudgetApiController::class)
+        ->middleware('abilities:budgets:read')
+        ->name('api.budgets');
 
     // Static segment must be declared BEFORE the {fund} wildcard.
     Route::get('funds/upcoming', UpcomingFundApiController::class)

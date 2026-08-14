@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class ApiTokenCommand extends Command
 {
-    protected $signature = 'api:token {user} {--name=api} {--abilities=transactions:read,transactions:write,categories:read,balances:read,funds:read,funds:write}';
+    protected $signature = 'api:token {user} {--name=api} {--abilities=transactions:read,transactions:write,categories:read,balances:read,budgets:read,funds:read,funds:write}';
 
     protected $description = 'Create a Sanctum personal access token for a user (by id or email)';
 
