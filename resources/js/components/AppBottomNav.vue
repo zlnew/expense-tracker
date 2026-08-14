@@ -4,6 +4,7 @@ import {
   ArrowLeftRight,
   CircleDollarSign,
   LayoutGrid,
+  PiggyBank,
   Plus,
   Wallet,
 } from 'lucide-vue-next'
@@ -13,6 +14,7 @@ import { useLang } from '@/composables/useLang'
 import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
 import budgets from '@/routes/budgets'
+import funds from '@/routes/funds'
 import transactions from '@/routes/transactions'
 
 const { __ } = useLang()
@@ -38,6 +40,12 @@ const items = [
     active: () => page.url.startsWith(budgets.index.url()),
   },
   {
+    title: __('sinking_funds'),
+    href: funds.index.url(),
+    icon: PiggyBank,
+    active: () => page.url.startsWith(funds.index.url()),
+  },
+  {
     title: __('balances'),
     href: balances.index.url(),
     icon: Wallet,
@@ -59,7 +67,7 @@ function openTransactionCreate() {
     class="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
   >
     <div
-      class="relative mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2"
+      class="relative mx-auto grid h-16 max-w-lg grid-cols-6 items-center px-2"
     >
       <!-- Nav links (2 left) -->
       <template v-for="item in leftItems" :key="item.href">
