@@ -50,7 +50,13 @@ setLayoutProps({
   <AppContent>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          asChild
+          :aria-label="__('back')"
+          class="h-10 w-10"
+        >
           <Link :href="balanceIndex.url()">
             <ArrowLeft class="size-4" />
           </Link>

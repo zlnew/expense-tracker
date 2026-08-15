@@ -20,6 +20,7 @@ august,August,Agustus
 auto_contribution,"Auto contribution","Kontribusi otomatis"
 auto_contribution_hint,"Leave empty to auto-calculate","Kosongkan untuk hitung otomatis"
 available_reserve,"Available reserve: :amount","Saldo tersedia: :amount"
+back,Back,Kembali
 balance,Balance,Saldo
 balance_create_description,"Create a new balance or account to track your money","Buat saldo atau akun baru untuk melacak uang Anda"
 balance_delete_description,"Are you sure you want to delete this balance? All transactions related to this balance will also be deleted.","Apakah Anda yakin ingin menghapus saldo ini? Semua transaksi yang terkait dengan saldo ini juga akan dihapus."
@@ -141,6 +142,7 @@ june,June,Juni
 last_set_aside,"Last set aside","Terakhir menyisihkan"
 last_updated_at,"Last Updated At","Terakhir Diperbarui"
 list,List,List
+loading,Loading,Memuat
 log_out,"Log Out",Keluar
 main_navigation,"Main Navigation","Navigasi Utama"
 march,March,Maret
@@ -151,6 +153,7 @@ monthly_expenses,"Monthly Expenses","Pengeluaran Bulanan"
 monthly_incomes,"Monthly Incomes","Pendapatan Bulanan"
 monthly_spending_trend,"Monthly Spending Trend","Tren Pengeluaran & Pemasukan Bulanan"
 monthly_spending_trend_description,"See how your income and expenses change over time each month.","Lihat perubahan pemasukan dan pengeluaran Anda setiap bulan."
+more,More,Lainnya
 multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 needs_data,"needs :data","butuh :data"
@@ -186,6 +189,7 @@ period_end,"Period End","Periode Akhir"
 period_start,"Period Start","Periode Awal"
 periods,Periods,Periode
 planned,Planned,Direncanakan
+platform,Platform,Platform
 primary,Primary,Utama
 profile,Profile,Profil
 profile_settings,"Profile Settings","Pengaturan Profil"
@@ -200,6 +204,7 @@ recurring_transactions_description,"Manage automatic recurring income and expens
 recurring_transactions_update_description,"Update the recurring transaction schedule","Perbarui jadwal transaksi berulang"
 remaining,Remaining,Sisa
 remaining_budget,"Remaining Budget","Sisa Anggaran"
+remove_item,"Remove item","Hapus item"
 reset,Reset,"Atur Ulang"
 resume_recurring,"Resume Recurring","Lanjutkan Berulang"
 retry,Retry,"Coba Lagi"
@@ -226,6 +231,8 @@ settings_description,"Manage your profile and account settings","Kelola profil d
 settings_title,Settings,Pengaturan
 show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
 showing_results,"Showing :from to :to of :total results","Menampilkan :from sampai :to dari :total hasil"
+sidebar,Sidebar,"Bilah Samping"
+sidebar_mobile_description,"Displays the mobile sidebar.","Menampilkan bilah samping seluler."
 single_transaction,"Single Transaction","Satu Transaksi"
 sinking_funds,"Sinking Funds","Dana Cadangan"
 skip_to_content,"Skip to content","Langsung ke konten"
@@ -238,6 +245,7 @@ suggested_contribution,"Suggested: :amount","Disarankan: :amount"
 target_amount,"Target amount","Jumlah target"
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
+toggle_sidebar,"Toggle sidebar","Buka/tutup bilah samping"
 total,Total,Total
 total_balance,"Total Balance","Total Saldo"
 total_expense,"Total Expense","Total Pengeluaran"
