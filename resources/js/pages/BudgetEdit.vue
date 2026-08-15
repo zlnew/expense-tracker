@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { Head, setLayoutProps, useForm } from '@inertiajs/vue3'
-import { Check, X } from 'lucide-vue-next'
+import { Trash2 } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
 import AppContent from '@/components/AppContent.vue'
 import Heading from '@/components/Heading.vue'
-import { Button } from '@/components/ui/button'
+import InputError from '@/components/InputError.vue'
+import ResponsiveTable from '@/components/ResponsiveTable.vue'
+import RowActions from '@/components/RowActions.vue'
+import StickyFormActions from '@/components/StickyFormActions.vue'
 import {
   Card,
   CardAction,
@@ -25,14 +28,6 @@ import {
   NumberFieldInput,
 } from '@/components/ui/number-field'
 import { Separator } from '@/components/ui/separator'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -146,6 +141,13 @@ const initBudgetItems = () => {
 }
 
 const submit = () => {
+  // Double-submit guard: the submit button is disabled via
+  // :disabled="form.processing", but a same-tick double click can reach the
+  // handler before Vue re-renders — reject it here too.
+  if (form.processing) {
+    return
+  }
+
   form.items = [...expenseBudgetItems.value, ...incomeBudgetItems.value]
 
   form.put(budgetUpdate.url({ budget: props.budget }), {
@@ -159,6 +161,40 @@ const submit = () => {
 const goBack = () => {
   window.history.back()
 }
+
+// Server errors land on the concatenated items array — map back to the row.
+const itemError = (type: 'expense' | 'income', index: number) => {
+  const flatIndex =
+    type === 'expense' ? index : expenseBudgetItems.value.length + index
+
+  return (form.errors as Record<string, string>)[
+    `items.${flatIndex}.planned_amount`
+  ]
+}
+
+// Top-level errors only — per-row items errors render under their row.
+const topLevelErrors = computed(() =>
+  Object.entries(form.errors)
+    .filter(([key]) => !key.startsWith('items.'))
+    .map(([, value]) => value),
+)
+
+const removeItem = (type: 'expense' | 'income', index: number) => {
+  if (type === 'expense') {
+    expenseBudgetItems.value.splice(index, 1)
+  } else {
+    incomeBudgetItems.value.splice(index, 1)
+  }
+}
+
+const itemRowActions = (type: 'expense' | 'income', index: number) => [
+  {
+    label: __('delete'),
+    icon: Trash2,
+    variant: 'destructive' as const,
+    onClick: () => removeItem(type, index),
+  },
+]
 </script>
 
 <template>
@@ -172,10 +208,10 @@ const goBack = () => {
       />
 
       <form @submit.prevent="submit">
-        <div class="mb-16 space-y-4">
+        <div class="space-y-4">
           <AlertError
-            v-if="Object.keys(form.errors).length > 0"
-            :errors="Object.values(form.errors)"
+            v-if="topLevelErrors.length > 0"
+            :errors="topLevelErrors"
           />
 
           <div class="grid max-w-md grid-cols-2 gap-4">
@@ -257,19 +293,32 @@ const goBack = () => {
                 </CardAction>
               </CardHeader>
               <CardContent>
-                <!-- Mobile View -->
-                <div class="space-y-4 md:hidden">
-                  <div
-                    v-for="(exp, index) in expenseBudgetItems"
-                    :key="index"
-                    class="rounded-lg border p-4"
-                  >
-                    <Label class="mb-2 block">{{ exp.category?.name }}</Label>
+                <ResponsiveTable
+                  :columns="[
+                    {
+                      header: __('category'),
+                      cell: (row) => row.category?.name ?? '',
+                    },
+                    {
+                      header: __('planned'),
+                      cell: () => '',
+                      cellClass: 'w-[220px] text-end',
+                    },
+                    {
+                      header: __('actions'),
+                      cell: () => '',
+                      cellClass: 'w-[80px] text-right',
+                    },
+                  ]"
+                  :rows="expenseBudgetItems"
+                >
+                  <template #card="{ row, index }">
+                    <Label class="mb-2 block">{{ row.category?.name }}</Label>
                     <NumberField
-                      v-model="exp.planned_amount"
+                      v-model="row.planned_amount"
                       :min="0"
                       :step="1000"
-                      :stepSnapping="false"
+                      :step-snapping="false"
                       :format-options="{
                         style: 'currency',
                         currency: 'IDR',
@@ -283,52 +332,46 @@ const goBack = () => {
                         <NumberFieldIncrement />
                       </NumberFieldContent>
                     </NumberField>
-                  </div>
-                </div>
+                    <InputError
+                      :message="itemError('expense', index)"
+                      class="mt-2"
+                    />
+                    <div class="mt-2 flex justify-end">
+                      <RowActions :actions="itemRowActions('expense', index)" />
+                    </div>
+                  </template>
 
-                <!-- Desktop View -->
-                <div class="hidden md:block">
-                  <Table>
-                    <TableHeader class="bg-accent">
-                      <TableRow>
-                        <TableHead>
-                          {{ __('category') }}
-                        </TableHead>
-                        <TableHead class="w-[300px] text-end">
-                          {{ __('planned') }}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow
-                        v-for="(exp, index) in expenseBudgetItems"
-                        :key="index"
-                      >
-                        <TableCell>{{ exp.category?.name }}</TableCell>
-                        <TableCell class="text-end">
-                          <NumberField
-                            v-model="exp.planned_amount"
-                            :min="0"
-                            :step="1000"
-                            :stepSnapping="false"
-                            :format-options="{
-                              style: 'currency',
-                              currency: 'IDR',
-                              currencyDisplay: 'narrowSymbol',
-                              currencySign: 'standard',
-                            }"
-                          >
-                            <NumberFieldContent>
-                              <NumberFieldDecrement />
-                              <NumberFieldInput />
-                              <NumberFieldIncrement />
-                            </NumberFieldContent>
-                          </NumberField>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                  <template #cell-1="{ row, index }">
+                    <NumberField
+                      v-model="row.planned_amount"
+                      :min="0"
+                      :step="1000"
+                      :step-snapping="false"
+                      :format-options="{
+                        style: 'currency',
+                        currency: 'IDR',
+                        currencyDisplay: 'narrowSymbol',
+                        currencySign: 'standard',
+                      }"
+                    >
+                      <NumberFieldContent>
+                        <NumberFieldDecrement />
+                        <NumberFieldInput />
+                        <NumberFieldIncrement />
+                      </NumberFieldContent>
+                    </NumberField>
+                    <InputError
+                      :message="itemError('expense', index)"
+                      class="mt-2"
+                    />
+                  </template>
+
+                  <template #cell-2="{ index }">
+                    <div class="flex items-center justify-end gap-2">
+                      <RowActions :actions="itemRowActions('expense', index)" />
+                    </div>
+                  </template>
+                </ResponsiveTable>
               </CardContent>
             </Card>
 
@@ -342,19 +385,32 @@ const goBack = () => {
                 </CardAction>
               </CardHeader>
               <CardContent>
-                <!-- Mobile View -->
-                <div class="space-y-4 md:hidden">
-                  <div
-                    v-for="(inc, index) in incomeBudgetItems"
-                    :key="index"
-                    class="rounded-lg border p-4"
-                  >
-                    <Label class="mb-2 block">{{ inc.category?.name }}</Label>
+                <ResponsiveTable
+                  :columns="[
+                    {
+                      header: __('category'),
+                      cell: (row) => row.category?.name ?? '',
+                    },
+                    {
+                      header: __('planned'),
+                      cell: () => '',
+                      cellClass: 'w-[220px] text-end',
+                    },
+                    {
+                      header: __('actions'),
+                      cell: () => '',
+                      cellClass: 'w-[80px] text-right',
+                    },
+                  ]"
+                  :rows="incomeBudgetItems"
+                >
+                  <template #card="{ row, index }">
+                    <Label class="mb-2 block">{{ row.category?.name }}</Label>
                     <NumberField
-                      v-model="inc.planned_amount"
+                      v-model="row.planned_amount"
                       :min="0"
                       :step="1000"
-                      :stepSnapping="false"
+                      :step-snapping="false"
                       :format-options="{
                         style: 'currency',
                         currency: 'IDR',
@@ -368,75 +424,57 @@ const goBack = () => {
                         <NumberFieldIncrement />
                       </NumberFieldContent>
                     </NumberField>
-                  </div>
-                </div>
+                    <InputError
+                      :message="itemError('income', index)"
+                      class="mt-2"
+                    />
+                    <div class="mt-2 flex justify-end">
+                      <RowActions :actions="itemRowActions('income', index)" />
+                    </div>
+                  </template>
 
-                <!-- Desktop View -->
-                <div class="hidden md:block">
-                  <Table>
-                    <TableHeader class="bg-accent">
-                      <TableRow>
-                        <TableHead>
-                          {{ __('category') }}
-                        </TableHead>
-                        <TableHead class="w-[300px] text-end">
-                          {{ __('planned') }}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow
-                        v-for="(inc, index) in incomeBudgetItems"
-                        :key="index"
-                      >
-                        <TableCell>{{ inc.category?.name }}</TableCell>
-                        <TableCell>
-                          <NumberField
-                            v-model="inc.planned_amount"
-                            :min="0"
-                            :step="1000"
-                            :stepSnapping="false"
-                            :format-options="{
-                              style: 'currency',
-                              currency: 'IDR',
-                              currencyDisplay: 'narrowSymbol',
-                              currencySign: 'standard',
-                            }"
-                          >
-                            <NumberFieldContent>
-                              <NumberFieldDecrement />
-                              <NumberFieldInput />
-                              <NumberFieldIncrement />
-                            </NumberFieldContent>
-                          </NumberField>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                  <template #cell-1="{ row, index }">
+                    <NumberField
+                      v-model="row.planned_amount"
+                      :min="0"
+                      :step="1000"
+                      :step-snapping="false"
+                      :format-options="{
+                        style: 'currency',
+                        currency: 'IDR',
+                        currencyDisplay: 'narrowSymbol',
+                        currencySign: 'standard',
+                      }"
+                    >
+                      <NumberFieldContent>
+                        <NumberFieldDecrement />
+                        <NumberFieldInput />
+                        <NumberFieldIncrement />
+                      </NumberFieldContent>
+                    </NumberField>
+                    <InputError
+                      :message="itemError('income', index)"
+                      class="mt-2"
+                    />
+                  </template>
+
+                  <template #cell-2="{ index }">
+                    <div class="flex items-center justify-end gap-2">
+                      <RowActions :actions="itemRowActions('income', index)" />
+                    </div>
+                  </template>
+                </ResponsiveTable>
               </CardContent>
             </Card>
           </div>
         </div>
 
-        <div class="fixed right-4 bottom-20 z-50 md:right-8 md:bottom-8">
-          <div class="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              class="rounded-full shadow-xl"
-              @click="goBack"
-            >
-              <X />
-              <span>{{ __('cancel') }}</span>
-            </Button>
-            <Button type="submit" size="lg" class="rounded-full shadow-xl">
-              <Check />
-              <span>{{ __('save') }}</span>
-            </Button>
-          </div>
-        </div>
+        <StickyFormActions
+          :processing="form.processing"
+          :submit-label="form.processing ? __('saving') : __('save')"
+          show-cancel
+          @cancel="goBack"
+        />
       </form>
     </div>
   </AppContent>

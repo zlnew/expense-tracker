@@ -11,6 +11,8 @@ export const FILTER_KEYS = [
   'type',
   'dateFrom',
   'dateTo',
+  'month',
+  'year',
 ] as const
 
 export type FilterKey = (typeof FILTER_KEYS)[number]
@@ -35,6 +37,8 @@ const fallbackDefaults: Record<FilterKey, string> = {
   type: 'all',
   dateFrom: '',
   dateTo: '',
+  month: '',
+  year: '',
 }
 
 /**
@@ -70,6 +74,8 @@ export function useFilters(options: UseFiltersOptions) {
   const type = ref(initialParams.get('type') ?? defaults.type)
   const dateFrom = ref(initialParams.get('dateFrom') ?? defaults.dateFrom)
   const dateTo = ref(initialParams.get('dateTo') ?? defaults.dateTo)
+  const month = ref(initialParams.get('month') ?? defaults.month)
+  const year = ref(initialParams.get('year') ?? defaults.year)
 
   const filters = {
     search,
@@ -78,6 +84,8 @@ export function useFilters(options: UseFiltersOptions) {
     type,
     dateFrom,
     dateTo,
+    month,
+    year,
   } satisfies Record<FilterKey, Ref<string>>
 
   const activeCount = computed(
@@ -136,13 +144,16 @@ export function useFilters(options: UseFiltersOptions) {
     )
   }, options.debounceMs ?? 300)
 
-  watch([search, balance, category, type, dateFrom, dateTo], () => {
-    if (adopting) {
-      return
-    }
+  watch(
+    [search, balance, category, type, dateFrom, dateTo, month, year],
+    () => {
+      if (adopting) {
+        return
+      }
 
-    syncToUrl()
-  })
+      syncToUrl()
+    },
+  )
 
   const offNavigate = router.on('navigate', (event) => {
     // Echo of our own visit — the URL already reflects what we pushed.
@@ -164,6 +175,8 @@ export function useFilters(options: UseFiltersOptions) {
     type.value = params.get('type') ?? defaults.type
     dateFrom.value = params.get('dateFrom') ?? defaults.dateFrom
     dateTo.value = params.get('dateTo') ?? defaults.dateTo
+    month.value = params.get('month') ?? defaults.month
+    year.value = params.get('year') ?? defaults.year
     nextTick(() => {
       adopting = false
     })
@@ -194,6 +207,8 @@ export function useFilters(options: UseFiltersOptions) {
     type,
     dateFrom,
     dateTo,
+    month,
+    year,
     activeCount,
     isDirty,
     buildParams,

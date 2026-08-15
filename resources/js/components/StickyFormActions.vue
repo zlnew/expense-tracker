@@ -20,6 +20,8 @@ const props = withDefaults(defineProps<Props>(), {
   cancelHref: '',
 })
 
+const emit = defineEmits<{ cancel: [] }>()
+
 const { __ } = useLang()
 </script>
 
@@ -33,6 +35,7 @@ const { __ } = useLang()
         type="button"
         variant="outline"
         :disabled="props.processing"
+        @click="emit('cancel')"
       >
         {{ __('cancel') }}
       </Button>
