@@ -32,6 +32,7 @@ import {
   edit as budgetEdit,
   setActive as budgetSetActive,
   show as budgetShow,
+  transactions as budgetTransactions,
 } from '@/routes/budgets'
 import type { Budget, Transaction } from '@/types'
 
@@ -260,7 +261,12 @@ const fetchTransactions = async () => {
   transactionApi.year = year.value
 
   try {
-    const res = await transactionApi.get('/api/transactions')
+    // Web (session-auth) route mirroring the API read — /api/* is Sanctum
+    // token-only per ADR 2026-08-12, so browser sessions cannot auth there.
+    // useHttp keeps merging {budget, month, year} into the query string.
+    const res = await transactionApi.get(
+      budgetTransactions.url({ budget: props.budget.id }),
+    )
     transactions.value = res as Transaction[]
   } catch (error) {
     const apiError = error as Error
