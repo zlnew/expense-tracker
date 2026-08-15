@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Head, router, setLayoutProps } from '@inertiajs/vue3'
+import { Head, setLayoutProps } from '@inertiajs/vue3'
 import { PiggyBank, Plus, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
 import { ref } from 'vue'
-import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import FundDeleteDialog from '@/components/dialogs/FundDeleteDialog.vue'
 import FundFormDialog from '@/components/dialogs/FundFormDialog.vue'
@@ -21,7 +20,6 @@ import {
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
-import { destroy as destroyFund } from '@/routes/funds'
 import type { Balance, Category, SinkingFund } from '@/types'
 
 defineProps<{
@@ -101,23 +99,6 @@ const openPay = (fund: SinkingFund) => {
 const openDelete = (fund: SinkingFund) => {
   targetData.value = fund
   deleteOpen.value = true
-}
-
-const destroy = () => {
-  if (!targetData.value) {
-    return
-  }
-
-  router.delete(destroyFund.url({ fund: targetData.value }), {
-    preserveScroll: true,
-    onSuccess: (res) => {
-      deleteOpen.value = false
-      toast.success(
-        (res.props.flash as any)?.success ??
-          __('deleted_data', { data: __('fund') }),
-      )
-    },
-  })
 }
 
 const daysUntilDue = (fund: SinkingFund) => {
@@ -309,11 +290,7 @@ const daysUntilDue = (fund: SinkingFund) => {
         :fund="targetData"
         :balances="balances"
       />
-      <FundDeleteDialog
-        v-model:open="deleteOpen"
-        :fund="targetData"
-        @confirm="destroy"
-      />
+      <FundDeleteDialog v-model:open="deleteOpen" :fund="targetData" />
     </div>
   </AppContent>
 </template>
