@@ -42,14 +42,13 @@ defineProps<{
           autocomplete="off"
           autofocus
           placeholder="email@example.com"
-          class="h-11 md:h-9"
         />
         <InputError :message="errors.email" />
       </div>
 
       <div class="my-6 flex items-center justify-start">
         <Button
-          class="h-11 w-full md:h-9"
+          class="w-full"
           :disabled="processing"
           data-test="email-password-reset-link-button"
         >

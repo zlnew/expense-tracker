@@ -141,7 +141,7 @@ const setPrimary = (balance: Balance) => {
         <div class="flex w-full items-center gap-2 lg:max-w-md">
           <div class="relative w-full">
             <Search
-              class="absolute top-2.5 left-2.5 size-4 text-muted-foreground"
+              class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
             />
             <Input
               v-model="search"
