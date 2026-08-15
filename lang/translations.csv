@@ -14,6 +14,7 @@ appearance,Appearance,Tampilan
 appearance_settings,"Appearance Settings","Pengaturan Tampilan"
 appearance_settings_description,"Update your account's appearance settings","Perbarui pengaturan tampilan akun Anda"
 appearance_settings_title,"Appearance Settings","Pengaturan Tampilan"
+apply,Apply,Terapkan
 april,April,April
 august,August,Agustus
 auto_contribution,"Auto contribution","Kontribusi otomatis"
@@ -186,7 +187,9 @@ recurring_transactions_description,"Manage automatic recurring income and expens
 recurring_transactions_update_description,"Update the recurring transaction schedule","Perbarui jadwal transaksi berulang"
 remaining,Remaining,Sisa
 remaining_budget,"Remaining Budget","Sisa Anggaran"
+reset,Reset,"Atur Ulang"
 resume_recurring,"Resume Recurring","Lanjutkan Berulang"
+retry,Retry,"Coba Lagi"
 save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
 saved_data,":data Saved",":data Disimpan"
@@ -208,6 +211,7 @@ show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
 single_transaction,"Single Transaction","Satu Transaksi"
 sinking_funds,"Sinking Funds","Dana Cadangan"
 skip_to_content,"Skip to content","Langsung ke konten"
+something_went_wrong,"Something went wrong.","Terjadi kesalahan."
 spent,Spent,Terpakai
 start_date,"Start Date","Tanggal Mulai"
 status,Status,Status
