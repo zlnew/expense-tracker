@@ -191,6 +191,9 @@ class GenerateLanguageFiles extends Command
                 ':student',
                 ':activity',
                 ':period',
+                ':total',
+                ':from',
+                ':to',
             ],
             [
                 '{amount}',
@@ -201,6 +204,9 @@ class GenerateLanguageFiles extends Command
                 '{student}',
                 '{activity}',
                 '{period}',
+                '{total}',
+                '{from}',
+                '{to}',
             ],
             $value
         );

@@ -20,5 +20,7 @@ class RecurringTransactionData extends Data
         public ?CarbonImmutable $end_date,
         public CarbonImmutable $next_run_date,
         public bool $is_active = true,
+        public ?BalanceData $balance = null,
+        public ?CategoryData $category = null,
     ) {}
 }

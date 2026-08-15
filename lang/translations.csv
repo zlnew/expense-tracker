@@ -119,6 +119,8 @@ fund_update_description,"Update the fund target, cadence, or next due date","Per
 fund_withdrawal,Withdrawal,Penarikan
 funded,funded,terdanai
 funds,Funds,Dana
+go_to_next_page,"Go to next page","Ke halaman berikutnya"
+go_to_previous_page,"Go to previous page","Ke halaman sebelumnya"
 inactive,Inactive,"Tidak Aktif"
 income,Income,Pemasukan
 incomes,Incomes,Pemasukan
@@ -167,6 +169,7 @@ no_trend_data_description,"Income and expenses from this budget cycle will appea
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
+of,of,dari
 offline,"You're offline","Anda sedang offline"
 on_track,"On track","Sesuai rencana"
 optional,Optional,Opsional
@@ -204,7 +207,10 @@ save,Save,Simpan
 save_password,"Save Password","Simpan Kata Sandi"
 saved_data,":data Saved",":data Disimpan"
 saving,Saving...,Menyimpan...
+search_balances_placeholder,"Search by name...","Cari berdasarkan nama..."
+search_budgets_placeholder,"Search by name or notes...","Cari berdasarkan nama atau catatan..."
 search_categories_placeholder,"Search by name...","Cari berdasarkan nama..."
+search_recurring_placeholder,"Search by description...","Cari berdasarkan deskripsi..."
 search_transactions_placeholder,Search...,Cari...
 security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
@@ -219,6 +225,7 @@ settings,Settings,Pengaturan
 settings_description,"Manage your profile and account settings","Kelola profil dan pengaturan akun Anda"
 settings_title,Settings,Pengaturan
 show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
+showing_results,"Showing :from to :to of :total results","Menampilkan :from sampai :to dari :total hasil"
 single_transaction,"Single Transaction","Satu Transaksi"
 sinking_funds,"Sinking Funds","Dana Cadangan"
 skip_to_content,"Skip to content","Langsung ke konten"
