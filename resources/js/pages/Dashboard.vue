@@ -230,7 +230,11 @@ const {
   getProgressTextColor,
 } = useBudgetProgress()
 
-const topBudgetProgress = computed(() => props.budget_progress)
+const topBudgetProgress = computed(() =>
+  props.budget_progress.filter(
+    (bp) => bp.planned_amount > 0 || (bp.actual_amount ?? 0) > 0,
+  ),
+)
 const topRecentTransactions = computed(() =>
   props.recent_transactions.slice(0, 5),
 )
@@ -273,7 +277,7 @@ const statCards = computed(() => [
 
       <!-- Hero balance -->
       <Card class="border-border/50 bg-card shadow-xs">
-        <CardContent class="flex flex-col gap-4 pt-4">
+        <CardContent class="flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <CardTitle
               class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
@@ -309,7 +313,7 @@ const statCards = computed(() => [
           class="border-border/50 bg-card shadow-xs"
         >
           <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 px-3 pt-3 pb-2 sm:px-5"
+            class="flex flex-row items-center justify-between space-y-0"
           >
             <CardTitle
               class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
@@ -320,7 +324,7 @@ const statCards = computed(() => [
               <component :is="stat.icon" class="size-4" />
             </div>
           </CardHeader>
-          <CardContent class="px-3 pb-4 sm:px-5 sm:pb-5">
+          <CardContent>
             <div
               class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-2xl"
             >

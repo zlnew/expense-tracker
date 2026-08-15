@@ -61,7 +61,7 @@ function openTransactionCreate() {
     class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] lg:hidden"
   >
     <div
-      class="relative mx-auto grid h-16 max-w-lg grid-cols-6 items-center px-2"
+      class="relative mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2"
     >
       <!-- Nav links (2 left) -->
       <template v-for="item in leftItems" :key="item.href">
