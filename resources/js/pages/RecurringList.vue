@@ -11,6 +11,7 @@ import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
+import TransactionTabs from '@/components/TransactionTabs.vue'
 import { Button } from '@/components/ui/button'
 import { useDate } from '@/composables/useDate'
 import { useFilters } from '@/composables/useFilters'
@@ -130,6 +131,10 @@ const rowActions = (r: RecurringTransaction) => [
             :placeholder="__('search_recurring_placeholder')"
           />
         </div>
+
+        <!-- Segmented [ Transactions | Recurring ] — visible at every
+             breakpoint, mirroring the transactions page. -->
+        <TransactionTabs viewMode="recurring" />
       </div>
 
       <DataListState

@@ -111,7 +111,7 @@ watch(
 
 <template>
   <Dialog :open="isOpen" @update:open="isOpen = $event">
-    <SheetDialogContent class="sm:max-w-md">
+    <SheetDialogContent class="md:max-w-md">
       <DialogHeader class="flex items-center justify-center">
         <div
           class="mb-3 w-auto rounded-full border border-border bg-card p-0.5 shadow-sm"

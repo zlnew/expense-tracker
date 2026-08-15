@@ -4,7 +4,6 @@ import {
   ArrowLeftRight,
   CircleDollarSign,
   LayoutGrid,
-  PiggyBank,
   Plus,
   Wallet,
 } from 'lucide-vue-next'
@@ -14,7 +13,6 @@ import { useLang } from '@/composables/useLang'
 import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
 import budgets from '@/routes/budgets'
-import funds from '@/routes/funds'
 import transactions from '@/routes/transactions'
 
 const { __ } = useLang()
@@ -38,12 +36,6 @@ const items = [
     href: budgets.index.url(),
     icon: CircleDollarSign,
     active: () => page.url.startsWith(budgets.index.url()),
-  },
-  {
-    title: __('sinking_funds'),
-    href: funds.index.url(),
-    icon: PiggyBank,
-    active: () => page.url.startsWith(funds.index.url()),
   },
   {
     title: __('balances'),
