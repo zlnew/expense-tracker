@@ -8,6 +8,7 @@ import {
   VisAxis,
   VisSingleContainer,
   VisDonut,
+  VisScatter,
 } from '@unovis/vue'
 import { useMediaQuery } from '@vueuse/core'
 import {
@@ -264,7 +265,7 @@ const statCards = computed(() => [
   <Head :title="__('dashboard')" />
 
   <AppContent>
-    <div class="space-y-4 px-4 py-4 sm:space-y-6 sm:px-6 md:py-6 lg:px-8">
+    <div class="space-y-4 px-4 pb-4 sm:space-y-6 sm:px-6 md:pb-6 lg:px-8">
       <!-- Header -->
       <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-extrabold tracking-tight text-foreground">
@@ -836,6 +837,18 @@ const statCards = computed(() => [
                     color="var(--color-expense)"
                     :opacity="0.04"
                   />
+                  <VisScatter
+                    :x="x"
+                    :y="incomeY"
+                    color="var(--color-income)"
+                    :size="6"
+                  />
+                  <VisScatter
+                    :x="x"
+                    :y="expenseY"
+                    color="var(--color-expense)"
+                    :size="6"
+                  />
                   <VisAxis
                     type="x"
                     :tickFormat="tickFormatX"
@@ -847,6 +860,7 @@ const statCards = computed(() => [
                     :gridLine="true"
                     :numTicks="4"
                   />
+                  <ChartTooltip />
                   <ChartCrosshair :template="lineTooltipTemplate" />
                 </VisXYContainer>
                 <ChartLegendContent />

@@ -32,11 +32,11 @@ const props = defineProps<Props>()
 <template>
   <!-- Desktop: table (md+) -->
   <div
-    class="hidden overflow-hidden rounded-md border bg-background md:block"
+    class="hidden overflow-x-clip rounded-md border bg-background md:block"
     :class="props.class"
   >
-    <Table>
-      <TableHeader>
+    <Table class="w-full">
+      <TableHeader class="sticky top-0 z-10 bg-background">
         <TableRow>
           <TableHead
             v-for="(col, i) in props.columns"
