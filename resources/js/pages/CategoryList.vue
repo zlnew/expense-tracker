@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { Head, router, setLayoutProps } from '@inertiajs/vue3'
-import { useDebounceFn } from '@vueuse/core'
-import { Plus, Search, SquarePen, Tags, Trash2 } from 'lucide-vue-next'
-import { ref, watch } from 'vue'
+import { Head, setLayoutProps } from '@inertiajs/vue3'
+import { Plus, SquarePen, Tags, Trash2 } from 'lucide-vue-next'
+import { ref } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
+import DataListState from '@/components/DataListState.vue'
 import CategoryCreateDialog from '@/components/dialogs/CategoryCreateDialog.vue'
 import CategoryDeleteDialog from '@/components/dialogs/CategoryDeleteDialog.vue'
 import CategoryUpdateDialog from '@/components/dialogs/CategoryUpdateDialog.vue'
 import Heading from '@/components/Heading.vue'
-import ListSkeleton from '@/components/ListSkeleton.vue'
+import ResponsiveTable from '@/components/ResponsiveTable.vue'
+import RowActions from '@/components/RowActions.vue'
+import SearchInput from '@/components/SearchInput.vue'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -20,16 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
-import { useParam } from '@/composables/useParam'
 import { index as categoriesIndex } from '@/routes/categories'
 import type { Category, Paginate } from '@/types'
 
@@ -53,46 +46,23 @@ setLayoutProps({
   ],
 })
 
-const param = useParam()
-
 const createDialogOpen = ref(false)
 const updateDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
 const targetData = ref<Data | null>(null)
 
-const search = ref(param.get('search') || '')
-const typeFilter = ref(param.get('type') || 'all')
-
-// True while a debounced search/filter visit is in flight — shows the skeleton.
 const loading = ref(false)
 
-watch([search, typeFilter], () => {
-  fetchData()
+const { search, type: typeFilter } = useFilters({
+  url: categoriesIndex.url(),
+  defaults: { type: 'all' },
+  onStart: () => {
+    loading.value = true
+  },
+  onFinish: () => {
+    loading.value = false
+  },
 })
-
-const fetchData = useDebounceFn(() => {
-  const params: Record<string, any> = {}
-
-  if (search.value) {
-    params.search = search.value
-  }
-
-  if (typeFilter.value) {
-    params.type = typeFilter.value
-  }
-
-  router.get(categoriesIndex.url(), params, {
-    preserveState: true,
-    preserveScroll: true,
-    replace: true,
-    onStart: () => {
-      loading.value = true
-    },
-    onFinish: () => {
-      loading.value = false
-    },
-  })
-}, 300)
 
 const openEditDialog = (data: Data) => {
   targetData.value = data
@@ -103,6 +73,20 @@ const openDeleteDialog = (data: Data) => {
   targetData.value = data
   deleteDialogOpen.value = true
 }
+
+const rowActions = (c: Data) => [
+  {
+    label: __('edit_data', { data: __('category') }),
+    icon: SquarePen,
+    onClick: () => openEditDialog(c),
+  },
+  {
+    label: __('delete_data', { data: __('category') }),
+    icon: Trash2,
+    variant: 'destructive' as const,
+    onClick: () => openDeleteDialog(c),
+  },
+]
 </script>
 
 <template>
@@ -126,22 +110,16 @@ const openDeleteDialog = (data: Data) => {
 
       <div class="flex flex-col items-center gap-4 lg:flex-row">
         <div class="flex w-full items-center gap-2 lg:max-w-md">
-          <div class="relative w-full">
-            <Search
-              class="absolute top-2.5 left-2.5 size-4 text-muted-foreground"
-            />
-            <Input
-              v-model="search"
-              :placeholder="__('search_categories_placeholder')"
-              class="h-10 w-full bg-background pl-8 md:h-9"
-            />
-          </div>
+          <SearchInput
+            v-model="search"
+            :placeholder="__('search_categories_placeholder')"
+          />
         </div>
 
         <div class="flex w-full gap-2 sm:w-auto">
           <div class="w-full">
             <Select v-model="typeFilter">
-              <SelectTrigger class="h-10 w-full bg-background md:h-9">
+              <SelectTrigger class="w-full bg-background">
                 <SelectValue
                   :placeholder="__('all_data', { data: __('types') })"
                 />
@@ -165,131 +143,65 @@ const openDeleteDialog = (data: Data) => {
         </div>
       </div>
 
-      <!-- Loading skeleton while a search/filter visit is in flight -->
-      <ListSkeleton v-if="loading" :rows="5" />
-
-      <!-- Mobile View: Cards -->
-      <div v-if="!loading" class="grid grid-cols-1 gap-4 md:hidden">
-        <div
-          v-if="categories.data.length === 0"
-          class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
-        >
-          <div class="mb-4 rounded-full bg-muted p-4">
-            <Tags class="size-8 text-muted-foreground" />
-          </div>
-          <h3 class="text-lg font-semibold">
-            {{ __('no_data_found', { data: __('categories') }) }}
-          </h3>
-          <p class="mb-6 text-muted-foreground">
-            {{ __('category_list_description') }}
-          </p>
+      <DataListState
+        :loading="loading"
+        :is-empty="!loading && categories.data.length === 0"
+        :rows="5"
+        :empty-icon="Tags"
+        :empty-title="__('no_data_found', { data: __('categories') })"
+        :empty-description="__('category_list_description')"
+      >
+        <template #empty>
           <Button @click="createDialogOpen = true">
             <Plus class="mr-2 size-4" />
             {{ __('add_data', { data: __('category') }) }}
           </Button>
-        </div>
-        <div
-          v-for="c in categories.data"
-          :key="c.id"
-          class="rounded-lg border bg-background p-4 shadow-sm"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p
-                class="mb-1 text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
-              >
-                {{ __(c.type) }}
-              </p>
-              <h3 class="text-lg font-bold">{{ c.name }}</h3>
-            </div>
-            <div class="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-10 w-10"
-                @click="openEditDialog(c)"
-                :title="__('edit_data', { data: __('category') })"
-              >
-                <SquarePen class="size-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-10 w-10 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                @click="openDeleteDialog(c)"
-                :title="__('delete_data', { data: __('category') })"
-              >
-                <Trash2 class="size-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+        </template>
 
-      <!-- Desktop View: Table -->
-      <div
-        v-if="!loading"
-        class="hidden overflow-hidden rounded-md border bg-background md:block"
-      >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead class="w-[60px]">#</TableHead>
-              <TableHead class="w-[100px]">{{ __('type') }}</TableHead>
-              <TableHead>{{ __('name') }}</TableHead>
-              <TableHead class="w-[100px] text-right">
-                {{ __('actions') }}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-if="categories.data.length === 0">
-              <TableCell colspan="4" class="h-24 text-center">
-                {{ __('no_data_found', { data: __('categories') }) }}
-              </TableCell>
-            </TableRow>
-            <template v-else>
-              <TableRow v-for="(c, index) in categories.data" :key="c.id">
-                <TableCell>
-                  {{
-                    (categories.meta.current_page - 1) *
-                      categories.meta.per_page +
-                    index +
-                    1
-                  }}.
-                </TableCell>
-                <TableCell class="text-muted-foreground">
+        <ResponsiveTable
+          :columns="[
+            { header: '#', cell: (row, i) => i + 1, cellClass: 'w-[60px]' },
+            {
+              header: __('type'),
+              cell: (c) => __(c.type),
+              cellClass: 'w-[100px] text-muted-foreground',
+            },
+            {
+              header: __('name'),
+              cell: (c) => c.name,
+              cellClass: 'font-medium',
+            },
+            {
+              header: __('actions'),
+              cell: () => '',
+              cellClass: 'w-[100px] text-right',
+            },
+          ]"
+          :rows="categories.data"
+        >
+          <!-- Mobile card -->
+          <template #card="{ row: c }">
+            <div class="flex items-center justify-between">
+              <div>
+                <p
+                  class="mb-1 text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
+                >
                   {{ __(c.type) }}
-                </TableCell>
-                <TableCell class="font-medium">
-                  {{ c.name }}
-                </TableCell>
-                <TableCell class="text-right">
-                  <div class="flex items-center justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      @click="openEditDialog(c)"
-                      :title="__('edit_data', { data: __('category') })"
-                    >
-                      <SquarePen class="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      class="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      @click="openDeleteDialog(c)"
-                      :title="__('delete_data', { data: __('category') })"
-                    >
-                      <Trash2 class="size-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </template>
-          </TableBody>
-        </Table>
-      </div>
+                </p>
+                <h3 class="text-lg font-bold">{{ c.name }}</h3>
+              </div>
+              <RowActions :actions="rowActions(c)" collapse-below="md" />
+            </div>
+          </template>
+
+          <!-- Desktop cells -->
+          <template #cell-3="{ row: c }">
+            <div class="flex items-center justify-end gap-2">
+              <RowActions :actions="rowActions(c)" collapse-below="md" />
+            </div>
+          </template>
+        </ResponsiveTable>
+      </DataListState>
 
       <AppPagination
         v-if="!loading && categories.meta"

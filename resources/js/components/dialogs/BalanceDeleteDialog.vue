@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { nextTick } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
+import { Spinner } from '@/components/ui/spinner'
 import { useLang } from '@/composables/useLang'
 import { destroy as destroyBalance } from '@/routes/balances'
 import type { Balance } from '@/types'
@@ -42,13 +44,21 @@ const submit = () => {
           __('deleted_data', { data: __('balance') }),
       )
     },
+    onError: () => {
+      nextTick(() => {
+        document.querySelector('[role="alert"]')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      })
+    },
   })
 }
 </script>
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="sm:max-w-[425px]">
+    <SheetDialogContent class="md:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>
           {{ __('delete_data', { data: __('balance') }) }}
@@ -58,23 +68,31 @@ const submit = () => {
         </DialogDescription>
       </DialogHeader>
 
-      <AlertError
-        v-if="Object.keys(form.errors).length > 0"
-        :errors="Object.values(form.errors)"
-      />
+      <form @submit.prevent="submit">
+        <AlertError
+          v-if="Object.keys(form.errors).length > 0"
+          :errors="Object.values(form.errors)"
+        />
 
-      <DialogFooter>
-        <Button variant="outline" @click="$emit('update:open', false)">
-          {{ __('cancel') }}
-        </Button>
-        <Button
-          variant="destructive"
-          @click="submit"
-          :disabled="form.processing"
-        >
-          {{ form.processing ? __('deleting') : __('delete') }}
-        </Button>
-      </DialogFooter>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            @click="$emit('update:open', false)"
+            :disabled="form.processing"
+          >
+            {{ __('cancel') }}
+          </Button>
+          <Button
+            type="submit"
+            variant="destructive"
+            :disabled="form.processing"
+          >
+            <Spinner v-if="form.processing" class="mr-2" />
+            {{ form.processing ? __('deleting') : __('delete') }}
+          </Button>
+        </DialogFooter>
+      </form>
     </SheetDialogContent>
   </Dialog>
 </template>

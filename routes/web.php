@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\GetTransactionApiController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
@@ -25,6 +26,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('budgets', BudgetController::class);
         Route::post('budgets/{budget}/set-active', [BudgetController::class, 'setActive'])->name('budgets.set-active');
+
+        // Web (session-auth) mirror of the /api/transactions read for
+        // BudgetDetail — /api/* is Sanctum token-only since the 2026-08-12
+        // lockdown, so browser sessions use this route instead. Reuses the
+        // API controller unchanged; the same TransactionQuery keys apply.
+        Route::get('budgets/{budget}/transactions', GetTransactionApiController::class)
+            ->name('budgets.transactions');
 
         Route::get('transactions/export', [TransactionController::class, 'export'])->name('transactions.export');
         Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);

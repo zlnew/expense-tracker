@@ -148,3 +148,79 @@ test('locks the recurring row before advancing its schedule', function () {
 
     expect($grammar->lockedTables)->toContain('recurring_transactions');
 });
+
+test('recurring index paginates and searches', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['name' => 'Cash', 'initial_amount' => 0, 'final_amount' => 0]);
+
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'gym-membership']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'netflix-subscription']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'spotify-subscription']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'insurance-premium']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'wifi-bill']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'electricity-bill']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'water-bill']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'phone-bill']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'internet-bill']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'car-insurance']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'home-insurance']);
+    RecurringTransaction::factory()->for($user)->for($balance)->create(['description' => 'life-insurance']);
+
+    $this->withoutMiddleware(PreventRequestForgery::class);
+
+    // Pagination: default per_page is 10, 12 rows → two pages.
+    $this->actingAs($user)
+        ->get(route('recurring-transactions.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('RecurringList')
+            ->has('recurrings.data', 10)
+            ->where('recurrings.meta.total', 12)
+            ->where('recurrings.meta.last_page', 2)
+        );
+
+    // Search: description match narrows the result set.
+    $this->actingAs($user)
+        ->get(route('recurring-transactions.index', ['search' => 'insurance']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('RecurringList')
+            ->has('recurrings.data', 4)
+            ->where('recurrings.meta.total', 4)
+        );
+
+    // Search also matches the related category name.
+    $category = Category::factory()->for($user)->create(['name' => 'Entertainment']);
+    RecurringTransaction::factory()->for($user)->for($balance)->for($category)->create(['description' => 'cinema-night']);
+
+    $this->actingAs($user)
+        ->get(route('recurring-transactions.index', ['search' => 'entertainment']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('RecurringList')
+            ->has('recurrings.data', 1)
+            ->where('recurrings.meta.total', 1)
+        );
+});
+
+test('recurring index returns category and balance relations', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create(['name' => 'Cash', 'initial_amount' => 0, 'final_amount' => 0]);
+    $category = Category::factory()->for($user)->create(['name' => 'Food']);
+
+    RecurringTransaction::factory()->for($user)->for($balance)->for($category)->create([
+        'description' => 'lunch-box',
+    ]);
+
+    $this->withoutMiddleware(PreventRequestForgery::class);
+
+    $this->actingAs($user)
+        ->get(route('recurring-transactions.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('RecurringList')
+            ->has('recurrings.data', 1)
+            ->where('recurrings.data.0.balance.name', 'Cash')
+            ->where('recurrings.data.0.category.name', 'Food')
+        );
+});

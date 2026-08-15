@@ -123,6 +123,8 @@ export type SummaryCards = {
   current_month_expenses: number
   current_month_incomes: number
   budget_remaining: number
+  has_active_budget: boolean
+  active_budget_id: number | null
 }
 
 export type BudgetProgress = BudgetItem[]

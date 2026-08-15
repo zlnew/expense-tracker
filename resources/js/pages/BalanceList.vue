@@ -1,22 +1,16 @@
 <script setup lang="ts">
-import { Head, router, setLayoutProps } from '@inertiajs/vue3'
-import { useDebounceFn } from '@vueuse/core'
-import {
-  CheckCircle2,
-  Plus,
-  Search,
-  SquarePen,
-  Trash2,
-  Wallet,
-} from 'lucide-vue-next'
-import { ref, watch } from 'vue'
+import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
+import { CheckCircle2, Plus, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
+import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
+import DataListState from '@/components/DataListState.vue'
 import BalanceDeleteDialog from '@/components/dialogs/BalanceDeleteDialog.vue'
 import BalanceSaveDialog from '@/components/dialogs/BalanceSaveDialog.vue'
 import Heading from '@/components/Heading.vue'
-import ListSkeleton from '@/components/ListSkeleton.vue'
+import RowActions from '@/components/RowActions.vue'
+import SearchInput from '@/components/SearchInput.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,13 +21,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
-import { useParam } from '@/composables/useParam'
 import {
   index as balanceIndex,
   setPrimary as setPrimaryRoute,
+  show as balanceShow,
 } from '@/routes/balances'
 import type { Balance, Paginate } from '@/types'
 
@@ -43,7 +37,6 @@ defineProps<{
 
 const { __ } = useLang()
 const { formatAmount } = useNumber()
-const param = useParam()
 
 setLayoutProps({
   breadcrumbs: [
@@ -57,34 +50,17 @@ const saveDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
 const targetData = ref<Balance | null>(null)
 
-const search = ref(param.get('search') || '')
-
-// True while a debounced search visit is in flight — shows the skeleton.
 const loading = ref(false)
 
-watch(search, () => {
-  fetchData()
+const { search } = useFilters({
+  url: balanceIndex.url(),
+  onStart: () => {
+    loading.value = true
+  },
+  onFinish: () => {
+    loading.value = false
+  },
 })
-
-const fetchData = useDebounceFn(() => {
-  const params: Record<string, any> = {}
-
-  if (search.value) {
-    params.search = search.value
-  }
-
-  router.get(balanceIndex.url(), params, {
-    preserveState: true,
-    preserveScroll: true,
-    replace: true,
-    onStart: () => {
-      loading.value = true
-    },
-    onFinish: () => {
-      loading.value = false
-    },
-  })
-}, 300)
 
 const openCreateDialog = () => {
   targetData.value = null
@@ -116,6 +92,20 @@ const setPrimary = (balance: Balance) => {
     },
   )
 }
+
+const rowActions = (b: Balance) => [
+  {
+    label: __('edit_data', { data: __('balance') }),
+    icon: SquarePen,
+    onClick: () => openEditDialog(b),
+  },
+  {
+    label: __('delete_data', { data: __('balance') }),
+    icon: Trash2,
+    variant: 'destructive' as const,
+    onClick: () => openDeleteDialog(b),
+  },
+]
 </script>
 
 <template>
@@ -139,122 +129,100 @@ const setPrimary = (balance: Balance) => {
 
       <div class="flex flex-col items-center gap-4 lg:flex-row">
         <div class="flex w-full items-center gap-2 lg:max-w-md">
-          <div class="relative w-full">
-            <Search
-              class="absolute top-2.5 left-2.5 size-4 text-muted-foreground"
-            />
-            <Input
-              v-model="search"
-              :placeholder="__('search_categories_placeholder')"
-              class="w-full bg-background pl-8"
-            />
-          </div>
+          <SearchInput
+            v-model="search"
+            :placeholder="__('search_balances_placeholder')"
+          />
         </div>
       </div>
 
-      <!-- Loading skeleton while a search visit is in flight -->
-      <ListSkeleton v-if="loading" :rows="5" />
-
-      <div
-        v-if="!loading && balances.data.length === 0"
-        class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-background/50 p-8 text-center"
+      <DataListState
+        :loading="loading"
+        :is-empty="!loading && balances.data.length === 0"
+        :rows="5"
+        :empty-icon="Wallet"
+        :empty-title="__('no_data_found', { data: __('balances') })"
+        :empty-description="__('balance_create_description')"
       >
-        <div class="mb-4 rounded-full bg-muted p-4">
-          <Wallet class="size-8 text-muted-foreground" />
-        </div>
-        <h3 class="text-lg font-semibold">
-          {{ __('no_data_found', { data: __('balances') }) }}
-        </h3>
-        <p class="mb-6 text-muted-foreground">
-          {{ __('balance_create_description') }}
-        </p>
-        <Button @click="openCreateDialog">
-          <Plus class="mr-2 size-4" />
-          {{ __('add_data', { data: __('balance') }) }}
-        </Button>
-      </div>
+        <template #empty>
+          <Button @click="openCreateDialog">
+            <Plus class="mr-2 size-4" />
+            {{ __('add_data', { data: __('balance') }) }}
+          </Button>
+        </template>
 
-      <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-        <Card
-          v-for="b in balances.data"
-          :key="b.id"
-          class="group relative overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-primary/5"
-        >
-          <div v-if="b.is_primary" class="absolute top-0 right-0 p-2">
-            <Badge
-              variant="secondary"
-              class="border-primary/20 bg-primary/10 text-primary"
-            >
-              <CheckCircle2 class="mr-1 size-3" />
-              {{ __('primary') }}
-            </Badge>
-          </div>
-
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Wallet class="size-5 text-primary" />
-              {{ b.name }}
-            </CardTitle>
-            <CardDescription class="line-clamp-2 min-h-[40px]">
-              {{ b.description ?? '-' }}
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <div class="space-y-4">
-              <div class="flex items-end justify-between">
-                <span class="text-sm text-muted-foreground">{{
-                  __('final_amount')
-                }}</span>
-                <span class="text-2xl font-bold tracking-tight">
-                  {{ formatAmount(b.final_amount) }}
-                </span>
-              </div>
-              <div
-                class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
-              >
-                <span>{{ __('initial_amount') }}</span>
-                <span>{{ formatAmount(b.initial_amount) }}</span>
-              </div>
-            </div>
-          </CardContent>
-
-          <CardFooter
-            class="flex justify-between gap-2 border-t pt-4 transition-colors"
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+          <Card
+            v-for="b in balances.data"
+            :key="b.id"
+            class="group relative overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-primary/5"
           >
-            <div class="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-10 w-10 md:h-8 md:w-8"
-                @click="openEditDialog(b)"
-                :title="__('edit_data', { data: __('balance') })"
+            <div v-if="b.is_primary" class="absolute top-0 right-0 p-2">
+              <Badge
+                variant="secondary"
+                class="border-primary/20 bg-primary/10 text-primary"
               >
-                <SquarePen class="size-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-10 w-10 text-destructive hover:bg-destructive/10 hover:text-destructive md:h-8 md:w-8"
-                @click="openDeleteDialog(b)"
-                :title="__('delete_data', { data: __('balance') })"
-              >
-                <Trash2 class="size-4" />
-              </Button>
+                <CheckCircle2 class="mr-1 size-3" />
+                {{ __('primary') }}
+              </Badge>
             </div>
 
-            <Button
-              v-if="!b.is_primary"
-              variant="outline"
-              size="sm"
-              class="h-10 md:h-9"
-              @click="setPrimary(b)"
+            <CardHeader>
+              <CardTitle class="flex items-center gap-2">
+                <Wallet class="size-5 text-primary" />
+                <Link
+                  :href="balanceShow.url({ balance: b })"
+                  class="truncate hover:underline"
+                >
+                  {{ b.name }}
+                </Link>
+              </CardTitle>
+              <CardDescription class="line-clamp-2 min-h-[40px]">
+                {{ b.description ?? '-' }}
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent>
+              <div class="space-y-4">
+                <div class="flex items-end justify-between">
+                  <span class="text-sm text-muted-foreground">{{
+                    __('final_amount')
+                  }}</span>
+                  <span class="text-2xl font-bold tracking-tight">
+                    {{ formatAmount(b.final_amount) }}
+                  </span>
+                </div>
+                <div
+                  class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
+                >
+                  <span>{{ __('initial_amount') }}</span>
+                  <span>{{ formatAmount(b.initial_amount) }}</span>
+                </div>
+              </div>
+            </CardContent>
+
+            <CardFooter
+              class="flex justify-between gap-2 border-t pt-4 transition-colors"
             >
-              {{ __('set_as_primary') }}
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+              <RowActions
+                :actions="rowActions(b)"
+                collapse-below="md"
+                align="left"
+              />
+
+              <Button
+                v-if="!b.is_primary"
+                variant="outline"
+                size="sm"
+                class="h-10 md:h-9"
+                @click="setPrimary(b)"
+              >
+                {{ __('set_as_primary') }}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </DataListState>
 
       <AppPagination
         v-if="!loading && balances.meta"

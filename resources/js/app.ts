@@ -1,5 +1,4 @@
-import { createInertiaApp } from '@inertiajs/vue3'
-import { registerSW } from 'virtual:pwa-register'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import { createApp, h } from 'vue'
 import { initializeTheme } from '@/composables/useAppearance'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
@@ -9,7 +8,10 @@ import AuthLayout from '@/layouts/AuthLayout.vue'
 import SettingsLayout from '@/layouts/settings/Layout.vue'
 import { initializeFlashToast } from '@/lib/flashToast'
 
-registerSW({ immediate: true })
+// NOTE: no registerSW({ immediate: true }) here — the service worker is
+// registered with registerType: 'prompt' via PwaUpdatePrompt (mounted in
+// AppSidebarLayout), which surfaces a "new version available" toast instead
+// of force-reloading the app when a deploy lands mid-use.
 
 // Capture the browser's install prompt as early as possible so the
 // dismissible install banner (Dashboard) can react to it...
@@ -50,7 +52,7 @@ createInertiaApp({
     return app
   },
   progress: {
-    color: '#4B5563',
+    color: 'var(--primary)',
   },
 })
 
@@ -59,3 +61,23 @@ initializeTheme()
 
 // This will listen for flash toast data from the server...
 initializeFlashToast()
+
+// Focus management: after a real page navigation (component change), move
+// focus to the main content region so keyboard / screen-reader users start
+// at the top of the new page instead of a stale element. Same-component
+// visits (search/filter debounce, form re-renders) keep focus where it is.
+let lastNavigatedComponent: string | null = null
+
+router.on('navigate', (event) => {
+  const component = event.detail.page.component
+
+  if (component === lastNavigatedComponent) {
+    return
+  }
+
+  lastNavigatedComponent = component
+
+  requestAnimationFrame(() => {
+    document.getElementById('main-content')?.focus({ preventScroll: true })
+  })
+})

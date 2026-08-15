@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
-import { computed, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
+import InputError from '@/components/InputError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useLang } from '@/composables/useLang'
 import { store as storeFund, update as updateFund } from '@/routes/funds'
@@ -49,6 +51,18 @@ const form = useForm({
   due_interval_months: 1,
   notes: '',
 })
+
+const firstFieldRef = ref<HTMLElement | null>(null)
+
+const onOpenAutoFocus = () => {
+  nextTick(() => {
+    firstFieldRef.value
+      ?.querySelector<HTMLElement>(
+        'input, textarea, [data-slot="select-trigger"]',
+      )
+      ?.focus()
+  })
+}
 
 const expenseCategories = computed(() =>
   props.categories.filter((category) => category.type === 'expense'),
@@ -119,13 +133,24 @@ const submit = () => {
               : __('created_data', { data: __('fund') })),
         )
       },
+      onError: () => {
+        nextTick(() => {
+          document.querySelector('[role="alert"]')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          })
+        })
+      },
     })
 }
 </script>
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
+    <SheetDialogContent
+      class="md:max-w-[500px]"
+      @open-auto-focus.prevent="onOpenAutoFocus"
+    >
       <DialogHeader>
         <DialogTitle>
           {{
@@ -141,7 +166,7 @@ const submit = () => {
         </DialogDescription>
       </DialogHeader>
 
-      <form @submit.prevent="submit">
+      <form ref="firstFieldRef" @submit.prevent="submit">
         <div class="grid gap-4 py-4">
           <AlertError
             v-if="Object.keys(form.errors).length > 0"
@@ -158,7 +183,10 @@ const submit = () => {
               v-model="form.name"
               :placeholder="__('fund_name_placeholder')"
               required
+              :disabled="form.processing"
+              :aria-invalid="form.errors.name ? true : undefined"
             />
+            <InputError :message="form.errors.name" />
           </div>
 
           <div class="grid gap-2">
@@ -174,7 +202,10 @@ const submit = () => {
               min="1"
               placeholder="400000"
               required
+              :disabled="form.processing"
+              :aria-invalid="form.errors.target_amount ? true : undefined"
             />
+            <InputError :message="form.errors.target_amount" />
           </div>
 
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -194,6 +225,7 @@ const submit = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+              <InputError :message="form.errors.cadence" />
             </div>
 
             <div class="grid gap-2">
@@ -209,7 +241,12 @@ const submit = () => {
                 min="1"
                 max="60"
                 required
+                :disabled="form.processing"
+                :aria-invalid="
+                  form.errors.due_interval_months ? true : undefined
+                "
               />
+              <InputError :message="form.errors.due_interval_months" />
             </div>
           </div>
 
@@ -234,11 +271,18 @@ const submit = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+              <InputError :message="form.errors.category_id" />
             </div>
 
             <div class="grid gap-2">
               <Label for="fund_next_due">{{ __('next_due') }}</Label>
-              <Input id="fund_next_due" v-model="form.next_due" type="date" />
+              <Input
+                id="fund_next_due"
+                v-model="form.next_due"
+                type="date"
+                :disabled="form.processing"
+              />
+              <InputError :message="form.errors.next_due" />
             </div>
           </div>
 
@@ -254,7 +298,9 @@ const submit = () => {
               inputmode="numeric"
               min="1"
               :placeholder="__('auto_contribution_hint')"
+              :disabled="form.processing"
             />
+            <InputError :message="form.errors.contribution_amount" />
           </div>
 
           <div class="grid gap-2">
@@ -267,6 +313,7 @@ const submit = () => {
               v-model="form.notes"
               :placeholder="__('notes')"
               rows="2"
+              :disabled="form.processing"
             />
           </div>
         </div>
@@ -276,10 +323,12 @@ const submit = () => {
             type="button"
             variant="outline"
             @click="$emit('update:open', false)"
+            :disabled="form.processing"
           >
             {{ __('cancel') }}
           </Button>
           <Button type="submit" :disabled="form.processing">
+            <Spinner v-if="form.processing" class="mr-2" />
             {{ form.processing ? __('saving') : __('save') }}
           </Button>
         </DialogFooter>
