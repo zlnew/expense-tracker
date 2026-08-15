@@ -32,7 +32,7 @@ export default defineConfig({
             formVariants: true,
         }),
         VitePWA({
-            registerType: 'autoUpdate',
+            registerType: 'prompt',
             includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'robots.txt'],
             base: '/',
             scope: '/',
@@ -85,6 +85,8 @@ export default defineConfig({
             },
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+                navigateFallback: '/offline.html',
+                navigateFallbackDenylist: [/^\/api\//],
             },
         }),
     ],

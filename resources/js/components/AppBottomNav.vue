@@ -64,7 +64,8 @@ function openTransactionCreate() {
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
+    :aria-label="__('main_navigation')"
+    class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] lg:hidden"
   >
     <div
       class="relative mx-auto grid h-16 max-w-lg grid-cols-6 items-center px-2"
@@ -73,7 +74,8 @@ function openTransactionCreate() {
       <template v-for="item in leftItems" :key="item.href">
         <Link
           :href="item.href"
-          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
+          :aria-current="item.active() ? 'page' : undefined"
+          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           :class="
             item.active()
               ? 'text-primary'
@@ -89,9 +91,9 @@ function openTransactionCreate() {
       <div class="flex items-center justify-center">
         <Button
           variant="default"
-          size="icon"
-          aria-label="Add transaction"
-          class="z-10 size-12 rounded-full shadow-lg transition-transform active:scale-95"
+          size="icon-lg"
+          :aria-label="__('add_transaction')"
+          class="size-14 -translate-y-5 rounded-full shadow-lg ring-4 ring-background transition-transform active:scale-95"
           @click="openTransactionCreate"
         >
           <Plus class="size-6" />
@@ -102,7 +104,8 @@ function openTransactionCreate() {
       <template v-for="item in rightItems" :key="item.href">
         <Link
           :href="item.href"
-          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors"
+          :aria-current="item.active() ? 'page' : undefined"
+          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           :class="
             item.active()
               ? 'text-primary'
