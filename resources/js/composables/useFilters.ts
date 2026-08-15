@@ -10,6 +10,8 @@ export const FILTER_KEYS = [
   'category',
   'dateFrom',
   'dateTo',
+  'month',
+  'year',
 ] as const
 
 export type FilterKey = (typeof FILTER_KEYS)[number]
@@ -33,6 +35,8 @@ const fallbackDefaults: Record<FilterKey, string> = {
   category: 'all',
   dateFrom: '',
   dateTo: '',
+  month: '',
+  year: '',
 }
 
 /**
@@ -67,6 +71,8 @@ export function useFilters(options: UseFiltersOptions) {
   const category = ref(initialParams.get('category') ?? defaults.category)
   const dateFrom = ref(initialParams.get('dateFrom') ?? defaults.dateFrom)
   const dateTo = ref(initialParams.get('dateTo') ?? defaults.dateTo)
+  const month = ref(initialParams.get('month') ?? defaults.month)
+  const year = ref(initialParams.get('year') ?? defaults.year)
 
   const filters = {
     search,
@@ -74,6 +80,8 @@ export function useFilters(options: UseFiltersOptions) {
     category,
     dateFrom,
     dateTo,
+    month,
+    year,
   } satisfies Record<FilterKey, Ref<string>>
 
   const activeCount = computed(
@@ -132,7 +140,7 @@ export function useFilters(options: UseFiltersOptions) {
     )
   }, options.debounceMs ?? 300)
 
-  watch([search, balance, category, dateFrom, dateTo], () => {
+  watch([search, balance, category, dateFrom, dateTo, month, year], () => {
     if (adopting) {
       return
     }
@@ -159,6 +167,8 @@ export function useFilters(options: UseFiltersOptions) {
     category.value = params.get('category') ?? defaults.category
     dateFrom.value = params.get('dateFrom') ?? defaults.dateFrom
     dateTo.value = params.get('dateTo') ?? defaults.dateTo
+    month.value = params.get('month') ?? defaults.month
+    year.value = params.get('year') ?? defaults.year
     nextTick(() => {
       adopting = false
     })
@@ -188,6 +198,8 @@ export function useFilters(options: UseFiltersOptions) {
     category,
     dateFrom,
     dateTo,
+    month,
+    year,
     activeCount,
     isDirty,
     buildParams,

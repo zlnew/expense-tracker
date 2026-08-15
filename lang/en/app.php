@@ -180,6 +180,7 @@ return [
     'profile_settings' => 'Profile Settings',
     'profile_update_description' => 'Update your name and email address',
     'profile_update_title' => 'Profile Information',
+    'received' => 'Received',
     'recent_transactions' => 'Recent Transactions',
     'recent_transactions_description' => 'Quickly review your latest financial activities and transactions.',
     'recurring_transaction' => 'Recurring Transaction',
