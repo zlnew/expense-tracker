@@ -11,28 +11,27 @@ use App\Http\Requests\RecurringTransactionSaveRequest;
 use App\Models\Balance;
 use App\Models\Category;
 use App\Models\RecurringTransaction;
+use App\Queries\RecurringTransactionQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class RecurringTransactionController extends Controller
 {
     public function index(Request $request): Response
     {
-        $recurrings = RecurringTransaction::query()
-            ->where('user_id', Auth::id())
-            ->with(['balance', 'category'])
-            ->orderBy('is_active', 'desc')
-            ->orderBy('next_run_date', 'asc')
-            ->get();
+        $recurrings = RecurringTransactionQuery::make($request->all(), ['balance', 'category'])
+            ->forUser(Auth::id())
+            ->paginate();
 
         $balances = Balance::where('user_id', Auth::id())->get();
         $categories = Category::where('user_id', Auth::id())->get();
 
         return Inertia::render('RecurringList', [
-            'recurrings' => RecurringTransactionData::collect($recurrings),
+            'recurrings' => RecurringTransactionData::collect($recurrings, PaginatedDataCollection::class),
             'balances' => BalanceData::collect($balances),
             'categories' => CategoryData::collect($categories),
         ]);

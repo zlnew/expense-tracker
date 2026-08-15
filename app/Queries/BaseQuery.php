@@ -147,28 +147,40 @@ abstract class BaseQuery
         }
 
         $search = $this->filters['search'];
+        $operator = $this->searchOperator();
 
-        $this->query->where(function ($q) use ($search) {
+        $this->query->where(function ($q) use ($search, $operator) {
             foreach ($this->searchable as $column) {
                 if (str_contains($column, '.')) {
-                    $this->applyRelationSearch($q, $column, $search);
+                    $this->applyRelationSearch($q, $column, $search, $operator);
                 } else {
-                    $q->orWhere($column, 'ilike', "%{$search}%");
+                    $q->orWhere($column, $operator, "%{$search}%");
                 }
             }
         });
     }
 
-    protected function applyRelationSearch(Builder $query, string $column, string $search): void
+    protected function applyRelationSearch(Builder $query, string $column, string $search, string $operator = 'ilike'): void
     {
         $segments = explode('.', $column);
 
         $field = array_pop($segments);
         $relation = implode('.', $segments);
 
-        $query->orWhereHas($relation, function ($q) use ($field, $search) {
-            $q->where($field, 'ilike', "%{$search}%");
+        $query->orWhereHas($relation, function ($q) use ($field, $search, $operator) {
+            $q->where($field, $operator, "%{$search}%");
         });
+    }
+
+    /**
+     * Case-insensitive search operator for the active connection.
+     * pgsql supports ilike natively; sqlite (the test suite) uses LIKE.
+     */
+    protected function searchOperator(): string
+    {
+        return $this->query->getConnection()->getDriverName() === 'pgsql'
+            ? 'ilike'
+            : 'like';
     }
 
     protected function applySort(): void
