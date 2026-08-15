@@ -58,6 +58,7 @@ return [
     'close' => 'Close',
     'confirm_delete_recurring' => 'Are you sure you want to delete this recurring transaction?',
     'confirm_password' => 'Confirm Password',
+    'contribution_amount' => 'Contribution amount',
     'create' => 'Create',
     'create_budget' => 'Create Budget',
     'create_data' => 'Create :data',

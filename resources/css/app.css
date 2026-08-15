@@ -78,6 +78,7 @@
   --z-index-bottom-nav: 45;
   --z-index-overlay: 50;
   --z-index-modal: 60;
+  --z-index-popover: 65;
   --z-index-toast: 70;
 }
 
