@@ -28,7 +28,9 @@ class FundWithdrawalRequest extends FormRequest
                 'required',
                 Rule::exists('balances', 'id')->where('user_id', $this->user()?->id),
             ],
-            'date' => ['required', 'date'],
+            // Future-dated payouts are nonsensical (the expense hits the
+            // balance immediately) — reject them like future set-asides.
+            'date' => ['required', 'date', 'before_or_equal:today'],
             'description' => ['nullable', 'string'],
         ];
     }

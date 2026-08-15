@@ -21,6 +21,14 @@ function fundApiToken(User $user, string $abilities): string
     return $user->createToken('test', explode(',', $abilities))->plainTextToken;
 }
 
+function apiExpenseCategory(User $user): Category
+{
+    return Category::factory()->for($user)->create([
+        'type' => CategoryType::EXPENSE,
+        'name' => 'Maintenance',
+    ]);
+}
+
 test('unauthenticated requests to every fund api endpoint return 401', function () {
     $this->getJson('/api/funds')->assertUnauthorized();
     $this->postJson('/api/funds', [])->assertUnauthorized();
@@ -48,9 +56,10 @@ test('fund endpoints enforce abilities (read vs write)', function () {
     ])->assertForbidden();
 });
 
-test('creating a fund via the api returns 201 with progress and category', function () {
+test('creating a fund via the api returns 201 with progress and the picked category', function () {
     $user = User::factory()->create();
     $token = fundApiToken($user, 'funds:write');
+    $category = apiExpenseCategory($user);
 
     $this->withHeader('Authorization', "Bearer {$token}")
         ->postJson('/api/funds', [
@@ -58,22 +67,35 @@ test('creating a fund via the api returns 201 with progress and category', funct
             'target_amount' => 400_000,
             'cadence' => 'cycle',
             'contribution_amount' => null,
+            'category_id' => $category->id,
             'next_due' => CarbonImmutable::now()->addMonths(2)->toDateString(),
             'due_interval_months' => 2,
         ])
         ->assertCreated()
         ->assertJsonPath('name', 'Moto Maintenance')
         ->assertJsonPath('target_amount', 400_000)
+        ->assertJsonPath('category_id', $category->id)
         ->assertJsonPath('accumulated', 0)
         ->assertJsonPath('percent', 0)
         ->assertJsonPath('status', 'on_track');
 
-    // EnsureFundCategories ran — the Maintenance category exists.
-    $this->assertDatabaseHas('categories', [
-        'user_id' => $user->id,
-        'type' => CategoryType::EXPENSE->value,
-        'name' => 'Maintenance',
-    ]);
+    // Only the user-picked category exists — no auto-created Maintenance/Taxes.
+    expect($user->categories()->count())->toBe(1);
+});
+
+test('creating a fund via the api without a category is rejected', function () {
+    $user = User::factory()->create();
+    $token = fundApiToken($user, 'funds:write');
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/funds', [
+            'name' => 'No Category',
+            'target_amount' => 400_000,
+            'cadence' => 'cycle',
+            'due_interval_months' => 2,
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('category_id');
 });
 
 test('a fund is scoped to its user in every endpoint', function () {
@@ -83,12 +105,14 @@ test('a fund is scoped to its user in every endpoint', function () {
     // Create through the owner's own API token (exercises the store path and
     // avoids the actingAs default-guard leak documented in ApiTest).
     $ownerToken = fundApiToken($owner, 'funds:read,funds:write');
+    $category = apiExpenseCategory($owner);
 
     $created = $this->withHeader('Authorization', "Bearer {$ownerToken}")
         ->postJson('/api/funds', [
             'name' => 'Owner Fund',
             'target_amount' => 400_000,
             'cadence' => 'cycle',
+            'category_id' => $category->id,
             'due_interval_months' => 1,
         ])
         ->assertCreated();
@@ -147,10 +171,12 @@ test('withdrawal via api creates a real expense and returns progress', function 
     $this->actingAs($user);
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
+    $category = apiExpenseCategory($user);
     $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto',
         'target_amount' => 400_000,
         'cadence' => 'cycle',
+        'category_id' => $category->id,
         'due_interval_months' => 2,
     ]));
     SaveFundContribution::run($fund, FundContributionData::from([
@@ -178,10 +204,12 @@ test('withdrawal above the reserve returns 422 insufficient_fund_reserve', funct
     $this->actingAs($user);
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
+    $category = apiExpenseCategory($user);
     $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto',
         'target_amount' => 400_000,
         'cadence' => 'cycle',
+        'category_id' => $category->id,
         'due_interval_months' => 2,
     ]));
     SaveFundContribution::run($fund, FundContributionData::from([
