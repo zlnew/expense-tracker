@@ -7,6 +7,7 @@ active_expense,"Active Expense","Pengeluaran Aktif"
 active_income,"Active Income","Pemasukan Aktif"
 actual,Actual,Aktual
 add_data,"Add :data","Tambah :data"
+add_transaction,"Add transaction","Tambah transaksi"
 all_data,"All :data","Semua :data"
 amount,Amount,Jumlah
 appearance,Appearance,Tampilan
@@ -135,6 +136,7 @@ last_set_aside,"Last set aside","Terakhir menyisihkan"
 last_updated_at,"Last Updated At","Terakhir Diperbarui"
 list,List,List
 log_out,"Log Out",Keluar
+main_navigation,"Main Navigation","Navigasi Utama"
 march,March,Maret
 may,May,Mei
 month,Month,Bulan
@@ -147,12 +149,15 @@ multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 needs_data,"needs :data","butuh :data"
 new_password,"New Password","Kata Sandi Baru"
+new_version_available,"New version available","Versi baru tersedia"
+new_version_reload,Reload,"Muat ulang"
 next_due,"Next due","Jatuh tempo berikutnya"
 next_run_date,"Next Run","Berjalan Berikutnya"
 no_data_found,"No :data found",":data tidak ditemukan"
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
+offline,"You're offline","Anda sedang offline"
 on_track,"On track","Sesuai rencana"
 optional,Optional,Opsional
 overfunded,Overfunded,"Melebihi target"
@@ -202,6 +207,7 @@ settings_title,Settings,Pengaturan
 show_hide_balances,"Show/hide balances","Tampilkan/sembunyikan saldo"
 single_transaction,"Single Transaction","Satu Transaksi"
 sinking_funds,"Sinking Funds","Dana Cadangan"
+skip_to_content,"Skip to content","Langsung ke konten"
 spent,Spent,Terpakai
 start_date,"Start Date","Tanggal Mulai"
 status,Status,Status
