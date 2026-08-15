@@ -31,7 +31,11 @@ class GetFundProgress extends Action
     {
         $today = $this->today ?? CarbonImmutable::now()->startOfDay();
 
+        // Date-scoped (Bug fix): future-dated ledger rows must not count
+        // toward today's accumulated reserve — the reserve check in
+        // PayFromFund and the progress display both read through here.
         $accumulated = (int) $this->fund->contributions()
+            ->whereDate('date', '<=', $today)
             ->selectRaw(
                 'COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS balance',
                 ['contribution', 'withdrawal'],
@@ -44,6 +48,7 @@ class GetFundProgress extends Action
 
         $lastContributionDate = $this->fund->contributions()
             ->where('type', 'contribution')
+            ->whereDate('date', '<=', $today)
             ->max('date');
 
         return [
@@ -77,7 +82,10 @@ class GetFundProgress extends Action
             return max(1, (int) ceil($remaining / 12));
         }
 
-        $monthsToDue = max(0, (int) $today->diffInMonths(CarbonImmutable::parse($nextDue)->startOfDay()));
+        // Ceil the month count so a partial month still spreads the
+        // shortfall across an extra cycle (45 days to due → 2 slices,
+        // not "pay the whole shortfall now").
+        $monthsToDue = max(0, (int) ceil($today->diffInMonths(CarbonImmutable::parse($nextDue)->startOfDay())));
 
         return max(1, (int) ceil($remaining / max(1, $monthsToDue)));
     }

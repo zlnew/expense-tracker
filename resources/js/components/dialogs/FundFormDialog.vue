@@ -252,7 +252,10 @@ const submit = () => {
 
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="grid gap-2">
-              <Label for="fund_category">{{ __('category') }}</Label>
+              <Label for="fund_category">
+                {{ __('category') }}
+                <span class="text-destructive">*</span>
+              </Label>
               <Select v-model="form.category_id">
                 <SelectTrigger id="fund_category">
                   <SelectValue

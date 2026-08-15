@@ -1,7 +1,6 @@
 <?php
 
 use App\Actions\DeleteFund;
-use App\Actions\EnsureFundCategories;
 use App\Actions\GetFundProgress;
 use App\Actions\ListUpcomingDues;
 use App\Actions\PayFromFund;
@@ -47,26 +46,24 @@ function makeContributionData(array $overrides = []): FundContributionData
     ], $overrides));
 }
 
-test('creating a fund ensures the Maintenance and Taxes categories exist', function () {
+function makeExpenseCategory(User $user): Category
+{
+    return Category::factory()->for($user)->create([
+        'type' => CategoryType::EXPENSE,
+        'name' => 'Maintenance',
+    ]);
+}
+
+test('creating a fund stores the user-picked expense category', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $fund = SaveFund::run(new SinkingFund, makeFundData());
+    $category = makeExpenseCategory($user);
 
-    expect($fund->user_id)->toBe($user->id);
+    $fund = SaveFund::run(new SinkingFund, makeFundData(['category_id' => $category->id]));
 
-    $maintenance = $user->categories()->where('type', CategoryType::EXPENSE)->where('name', 'Maintenance')->first();
-    $taxes = $user->categories()->where('type', CategoryType::EXPENSE)->where('name', 'Taxes')->first();
-
-    expect($maintenance)->not->toBeNull()
-        ->and($taxes)->not->toBeNull();
-
-    // Idempotent — running again creates no duplicates.
-    EnsureFundCategories::run($user);
-    EnsureFundCategories::run($user);
-
-    expect($user->categories()->where('name', 'Maintenance')->count())->toBe(1)
-        ->and($user->categories()->where('name', 'Taxes')->count())->toBe(1);
+    expect($fund->user_id)->toBe($user->id)
+        ->and($fund->category_id)->toBe($category->id);
 });
 
 test('fund category must be a user-owned expense category (validation)', function () {
@@ -171,7 +168,8 @@ test('pay from fund rejects amount above accumulated with insufficient_fund_rese
     $this->actingAs($user);
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
-    $fund = SaveFund::run(new SinkingFund, makeFundData());
+    $category = makeExpenseCategory($user);
+    $fund = SaveFund::run(new SinkingFund, makeFundData(['category_id' => $category->id]));
 
     SaveFundContribution::run($fund, makeContributionData(['amount' => 50_000]));
 
@@ -183,6 +181,23 @@ test('pay from fund rejects amount above accumulated with insufficient_fund_rese
     // Nothing was created.
     expect(Transaction::count())->toBe(0)
         ->and(GetFundProgress::run($fund)['accumulated'])->toBe(50_000);
+});
+
+test('pay from fund without a category is rejected with fund_requires_category', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
+    // Legacy row: a fund created before category became required.
+    $fund = SaveFund::run(new SinkingFund, makeFundData());
+    SaveFundContribution::run($fund, makeContributionData(['amount' => 50_000]));
+
+    expect(fn () => PayFromFund::run($fund, makeContributionData([
+        'amount' => 10_000,
+        'balance_id' => $balance->id,
+    ])))->toThrow(ValidationException::class, 'Fund must have a category');
+
+    expect(Transaction::count())->toBe(0);
 });
 
 test('auto-contribution spreads the shortfall across months until due', function () {
@@ -306,4 +321,84 @@ test('list upcoming dues returns horizon + overdue with shortfall math', functio
     expect($dueSoonRow['projected_shortfall'])->toBe(200_000);
 
     expect(collect($rows)->pluck('fund.name'))->not->toContain('Far Out');
+});
+
+test('due roll preserves the anchor day across short months', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
+    $category = makeExpenseCategory($user);
+
+    // Due on the 31st; interval 1 month. Feb clamps to the 28th, but the
+    // NEXT roll must return to the 31st (anchor_day preserved), not drift
+    // to the 28th forever (the addMonthsNoOverflow bug).
+    $fund = SaveFund::run(new SinkingFund, makeFundData([
+        'category_id' => $category->id,
+        'next_due' => CarbonImmutable::create(2026, 1, 31)->toDateString(),
+        'due_interval_months' => 1,
+    ]));
+    expect($fund->anchor_day)->toBe(31);
+
+    SaveFundContribution::run($fund, makeContributionData(['amount' => 100_000]));
+    PayFromFund::run($fund, makeContributionData([
+        'amount' => 50_000,
+        'balance_id' => $balance->id,
+    ]));
+
+    // Jan 31 + 1mo → Feb 28 (clamped to the month length).
+    expect($fund->fresh()->next_due->toDateString())->toBe('2026-02-28');
+
+    SaveFundContribution::run($fund, makeContributionData(['amount' => 100_000]));
+    PayFromFund::run($fund, makeContributionData([
+        'amount' => 50_000,
+        'balance_id' => $balance->id,
+    ]));
+
+    // Feb 28 + 1mo → Mar 31 — anchored to the ORIGINAL day, not the clamp.
+    expect($fund->fresh()->next_due->toDateString())->toBe('2026-03-31');
+});
+
+test('future-dated set-aside does not count toward the reserve', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
+    $category = makeExpenseCategory($user);
+    $fund = SaveFund::run(new SinkingFund, makeFundData(['category_id' => $category->id]));
+
+    // Set aside dated NEXT month — must not inflate today's accumulated.
+    SaveFundContribution::run($fund, makeContributionData([
+        'amount' => 100_000,
+        'date' => CarbonImmutable::now()->addMonth()->toDateString(),
+    ]));
+
+    expect(GetFundProgress::run($fund)['accumulated'])->toBe(0);
+
+    // And the request layer rejects the future date outright.
+    $this->post(route('funds.contributions.store', $fund), [
+        'amount' => 10_000,
+        'date' => CarbonImmutable::now()->addDay()->toDateString(),
+    ])->assertSessionHasErrors('date');
+
+    // Reserve check rejects a payout even though a future row exists.
+    expect(fn () => PayFromFund::run($fund, makeContributionData([
+        'amount' => 10_000,
+        'balance_id' => $balance->id,
+    ])))->toThrow(ValidationException::class, 'Insufficient fund reserve');
+});
+
+test('auto-contribution ceils partial months so it spreads instead of dumping', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    // 200k shortfall, due in ~1.5 months → ceil(1.48) = 2 slices → 100k/cycle,
+    // NOT the whole 200k at once (the (int) truncation bug).
+    $fund = SaveFund::run(new SinkingFund, makeFundData([
+        'target_amount' => 400_000,
+        'next_due' => CarbonImmutable::now()->addDays(45)->toDateString(),
+    ]));
+    SaveFundContribution::run($fund, makeContributionData(['amount' => 200_000]));
+
+    expect(GetFundProgress::run($fund)['auto_contribution'])->toBe(100_000);
 });

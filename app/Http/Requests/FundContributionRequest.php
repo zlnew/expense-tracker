@@ -23,7 +23,8 @@ class FundContributionRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'integer', 'min:1'],
-            'date' => ['required', 'date'],
+            // Future-dated set-asides must not inflate today's reserve.
+            'date' => ['required', 'date', 'before_or_equal:today'],
             'description' => ['nullable', 'string'],
         ];
     }

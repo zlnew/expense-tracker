@@ -31,7 +31,7 @@ class FundUpdateRequest extends FormRequest
             'contribution_amount' => ['sometimes', 'nullable', 'integer', 'min:1'],
             'category_id' => [
                 'sometimes',
-                'nullable',
+                'required',
                 Rule::exists('categories', 'id')
                     ->where('user_id', $this->user()?->id)
                     ->where('type', CategoryType::EXPENSE->value),
