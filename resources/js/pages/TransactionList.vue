@@ -254,7 +254,7 @@ const rowActions = (t: Transaction) => [
 
         <!-- Segmented [ Transactions | Recurring ] — visible at every
              breakpoint; the old control was mobile-only. -->
-        <TransactionTabs class="md:hidden" viewMode="transactions" />
+        <TransactionTabs class="lg:hidden" viewMode="transactions" />
 
         <!-- Desktop: inline filter controls (lg+) -->
         <div class="hidden w-full gap-4 lg:flex lg:w-auto">
