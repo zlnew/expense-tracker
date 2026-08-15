@@ -8,7 +8,10 @@ import GlobalTransactionCreate from '@/components/GlobalTransactionCreate.vue'
 import OfflineIndicator from '@/components/OfflineIndicator.vue'
 import PwaUpdatePrompt from '@/components/PwaUpdatePrompt.vue'
 import { Toaster } from '@/components/ui/sonner'
+import { useLang } from '@/composables/useLang'
 import type { BreadcrumbItem } from '@/types'
+
+const { __ } = useLang()
 
 type Props = {
   breadcrumbs?: BreadcrumbItem[]
@@ -21,10 +24,18 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <AppShell variant="sidebar">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:ring-[3px] focus:ring-ring/50 focus:outline-none"
+    >
+      {{ __('skip_to_content') }}
+    </a>
     <AppSidebar />
     <AppContent
+      id="main-content"
+      tabindex="-1"
       variant="sidebar"
-      class="overflow-x-clip pb-[var(--bottom-nav-height)]"
+      class="overflow-x-clip pb-[var(--bottom-nav-height)] focus:outline-none"
     >
       <AppSidebarHeader :breadcrumbs="breadcrumbs" />
       <slot />

@@ -1,4 +1,4 @@
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import { createApp, h } from 'vue'
 import { initializeTheme } from '@/composables/useAppearance'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
@@ -52,7 +52,7 @@ createInertiaApp({
     return app
   },
   progress: {
-    color: '#4B5563',
+    color: 'var(--primary)',
   },
 })
 
@@ -61,3 +61,23 @@ initializeTheme()
 
 // This will listen for flash toast data from the server...
 initializeFlashToast()
+
+// Focus management: after a real page navigation (component change), move
+// focus to the main content region so keyboard / screen-reader users start
+// at the top of the new page instead of a stale element. Same-component
+// visits (search/filter debounce, form re-renders) keep focus where it is.
+let lastNavigatedComponent: string | null = null
+
+router.on('navigate', (event) => {
+  const component = event.detail.page.component
+
+  if (component === lastNavigatedComponent) {
+    return
+  }
+
+  lastNavigatedComponent = component
+
+  requestAnimationFrame(() => {
+    document.getElementById('main-content')?.focus({ preventScroll: true })
+  })
+})

@@ -226,6 +226,7 @@ watch(
               variant="ghost"
               size="icon"
               class="absolute top-2 right-2 z-10 text-destructive hover:bg-destructive/10"
+              :aria-label="__('remove_item')"
               @click="removeItem(index)"
             >
               <Trash2 class="size-4" />
