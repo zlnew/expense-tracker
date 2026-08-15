@@ -27,6 +27,7 @@ balance_list,"Balance List","List Balance"
 balance_list_description,"Manage your balances and accounts","Kelola saldo dan akun Anda"
 balance_update_description,"Update balance or account information","Perbarui informasi saldo atau akun"
 balances,Balances,Saldo
+breakdown_chart_aria,"Expense breakdown chart","Grafik proporsi pengeluaran"
 budget,Budget,Anggaran
 budget_create_description,"Create a new budget to manage your monthly finances","Buat anggaran baru untuk mengelola keuangan bulanan Anda"
 budget_delete_description,"Are you sure you want to delete this budget permanently?","Apakah Anda yakin ingin menghapus anggaran ini secara permanen?"
@@ -54,6 +55,7 @@ category_update_description,"Update budget category","Perbarui kategori anggaran
 confirm_delete_recurring,"Are you sure you want to delete this recurring transaction?","Apakah Anda yakin ingin menghapus transaksi berulang ini?"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
 create,Create,Buat
+create_budget,"Create Budget","Buat Anggaran"
 create_data,"Create :data","Buat :data"
 created_data,":data Created",":data Dibuat"
 current_month_expenses,"Current Month Expenses","Pengeluaran Bulan Ini"
@@ -154,13 +156,20 @@ new_version_available,"New version available","Versi baru tersedia"
 new_version_reload,Reload,"Muat ulang"
 next_due,"Next due","Jatuh tempo berikutnya"
 next_run_date,"Next Run","Berjalan Berikutnya"
+no_active_budget,"No Active Budget","Belum Ada Anggaran Aktif"
+no_active_budget_description,"Create a budget to start tracking your income and expenses.","Buat anggaran untuk mulai melacak pemasukan dan pengeluaran Anda."
+no_breakdown_data,"No expense breakdown yet","Belum ada proporsi pengeluaran"
+no_breakdown_data_description,"Expenses from this budget cycle will appear here.","Pengeluaran dari siklus anggaran ini akan muncul di sini."
 no_data_found,"No :data found",":data tidak ditemukan"
+no_trend_data,"No spending trend yet","Belum ada tren pengeluaran"
+no_trend_data_description,"Income and expenses from this budget cycle will appear here.","Pemasukan dan pengeluaran dari siklus anggaran ini akan muncul di sini."
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
 offline,"You're offline","Anda sedang offline"
 on_track,"On track","Sesuai rencana"
 optional,Optional,Opsional
+others,Others,Lainnya
 overfunded,Overfunded,"Melebihi target"
 overspent,Overspent,Melebihi
 password,Password,"Kata Sandi"
@@ -198,6 +207,7 @@ search_categories_placeholder,"Search by name...","Cari berdasarkan nama..."
 search_transactions_placeholder,Search...,Cari...
 security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
+see_all,"See All","Lihat Semua"
 select_data,"Select :data","Pilih :data"
 september,September,September
 set_as_active,"Set as Active","Jadikan Aktif"
@@ -235,6 +245,7 @@ transactions,Transactions,Transaksi
 transfer,Transfer,Transfer
 transfer_description,"Transfer between accounts","Transfer antar akun"
 transfer_same_account_error,"Source and destination accounts must be different","Akun sumber dan tujuan harus berbeda"
+trend_chart_aria,"Monthly income and expense trend chart","Grafik tren pemasukan dan pengeluaran bulanan"
 type,Type,Jenis
 types,Types,Jenis
 underfunded,Underfunded,"Kurang dari target"
