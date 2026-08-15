@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\DeleteFund;
-use App\Actions\EnsureFundCategories;
 use App\Actions\GetFundProgress;
 use App\Actions\PayFromFund;
 use App\Actions\SaveFund;
@@ -35,8 +34,6 @@ class FundApiController extends Controller
 
     public function store(FundSaveRequest $request): JsonResponse
     {
-        EnsureFundCategories::run($request->user());
-
         $fund = SaveFund::run(new SinkingFund, $request->getData());
 
         return response()->json(

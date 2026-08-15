@@ -119,6 +119,7 @@ return [
     'fund_delete_description' => 'Are you sure you want to delete this fund? Its contribution history will be kept for audit.',
     'fund_list_description' => 'Manage funds that set aside money for known future bills',
     'fund_name_placeholder' => 'e.g. Moto Maintenance',
+    'fund_requires_category' => 'Fund must have a category before paying from it',
     'fund_update_description' => 'Update the fund target, cadence, or next due date',
     'fund_withdrawal' => 'Withdrawal',
     'funded' => 'funded',

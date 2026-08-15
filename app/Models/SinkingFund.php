@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $category_id
  * @property CarbonImmutable|null $next_due
  * @property int $due_interval_months
+ * @property int|null $anchor_day
  * @property string|null $notes
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -49,7 +50,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['name', 'target_amount', 'cadence', 'contribution_amount', 'category_id', 'next_due', 'due_interval_months', 'notes'])]
+#[Fillable(['name', 'target_amount', 'cadence', 'contribution_amount', 'category_id', 'next_due', 'due_interval_months', 'anchor_day', 'notes'])]
 class SinkingFund extends Model
 {
     use HasFactory, SoftDeletes;
@@ -60,6 +61,7 @@ class SinkingFund extends Model
             'target_amount' => 'integer',
             'contribution_amount' => 'integer',
             'due_interval_months' => 'integer',
+            'anchor_day' => 'integer',
             'next_due' => 'date',
         ];
     }

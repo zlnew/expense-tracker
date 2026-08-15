@@ -18,9 +18,7 @@ class SaveFund extends Action
     {
         return DB::transaction(function () {
             if (! $this->fund->user_id) {
-                // Creating a fund also guarantees the per-user expense
-                // categories exist (D3) — idempotent.
-                EnsureFundCategories::run(Auth::user());
+                // Creating a fund is user-scoped server-side.
                 $this->fund->user()->associate(Auth::id());
             }
 
@@ -32,6 +30,9 @@ class SaveFund extends Action
                 'category_id' => $this->data->category_id,
                 'next_due' => $this->data->next_due,
                 'due_interval_months' => $this->data->due_interval_months,
+                // Re-anchor the cadence whenever next_due is set (create or
+                // edit); PayFromFund rolls from this day, clamped per month.
+                'anchor_day' => $this->data->next_due?->day,
                 'notes' => $this->data->notes,
             ]);
 

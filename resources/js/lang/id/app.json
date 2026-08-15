@@ -117,6 +117,7 @@
     "fund_delete_description": "Apakah Anda yakin ingin menghapus dana ini? Riwayat kontribusi akan tetap disimpan untuk audit.",
     "fund_list_description": "Kelola dana yang menyisihkan uang untuk tagihan masa depan",
     "fund_name_placeholder": "mis. Perawatan Motor",
+    "fund_requires_category": "Dana harus memiliki kategori sebelum ditarik",
     "fund_update_description": "Perbarui target dana, kadens, atau tanggal jatuh tempo berikutnya",
     "fund_withdrawal": "Penarikan",
     "funded": "terdanai",

@@ -8,6 +8,7 @@ use App\Enums\CategoryType;
 use App\Models\FundContribution;
 use App\Models\SinkingFund;
 use App\Models\Transaction;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -47,6 +48,7 @@ class PayFromFund extends Action
                 ->firstOrFail();
 
             $accumulated = (int) $locked->contributions()
+                ->whereDate('date', '<=', CarbonImmutable::now())
                 ->selectRaw(
                     'COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS balance',
                     ['contribution', 'withdrawal'],
@@ -56,6 +58,16 @@ class PayFromFund extends Action
             if ($accumulated < $this->data->amount) {
                 throw ValidationException::withMessages([
                     'amount' => __('insufficient_fund_reserve'),
+                ]);
+            }
+
+            // A fund without a category would mint an orphan expense (NULL
+            // category/budget on the real transaction). Category is required
+            // at create/update; this guards legacy rows created before the
+            // rule.
+            if ($locked->category_id === null) {
+                throw ValidationException::withMessages([
+                    'category_id' => __('fund_requires_category'),
                 ]);
             }
 
@@ -90,10 +102,21 @@ class PayFromFund extends Action
                 'description' => $this->data->description,
             ]);
 
-            // 6. Roll next_due anchored to the OLD due date (paying late
-            // doesn't drift the cadence); null stays null.
+            // 6. Roll next_due anchored to the ORIGINAL day-of-month (the
+            // anchor_day), clamped to the target month's length — a fund due
+            // on the 31st stays on the 31st (Jan 31 → Feb 28 → Mar 31), not
+            // drifting to the 28th. addMonthsNoOverflow alone drifts because
+            // it clamps from the CURRENT due date. Paying late doesn't drift
+            // the cadence; null stays null.
             if ($locked->next_due !== null) {
-                $locked->next_due = $locked->next_due->addMonthsNoOverflow($locked->due_interval_months);
+                $anchorDay = $locked->anchor_day ?? $locked->next_due->day;
+
+                $targetMonth = $locked->next_due->startOfMonth()
+                    ->addMonthsNoOverflow($locked->due_interval_months);
+
+                $locked->next_due = $targetMonth->setDay(
+                    min($anchorDay, $targetMonth->daysInMonth),
+                );
                 $locked->save();
             }
 

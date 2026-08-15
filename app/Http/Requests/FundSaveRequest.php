@@ -29,8 +29,12 @@ class FundSaveRequest extends FormRequest
             'target_amount' => ['required', 'integer', 'min:1'],
             'cadence' => ['required', new In(['cycle', 'monthly'])],
             'contribution_amount' => ['nullable', 'integer', 'min:1'],
+            // Category is REQUIRED — the user picks where fund payouts
+            // charge. Auto-created Maintenance/Taxes categories were a design
+            // failure; the fund must have an explicit user-picked expense
+            // category or payouts would mint orphan (uncategorized) expenses.
             'category_id' => [
-                'nullable',
+                'required',
                 Rule::exists('categories', 'id')
                     ->where('user_id', $this->user()?->id)
                     ->where('type', CategoryType::EXPENSE->value),
