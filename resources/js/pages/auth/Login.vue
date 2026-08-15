@@ -54,7 +54,6 @@ defineProps<{
           :tabindex="1"
           autocomplete="email"
           placeholder="email@example.com"
-          class="h-11 md:h-9"
         />
         <InputError :message="errors.email" />
       </div>
@@ -78,7 +77,6 @@ defineProps<{
           :tabindex="2"
           autocomplete="current-password"
           placeholder="Password"
-          class="h-11 md:h-9"
         />
         <InputError :message="errors.password" />
       </div>
@@ -92,7 +90,7 @@ defineProps<{
 
       <Button
         type="submit"
-        class="mt-4 h-11 w-full md:h-9"
+        class="mt-4 w-full"
         :tabindex="4"
         :disabled="processing"
         data-test="login-button"
