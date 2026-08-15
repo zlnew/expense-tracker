@@ -122,9 +122,9 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --chart-6: oklch(0.627 0.265 303.9);
-  --chart-7: oklch(0.645 0.246 16.439);
-  --chart-8: oklch(0.656 0.241 354.308);
+  --chart-6: oklch(0.68 0.17 123.5);
+  --chart-7: oklch(0.72 0.13 206);
+  --chart-8: oklch(0.62 0.24 340);
   --income: oklch(0.696 0.17 162.48);
   --income-muted: oklch(0.696 0.17 162.48 / 20%);
   --expense: oklch(0.645 0.246 16.439);
@@ -167,9 +167,9 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --chart-6: oklch(0.6 0.118 184.704);
-  --chart-7: oklch(0.656 0.241 354.308);
-  --chart-8: oklch(0.828 0.189 84.429);
+  --chart-6: oklch(0.65 0.16 123.5);
+  --chart-7: oklch(0.68 0.12 206);
+  --chart-8: oklch(0.6 0.23 340);
   --income: oklch(0.696 0.17 162.48);
   --income-muted: oklch(0.696 0.17 162.48 / 20%);
   --expense: oklch(0.704 0.191 22.216);

@@ -40,6 +40,8 @@ class GetSummaryCardsData extends Action
             'current_month_expenses' => $currentMonthExpenses,
             'current_month_incomes' => $currentMonthIncomes,
             'budget_remaining' => $budgetRemaining,
+            'has_active_budget' => $this->activeBudget !== null,
+            'active_budget_id' => $this->activeBudget?->id,
         ];
     }
 

@@ -64,6 +64,7 @@ function openTransactionCreate() {
 
 <template>
   <nav
+    data-testid="bottom-nav"
     :aria-label="__('main_navigation')"
     class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] lg:hidden"
   >
@@ -90,6 +91,7 @@ function openTransactionCreate() {
       <!-- Center slot: quick-add FAB, raised above the bar -->
       <div class="flex items-center justify-center">
         <Button
+          data-testid="transaction-fab"
           variant="default"
           size="icon-lg"
           :aria-label="__('add_transaction')"

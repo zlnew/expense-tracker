@@ -15,7 +15,7 @@ on:
       - workos
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   quality:
@@ -27,23 +27,40 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          extensions: pdo_sqlite, sqlite3
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Install Dependencies
         run: |
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm install
+          npm ci
 
       - name: Run Pint
-        run: composer lint
+        run: composer lint:check
 
       - name: Format Frontend
-        run: npm run format
+        run: npm run format-check
 
       - name: Lint Frontend
-        run: npm run lint
+        run: npm run lint-check
 
-      # - name: Commit Changes
-      #   uses: stefanzweifel/git-auto-commit-action@v7
-      #   with:
-      #     commit_message: fix code style
-      #     commit_options: '--no-verify'
+      - name: Build Frontend
+        run: npm run build
+
+      # Build first: the wayfinder Vite plugin generates resources/js/{routes,actions}
+      # (gitignored) during build, and type-check needs those modules to exist.
+      - name: Type-check Frontend
+        run: npm run type-check
+
+      - name: Test Backend
+        run: php artisan test
+
+      - name: Test Frontend Unit
+        run: npm run test:unit
+
+      - name: Check i18n Drift
+        run: php artisan app:generate-language-files && git diff --exit-code resources/js/lang

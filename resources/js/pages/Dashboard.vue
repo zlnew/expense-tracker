@@ -9,20 +9,20 @@ import {
   VisSingleContainer,
   VisDonut,
 } from '@unovis/vue'
+import { useMediaQuery } from '@vueuse/core'
 import {
   Wallet,
   TrendingUp,
   TrendingDown,
   Target,
-  TrendingUpIcon,
   AlertTriangle,
   ChevronRight,
   Download,
-  TrendingDownIcon,
   X,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
 import AppContent from '@/components/AppContent.vue'
+import ChartEmpty from '@/components/ChartEmpty.vue'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -33,11 +33,13 @@ import {
 } from '@/components/ui/card'
 import {
   ChartContainer,
+  ChartLegendContent,
   ChartTooltip,
   ChartCrosshair,
 } from '@/components/ui/chart'
 import ChartTooltipContent from '@/components/ui/chart/ChartTooltipContent.vue'
 import { componentToString } from '@/components/ui/chart/utils'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useBudgetProgress } from '@/composables/useBudgetProgress'
 import { useDate } from '@/composables/useDate'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
@@ -58,8 +60,8 @@ import type {
 const props = defineProps<{
   summary_cards: SummaryCards
   budget_progress: BudgetProgress
-  expense_breakdown: ExpenseBreakdown[]
-  monthly_spending_trend: MonthlySpendingTrend[]
+  expense_breakdown?: ExpenseBreakdown[]
+  monthly_spending_trend?: MonthlySpendingTrend[]
   recent_transactions: RecentTransactions
 }>()
 
@@ -77,17 +79,38 @@ setLayoutProps({
   ],
 })
 
-// --- Monthly Spending Trend (Line Chart) Configuration ---
+const isMobile = useMediaQuery('(max-width: 767px)')
+
+// --- Monthly Spending Trend (Line Chart) ---
 const lineChartConfig = {
   income: {
     label: __('income'),
-    color: '#10b981', // emerald-500
+    color: 'oklch(0.696 0.17 162.48)', // --income token
   },
   expense: {
     label: __('expense'),
-    color: '#f43f5e', // rose-500
+    color: 'oklch(0.645 0.246 16.439)', // --expense token (light)
   },
 }
+
+const trendData = computed(() => {
+  const data = props.monthly_spending_trend ?? []
+
+  // Mobile shows the 6 most recent months; desktop shows the full year.
+  if (!isMobile.value) {
+    return data
+  }
+
+  const currentMonth = new Date().getMonth() + 1
+
+  return data.filter((d) => d.month <= currentMonth).slice(-6)
+})
+
+const hasTrendData = computed(() => {
+  return (props.monthly_spending_trend ?? []).some(
+    (d) => d.income > 0 || d.expense > 0,
+  )
+})
 
 const x = (d: MonthlySpendingTrend) => d.month
 const incomeY = (d: MonthlySpendingTrend) => d.income
@@ -150,26 +173,39 @@ const lineTooltipTemplate = componentToString(
   },
 )
 
-// --- Expense Breakdown (Pie/Donut Chart) Configuration ---
-const totalExpenseAmount = computed(() => {
-  return props.expense_breakdown.reduce((sum, item) => sum + item.amount, 0)
+// --- Expense Breakdown (ranked list <md, donut md+) ---
+const BREAKDOWN_TOP = 7
+
+const breakdownItems = computed<ExpenseBreakdown[]>(() => {
+  const data = props.expense_breakdown ?? []
+
+  if (data.length <= BREAKDOWN_TOP) {
+    return data
+  }
+
+  const top = data.slice(0, BREAKDOWN_TOP)
+  const rest = data.slice(BREAKDOWN_TOP)
+  const restAmount = rest.reduce((sum, item) => sum + item.amount, 0)
+  const total = data.reduce((sum, item) => sum + item.amount, 0)
+
+  return [
+    ...top,
+    {
+      category: __('others'),
+      amount: restAmount,
+      percentage: total > 0 ? Math.round((restAmount / total) * 100) : 0,
+    },
+  ]
 })
 
-const donutColors = [
-  '#3b82f6', // blue-500
-  '#10b981', // emerald-500
-  '#f59e0b', // amber-500
-  '#f43f5e', // rose-500
-  '#8b5cf6', // violet-500
-  '#ec4899', // pink-500
-  '#14b8a6', // teal-500
-  '#f97316', // orange-500
-  '#06b6d4', // cyan-500
-  '#a855f7', // purple-500
-]
+const totalExpenseAmount = computed(() => {
+  return breakdownItems.value.reduce((sum, item) => sum + item.amount, 0)
+})
 
-const donutColor = (d: ExpenseBreakdown, i: number) => {
-  return donutColors[i % donutColors.length]
+// Chart tokens are theme-aware; index 0..7 maps to --chart-1..8, so the
+// top-7 + rollup never repeats a color.
+const donutColor = (_d: ExpenseBreakdown, i: number) => {
+  return `var(--chart-${(i % 8) + 1})`
 }
 
 const donutConfig = {
@@ -186,25 +222,48 @@ const donutTriggers = {
   [Donut.selectors.segment]: donutTemplate,
 }
 
-// --- Budget Progress Helpers (shared with BudgetDetail) ---
+// --- Budget Progress Helpers ---
 const {
   getProgressPercent,
   getProgressColor,
   getProgressBgColor,
   getProgressTextColor,
 } = useBudgetProgress()
+
+const topBudgetProgress = computed(() => props.budget_progress.slice(0, 5))
+const topRecentTransactions = computed(() =>
+  props.recent_transactions.slice(0, 5),
+)
+
+const hasActiveBudget = computed(() => props.summary_cards.has_active_budget)
+
+// --- Two-up income/expense row (config-driven) ---
+const statCards = computed(() => [
+  {
+    label: __('current_month_incomes'),
+    value: formatAmount(props.summary_cards.current_month_incomes),
+    icon: TrendingUp,
+    iconClass:
+      'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400',
+  },
+  {
+    label: __('current_month_expenses'),
+    value: formatAmount(props.summary_cards.current_month_expenses),
+    icon: TrendingDown,
+    iconClass:
+      'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400',
+  },
+])
 </script>
 
 <template>
   <Head :title="__('dashboard')" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
+    <div class="space-y-4 px-4 py-4 sm:space-y-6 sm:px-6 md:py-6 lg:px-8">
       <!-- Header -->
       <div class="flex flex-col gap-1">
-        <h1
-          class="text-3xl font-extrabold tracking-tight text-foreground md:text-4xl"
-        >
+        <h1 class="text-2xl font-extrabold tracking-tight text-foreground">
           {{ __('dashboard') }}
         </h1>
         <p class="text-sm text-muted-foreground">
@@ -212,18 +271,10 @@ const {
         </p>
       </div>
 
-      <!-- Summary Cards Grid -->
-      <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <!-- Total Balance -->
-        <Card
-          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
-        >
-          <div
-            class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-blue-500/5 blur-xl dark:bg-blue-400/5"
-          ></div>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
-          >
+      <!-- Hero balance -->
+      <Card class="border-border/50 bg-card shadow-xs">
+        <CardContent class="flex flex-col gap-4 pt-6">
+          <div class="flex items-center justify-between">
             <CardTitle
               class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
@@ -234,121 +285,72 @@ const {
             >
               <Wallet class="size-4" />
             </div>
-          </CardHeader>
-          <CardContent class="px-3 sm:px-6">
-            <div
-              class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
-            >
-              {{ formatAmount(summary_cards.total_balance) }}
-            </div>
-            <p
-              class="mt-1 flex items-center gap-1 text-xs text-muted-foreground"
-            >
-              <Link
-                :href="balanceIndex.url()"
-                class="inline-flex items-center font-medium text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                {{ __('balance_list') }}
-                <ChevronRight class="ml-0.5 size-3" />
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
-
-        <!-- Monthly Incomes -->
-        <Card
-          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
-        >
+          </div>
           <div
-            class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-emerald-500/5 blur-xl dark:bg-emerald-400/5"
-          ></div>
+            class="min-w-0 truncate text-4xl font-extrabold tracking-tight text-foreground tabular-nums"
+          >
+            {{ formatAmount(summary_cards.total_balance) }}
+          </div>
+          <Link
+            :href="balanceIndex.url()"
+            class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            {{ __('balance_list') }}
+            <ChevronRight class="size-3" />
+          </Link>
+        </CardContent>
+      </Card>
+
+      <!-- Two-up income/expense -->
+      <div class="grid grid-cols-2 gap-3 sm:gap-4">
+        <Card
+          v-for="stat in statCards"
+          :key="stat.label"
+          class="border-border/50 bg-card shadow-xs"
+        >
           <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
+            class="flex flex-row items-center justify-between space-y-0 px-3 pt-4 pb-2 sm:px-5"
           >
             <CardTitle
               class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
-              {{ __('current_month_incomes') }}
+              {{ stat.label }}
             </CardTitle>
-            <div
-              class="rounded-lg bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
-            >
-              <TrendingUp class="size-4" />
+            <div class="rounded-lg p-2" :class="stat.iconClass">
+              <component :is="stat.icon" class="size-4" />
             </div>
           </CardHeader>
-          <CardContent class="px-3 sm:px-6">
+          <CardContent class="px-3 pb-4 sm:px-5 sm:pb-5">
             <div
-              class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
+              class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-2xl"
             >
-              {{ formatAmount(summary_cards.current_month_incomes) }}
+              {{ stat.value }}
             </div>
-            <p
-              class="mt-1 text-xs font-medium text-emerald-600 dark:text-emerald-400"
-            >
-              {{ __('active_income') }}
-            </p>
           </CardContent>
         </Card>
+      </div>
 
-        <!-- Monthly Expenses -->
-        <Card
-          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
-        >
+      <!-- Budget status band -->
+      <div
+        v-if="hasActiveBudget"
+        role="region"
+        :aria-label="__('remaining_budget')"
+        class="flex items-center justify-between gap-3 rounded-xl border border-border/50 bg-card p-4 shadow-xs sm:p-5"
+      >
+        <div class="flex min-w-0 items-center gap-3">
           <div
-            class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-rose-500/5 blur-xl dark:bg-rose-400/5"
-          ></div>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
+            class="rounded-lg bg-violet-50 p-2 text-violet-600 dark:bg-violet-950/30 dark:text-violet-400"
           >
-            <CardTitle
-              class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
-            >
-              {{ __('current_month_expenses') }}
-            </CardTitle>
-            <div
-              class="rounded-lg bg-rose-50 p-2 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400"
-            >
-              <TrendingDown class="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent class="px-3 sm:px-6">
-            <div
-              class="min-w-0 truncate text-xl font-bold tracking-tight text-foreground tabular-nums sm:text-3xl"
-            >
-              {{ formatAmount(summary_cards.current_month_expenses) }}
-            </div>
+            <Target class="size-4" />
+          </div>
+          <div class="min-w-0">
             <p
-              class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400"
-            >
-              {{ __('active_expense') }}
-            </p>
-          </CardContent>
-        </Card>
-
-        <!-- Budget Remaining -->
-        <Card
-          class="relative gap-3 overflow-hidden border border-border/50 bg-card py-3 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:gap-6 sm:py-6"
-        >
-          <div
-            class="absolute top-0 right-0 h-24 w-24 translate-x-6 -translate-y-6 rounded-full bg-violet-500/5 blur-xl dark:bg-violet-400/5"
-          ></div>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6"
-          >
-            <CardTitle
               class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
               {{ __('remaining_budget') }}
-            </CardTitle>
-            <div
-              class="rounded-lg bg-violet-50 p-2 text-violet-600 dark:bg-violet-950/30 dark:text-violet-400"
-            >
-              <Target class="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent class="px-3 sm:px-6">
-            <div
-              class="min-w-0 truncate text-xl font-bold tracking-tight tabular-nums sm:text-3xl"
+            </p>
+            <p
+              class="truncate text-lg font-bold tracking-tight tabular-nums sm:text-xl"
               :class="
                 summary_cards.budget_remaining < 0
                   ? 'text-rose-600 dark:text-rose-400'
@@ -358,208 +360,177 @@ const {
               {{ formatAmount(Math.abs(summary_cards.budget_remaining)) }}
               <span
                 v-if="summary_cards.budget_remaining < 0"
-                class="block text-xs font-normal text-rose-500 sm:ml-1 sm:inline-block"
+                class="text-xs font-normal text-rose-500"
               >
-                (Overspent)
+                ({{ __('overspent') }})
               </span>
-            </div>
-            <p
-              class="mt-1 flex items-center gap-1 text-xs text-muted-foreground"
-            >
-              <Link
-                :href="budgetIndex.url()"
-                class="inline-flex items-center font-medium text-violet-600 transition-colors hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300"
-              >
-                {{ __('budget_list') }}
-                <ChevronRight class="ml-0.5 size-3" />
-              </Link>
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <Link :href="budgetIndex.url()" class="shrink-0">
+          <Button variant="ghost" size="sm" class="gap-1 text-xs font-semibold">
+            {{ __('see_all') }}
+            <ChevronRight class="size-4" />
+          </Button>
+        </Link>
       </div>
 
-      <!-- Charts Section -->
-      <div class="grid min-w-0 gap-6 lg:grid-cols-3">
-        <!-- Monthly Spending Trend (Line Chart) -->
-        <Card
-          class="min-w-0 border border-border/50 bg-card shadow-xs lg:col-span-2"
-        >
-          <CardHeader>
-            <CardTitle class="text-lg font-bold text-foreground">
-              {{ __('monthly_spending_trend') }}
-            </CardTitle>
-            <CardDescription class="text-xs">
-              {{ __('monthly_spending_trend_description') }}
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="pt-2 pb-6">
-            <div
-              class="mb-4 flex items-center justify-end gap-4 text-xs font-medium"
-            >
-              <div class="flex items-center gap-1.5">
-                <span
-                  class="inline-block h-0.5 w-3 rounded-full bg-emerald-500"
-                ></span>
-                <span>{{ __('income') }}</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span
-                  class="inline-block h-0.5 w-3 rounded-full bg-rose-500"
-                ></span>
-                <span>{{ __('expense') }}</span>
-              </div>
-            </div>
-
-            <div class="h-[220px] w-full min-w-0 overflow-hidden sm:h-[300px]">
-              <ChartContainer :config="lineChartConfig" class="h-full w-full">
-                <VisXYContainer
-                  :data="monthly_spending_trend"
-                  :margin="{ left: 10, right: 8, top: 10, bottom: 20 }"
-                  class="h-full w-full"
-                >
-                  <VisLine
-                    :x="x"
-                    :y="incomeY"
-                    color="var(--color-income)"
-                    :lineWidth="2.5"
-                  />
-                  <VisLine
-                    :x="x"
-                    :y="expenseY"
-                    color="var(--color-expense)"
-                    :lineWidth="2.5"
-                  />
-                  <VisArea
-                    :x="x"
-                    :y="incomeY"
-                    color="var(--color-income)"
-                    :opacity="0.04"
-                  />
-                  <VisArea
-                    :x="x"
-                    :y="expenseY"
-                    color="var(--color-expense)"
-                    :opacity="0.04"
-                  />
-                  <VisAxis
-                    type="x"
-                    :tickFormat="tickFormatX"
-                    :gridLine="false"
-                  />
-                  <VisAxis
-                    type="y"
-                    :tickFormat="tickFormatY"
-                    :gridLine="true"
-                    :numTicks="5"
-                  />
-                  <ChartCrosshair :template="lineTooltipTemplate" />
-                </VisXYContainer>
-              </ChartContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <!-- Expense Breakdown (Pie/Donut Chart) -->
-        <Card class="min-w-0 border border-border/50 bg-card shadow-xs">
-          <CardHeader>
-            <CardTitle class="text-lg font-bold text-foreground">
-              {{ __('expense_breakdown') }}
-            </CardTitle>
-            <CardDescription class="text-xs">
-              {{ __('expense_breakdown_description') }}
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="pt-2 pb-6">
-            <div
-              v-if="expense_breakdown.length === 0"
-              class="flex h-[260px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/60 p-6 text-center text-muted-foreground"
-            >
-              <TrendingDown
-                class="mb-2 size-8 stroke-1 text-muted-foreground/40"
-              />
-              <span class="text-sm font-medium">{{
-                __('no_data_found', { data: __('expense') })
-              }}</span>
-              <span class="mt-1 text-xs text-muted-foreground">{{
-                __('transaction_list_description')
-              }}</span>
-            </div>
-
-            <div v-else class="flex flex-col gap-6">
-              <!-- Donut Chart Wrapper -->
-              <div
-                class="relative mx-auto h-[160px] w-[160px] max-w-[180px] sm:h-[200px] sm:w-[200px]"
-              >
-                <ChartContainer :config="donutConfig" class="h-full w-full">
-                  <VisSingleContainer
-                    :data="expense_breakdown"
-                    class="h-full w-full"
-                  >
-                    <VisDonut
-                      :value="(d: ExpenseBreakdown) => d.amount"
-                      :name="(d: ExpenseBreakdown) => d.category"
-                      :arcWidth="20"
-                      :color="donutColor"
-                    />
-                    <ChartTooltip :triggers="donutTriggers" />
-                  </VisSingleContainer>
-                </ChartContainer>
-                <!-- Centered Text -->
-                <div
-                  class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
-                >
-                  <span
-                    class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
-                    >Total</span
-                  >
-                  <span
-                    class="mt-0.5 text-sm font-extrabold text-foreground tabular-nums"
-                  >
-                    {{ formatAmount(totalExpenseAmount) }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Custom Detailed Legend -->
-              <div class="max-h-[140px] space-y-1.5 overflow-y-auto pr-1">
-                <div
-                  v-for="(item, i) in expense_breakdown"
-                  :key="item.category"
-                  class="flex items-center justify-between border-b border-border/20 py-1.5 text-xs last:border-b-0"
-                >
-                  <div class="flex min-w-0 items-center gap-2">
-                    <span
-                      class="h-2.5 w-2.5 shrink-0 rounded-full"
-                      :style="{ backgroundColor: donutColor(item, i) }"
-                    />
-                    <span class="truncate font-medium text-foreground">{{
-                      item.category
-                    }}</span>
-                  </div>
-                  <div class="shrink-0 pl-2 text-right">
-                    <span class="font-mono font-semibold text-foreground">{{
-                      formatAmount(item.amount)
-                    }}</span>
-                    <span class="ml-1 font-mono text-muted-foreground"
-                      >({{ item.percentage }}%)</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <!-- No active budget: the highest-value CTA -->
+      <div
+        v-else
+        role="region"
+        :aria-label="__('no_active_budget')"
+        class="flex flex-col items-start gap-3 rounded-xl border border-dashed border-border/60 bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"
+      >
+        <div class="flex items-start gap-3 sm:items-center">
+          <div
+            class="rounded-lg bg-primary/10 p-2 text-primary dark:bg-primary/15"
+          >
+            <Target class="size-4" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-foreground">
+              {{ __('no_active_budget') }}
+            </p>
+            <p class="mt-0.5 text-xs text-muted-foreground">
+              {{ __('no_active_budget_description') }}
+            </p>
+          </div>
+        </div>
+        <Link :href="budgetIndex.url()" class="shrink-0">
+          <Button size="sm" class="gap-1.5">
+            {{ __('create_budget') }}
+            <ChevronRight class="size-4" />
+          </Button>
+        </Link>
       </div>
 
-      <!-- Data Feed Section -->
-      <div class="grid items-start gap-6 md:grid-cols-2">
-        <!-- Recent Transactions -->
-        <Card class="border border-border/50 bg-card shadow-xs">
+      <!-- Budget progress (top-5) + Recent transactions -->
+      <div class="grid items-start gap-4 sm:gap-6 md:grid-cols-2">
+        <Card class="border-border/50 bg-card shadow-xs">
           <CardHeader
             class="flex flex-col justify-between space-y-0 sm:flex-row sm:items-center"
           >
             <div>
-              <CardTitle class="text-lg font-bold text-foreground">
+              <CardTitle class="text-base font-bold text-foreground">
+                {{ __('budget_progress') }}
+              </CardTitle>
+              <CardDescription class="text-xs">
+                {{ __('budget_progress_description') }}
+              </CardDescription>
+            </div>
+            <Link :href="budgetIndex.url()">
+              <Button
+                variant="link"
+                size="sm"
+                class="flex h-8 items-center gap-1 px-0! text-xs font-semibold"
+              >
+                {{ __('see_all') }}
+                <ChevronRight class="size-4" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent class="pt-2 pb-5">
+            <div class="space-y-4">
+              <div
+                v-if="budget_progress.length === 0"
+                class="flex flex-col items-center justify-center py-8 text-center text-muted-foreground"
+              >
+                <Target class="mb-2 size-8 stroke-1 text-muted-foreground/30" />
+                <span class="text-sm font-medium">{{
+                  __('no_data_found', { data: __('budget') })
+                }}</span>
+              </div>
+              <div
+                v-for="bi in topBudgetProgress"
+                :key="bi.id"
+                class="-mx-2 space-y-1.5 rounded-lg px-2 py-2"
+              >
+                <div class="flex items-center justify-between text-sm">
+                  <div class="flex min-w-0 items-center gap-1.5">
+                    <span class="truncate font-bold text-foreground">
+                      {{ bi.category?.name || __('unknown') }}
+                    </span>
+                    <span
+                      v-if="
+                        bi.actual_amount !== undefined &&
+                        bi.planned_amount > 0 &&
+                        bi.actual_amount > bi.planned_amount
+                      "
+                      class="inline-flex items-center gap-0.5 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-semibold text-rose-600 dark:bg-rose-950/20 dark:text-rose-400"
+                    >
+                      <AlertTriangle class="size-2.5" />
+                      {{ __('overspent') }}
+                    </span>
+                  </div>
+                  <span
+                    class="text-xs font-semibold"
+                    :class="
+                      getProgressTextColor(
+                        bi.planned_amount,
+                        bi.actual_amount ?? 0,
+                      )
+                    "
+                  >
+                    {{
+                      getProgressPercent(
+                        bi.planned_amount,
+                        bi.actual_amount ?? 0,
+                      )
+                    }}% {{ __('spent') }}
+                  </span>
+                </div>
+
+                <div
+                  class="h-2 w-full overflow-hidden rounded-full"
+                  :class="
+                    getProgressBgColor(bi.planned_amount, bi.actual_amount ?? 0)
+                  "
+                >
+                  <div
+                    class="h-full rounded-full transition-all duration-500 ease-out"
+                    :class="
+                      getProgressColor(bi.planned_amount, bi.actual_amount ?? 0)
+                    "
+                    :style="{
+                      width: `${getProgressPercent(bi.planned_amount, bi.actual_amount ?? 0)}%`,
+                    }"
+                  ></div>
+                </div>
+
+                <div
+                  class="flex justify-between font-mono text-[11px] text-muted-foreground"
+                >
+                  <span>
+                    {{ formatAmount(bi.actual_amount ?? 0) }} /
+                    {{ formatAmount(bi.planned_amount) }}
+                  </span>
+                  <span
+                    v-if="bi.actual_amount !== undefined"
+                    :class="
+                      bi.planned_amount - bi.actual_amount < 0
+                        ? 'text-rose-500'
+                        : 'text-emerald-500'
+                    "
+                  >
+                    {{
+                      bi.planned_amount - bi.actual_amount < 0
+                        ? `-${formatAmount(Math.abs(bi.planned_amount - bi.actual_amount))}`
+                        : `${__('remaining')} ${formatAmount(bi.planned_amount - bi.actual_amount)}`
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card class="border-border/50 bg-card shadow-xs">
+          <CardHeader
+            class="flex flex-col justify-between space-y-0 sm:flex-row sm:items-center"
+          >
+            <div>
+              <CardTitle class="text-base font-bold text-foreground">
                 {{ __('recent_transactions') }}
               </CardTitle>
               <CardDescription class="text-xs">
@@ -577,11 +548,11 @@ const {
               </Button>
             </Link>
           </CardHeader>
-          <CardContent class="pt-2 pb-6">
+          <CardContent class="pt-2 pb-5">
             <div class="divide-y divide-border/40">
               <div
                 v-if="recent_transactions.length === 0"
-                class="flex flex-col items-center justify-center py-10 text-center text-muted-foreground"
+                class="flex flex-col items-center justify-center py-8 text-center text-muted-foreground"
               >
                 <Wallet class="mb-2 size-8 stroke-1 text-muted-foreground/30" />
                 <span class="text-sm font-medium">{{
@@ -589,7 +560,7 @@ const {
                 }}</span>
               </div>
               <div
-                v-for="t in recent_transactions"
+                v-for="t in topRecentTransactions"
                 :key="t.id"
                 class="-mx-2 flex items-center justify-between rounded-lg px-2 py-3 transition-colors duration-200 hover:bg-muted/10"
               >
@@ -603,9 +574,7 @@ const {
                     "
                   >
                     <component
-                      :is="
-                        t.type === 'income' ? TrendingUpIcon : TrendingDownIcon
-                      "
+                      :is="t.type === 'income' ? TrendingUp : TrendingDown"
                       class="size-4"
                     />
                   </div>
@@ -647,139 +616,272 @@ const {
             </div>
           </CardContent>
         </Card>
+      </div>
 
-        <!-- Budget Progress -->
-        <Card class="border border-border/50 bg-card shadow-xs">
-          <CardHeader
-            class="flex flex-col justify-between space-y-0 sm:flex-row sm:items-center"
+      <!-- Expense breakdown: ranked list <md, donut md+ -->
+      <Card class="border-border/50 bg-card shadow-xs">
+        <CardHeader>
+          <CardTitle class="text-base font-bold text-foreground">
+            {{ __('expense_breakdown') }}
+          </CardTitle>
+          <CardDescription class="text-xs">
+            {{ __('expense_breakdown_description') }}
+          </CardDescription>
+        </CardHeader>
+        <CardContent class="pt-2 pb-5">
+          <Skeleton
+            v-if="expense_breakdown === undefined"
+            class="h-[240px] w-full"
+          />
+          <ChartEmpty
+            v-else-if="expense_breakdown.length === 0"
+            :icon="TrendingDown"
+            :title="
+              hasActiveBudget ? __('no_breakdown_data') : __('no_active_budget')
+            "
+            :description="
+              hasActiveBudget
+                ? __('no_breakdown_data_description')
+                : __('no_active_budget_description')
+            "
           >
-            <div>
-              <CardTitle class="text-lg font-bold text-foreground">
-                {{ __('budget_progress') }}
-              </CardTitle>
-              <CardDescription class="text-xs">
-                {{ __('budget_progress_description') }}
-              </CardDescription>
-            </div>
-            <Link :href="budgetIndex.url()">
-              <Button
-                variant="ghost"
-                size="sm"
-                class="flex h-8 items-center gap-1 px-0! text-xs font-semibold"
-              >
-                {{ __('all_data', { data: __('budgets') }) }}
+            <Link v-if="!hasActiveBudget" :href="budgetIndex.url()">
+              <Button size="sm" class="mt-2 gap-1.5">
+                {{ __('create_budget') }}
                 <ChevronRight class="size-4" />
               </Button>
             </Link>
-          </CardHeader>
-          <CardContent class="pt-2 pb-6">
-            <div class="space-y-4">
+          </ChartEmpty>
+
+          <template v-else>
+            <div class="flex flex-col gap-6 md:flex-row md:items-center">
+              <!-- Donut (md+) -->
               <div
-                v-if="budget_progress.length === 0"
-                class="flex flex-col items-center justify-center py-10 text-center text-muted-foreground"
+                role="img"
+                :aria-label="__('breakdown_chart_aria')"
+                class="relative mx-auto hidden h-[180px] w-[180px] shrink-0 md:block lg:h-[200px] lg:w-[200px]"
               >
-                <Target class="mb-2 size-8 stroke-1 text-muted-foreground/30" />
-                <span class="text-sm font-medium">{{
-                  __('no_data_found', { data: __('budget') })
-                }}</span>
-                <span class="mt-1 text-xs">{{
-                  __('budget_create_description')
-                }}</span>
+                <ChartContainer :config="donutConfig" class="h-full w-full">
+                  <VisSingleContainer
+                    :data="breakdownItems"
+                    class="h-full w-full"
+                  >
+                    <VisDonut
+                      :value="(d: ExpenseBreakdown) => d.amount"
+                      :name="(d: ExpenseBreakdown) => d.category"
+                      :arcWidth="20"
+                      :color="donutColor"
+                    />
+                    <ChartTooltip :triggers="donutTriggers" />
+                  </VisSingleContainer>
+                </ChartContainer>
+                <div
+                  class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
+                >
+                  <span
+                    class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
+                    >{{ __('total') }}</span
+                  >
+                  <span
+                    class="mt-0.5 text-sm font-extrabold text-foreground tabular-nums"
+                  >
+                    {{ formatAmount(totalExpenseAmount) }}
+                  </span>
+                </div>
               </div>
+
+              <!-- Ranked list: bars on mobile, legend on md+ -->
               <div
-                v-for="bi in budget_progress"
-                :key="bi.id"
-                class="-mx-2 space-y-1.5 rounded-lg px-2 py-2 transition-colors duration-200 hover:bg-muted/10"
+                role="img"
+                :aria-label="__('breakdown_chart_aria')"
+                class="min-w-0 flex-1 space-y-3"
               >
-                <div class="flex items-center justify-between text-sm">
-                  <div class="flex min-w-0 items-center gap-1.5">
-                    <span class="truncate font-bold text-foreground">
-                      {{ bi.category?.name || __('unknown') }}
-                    </span>
-                    <span
-                      v-if="
-                        bi.actual_amount !== undefined &&
-                        bi.planned_amount > 0 &&
-                        bi.actual_amount > bi.planned_amount
-                      "
-                      class="inline-flex items-center gap-0.5 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-semibold text-rose-600 dark:bg-rose-950/20 dark:text-rose-400"
-                    >
-                      <AlertTriangle class="size-2.5" />
-                      {{ __('overspent') }}
-                    </span>
+                <div
+                  v-for="(item, i) in breakdownItems"
+                  :key="item.category"
+                  class="space-y-1"
+                >
+                  <div class="flex items-center justify-between gap-2 text-xs">
+                    <div class="flex min-w-0 items-center gap-2">
+                      <span
+                        class="h-2.5 w-2.5 shrink-0 rounded-full"
+                        :style="{ backgroundColor: donutColor(item, i) }"
+                      />
+                      <span class="truncate font-medium text-foreground">{{
+                        item.category
+                      }}</span>
+                    </div>
+                    <div class="shrink-0 pl-2 text-right">
+                      <span class="font-mono font-semibold text-foreground">{{
+                        formatAmount(item.amount)
+                      }}</span>
+                      <span class="ml-1 font-mono text-muted-foreground"
+                        >({{ item.percentage }}%)</span
+                      >
+                    </div>
                   </div>
-                  <span
-                    class="text-xs font-semibold"
-                    :class="
-                      getProgressTextColor(
-                        bi.planned_amount,
-                        bi.actual_amount ?? 0,
-                      )
-                    "
-                  >
-                    {{
-                      getProgressPercent(
-                        bi.planned_amount,
-                        bi.actual_amount ?? 0,
-                      )
-                    }}% {{ __('spent') }}
-                  </span>
-                </div>
-
-                <!-- Progress Bar -->
-                <div
-                  class="h-2 w-full overflow-hidden rounded-full"
-                  :class="
-                    getProgressBgColor(bi.planned_amount, bi.actual_amount ?? 0)
-                  "
-                >
                   <div
-                    class="h-full rounded-full transition-all duration-500 ease-out"
-                    :class="
-                      getProgressColor(bi.planned_amount, bi.actual_amount ?? 0)
-                    "
-                    :style="{
-                      width: `${getProgressPercent(bi.planned_amount, bi.actual_amount ?? 0)}%`,
-                    }"
-                  ></div>
-                </div>
-
-                <!-- Amounts detail -->
-                <div
-                  class="flex justify-between font-mono text-[11px] text-muted-foreground"
-                >
-                  <span>
-                    {{ formatAmount(bi.actual_amount ?? 0) }} /
-                    {{ formatAmount(bi.planned_amount) }}
-                  </span>
-                  <span
-                    v-if="bi.actual_amount !== undefined"
-                    :class="
-                      bi.planned_amount - bi.actual_amount < 0
-                        ? 'text-rose-500'
-                        : 'text-emerald-500'
-                    "
+                    class="h-1.5 w-full overflow-hidden rounded-full bg-muted md:hidden"
                   >
-                    {{
-                      bi.planned_amount - bi.actual_amount < 0
-                        ? `-${formatAmount(Math.abs(bi.planned_amount - bi.actual_amount))}`
-                        : `${__('remaining')} ${formatAmount(bi.planned_amount - bi.actual_amount)}`
-                    }}
-                  </span>
+                    <div
+                      class="h-full rounded-full"
+                      :style="{
+                        width: `${Math.min(item.percentage, 100)}%`,
+                        backgroundColor: donutColor(item, i),
+                      }"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            <!-- Screen-reader table fallback -->
+            <table class="sr-only">
+              <caption>
+                {{
+                  __('expense_breakdown')
+                }}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">{{ __('category') }}</th>
+                  <th scope="col">{{ __('amount') }}</th>
+                  <th scope="col">%</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in breakdownItems" :key="item.category">
+                  <td>{{ item.category }}</td>
+                  <td>{{ formatAmount(item.amount) }}</td>
+                  <td>{{ item.percentage }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </template>
+        </CardContent>
+      </Card>
+
+      <!-- Trend chart (last) -->
+      <Card class="border-border/50 bg-card shadow-xs">
+        <CardHeader>
+          <CardTitle class="text-base font-bold text-foreground">
+            {{ __('monthly_spending_trend') }}
+          </CardTitle>
+          <CardDescription class="text-xs">
+            {{ __('monthly_spending_trend_description') }}
+          </CardDescription>
+        </CardHeader>
+        <CardContent class="pt-2 pb-5">
+          <Skeleton
+            v-if="monthly_spending_trend === undefined"
+            class="h-[180px] w-full sm:h-[260px] md:h-[300px]"
+          />
+          <ChartEmpty
+            v-else-if="!hasTrendData"
+            :icon="TrendingDown"
+            :title="
+              hasActiveBudget ? __('no_trend_data') : __('no_active_budget')
+            "
+            :description="
+              hasActiveBudget
+                ? __('no_trend_data_description')
+                : __('no_active_budget_description')
+            "
+          >
+            <Link v-if="!hasActiveBudget" :href="budgetIndex.url()">
+              <Button size="sm" class="mt-2 gap-1.5">
+                {{ __('create_budget') }}
+                <ChevronRight class="size-4" />
+              </Button>
+            </Link>
+          </ChartEmpty>
+
+          <template v-else>
+            <div
+              role="img"
+              :aria-label="__('trend_chart_aria')"
+              class="h-[180px] w-full min-w-0 overflow-hidden sm:h-[260px] md:h-[300px]"
+            >
+              <ChartContainer :config="lineChartConfig" class="h-full w-full">
+                <VisXYContainer
+                  :data="trendData"
+                  :margin="{ left: 44, right: 8, top: 10, bottom: 20 }"
+                  class="h-full w-full"
+                >
+                  <VisLine
+                    :x="x"
+                    :y="incomeY"
+                    color="var(--color-income)"
+                    :lineWidth="2.5"
+                  />
+                  <VisLine
+                    :x="x"
+                    :y="expenseY"
+                    color="var(--color-expense)"
+                    :lineWidth="2.5"
+                  />
+                  <VisArea
+                    :x="x"
+                    :y="incomeY"
+                    color="var(--color-income)"
+                    :opacity="0.04"
+                  />
+                  <VisArea
+                    :x="x"
+                    :y="expenseY"
+                    color="var(--color-expense)"
+                    :opacity="0.04"
+                  />
+                  <VisAxis
+                    type="x"
+                    :tickFormat="tickFormatX"
+                    :gridLine="false"
+                  />
+                  <VisAxis
+                    type="y"
+                    :tickFormat="tickFormatY"
+                    :gridLine="true"
+                    :numTicks="4"
+                  />
+                  <ChartCrosshair :template="lineTooltipTemplate" />
+                </VisXYContainer>
+                <ChartLegendContent />
+              </ChartContainer>
+            </div>
+
+            <!-- Screen-reader table fallback -->
+            <table class="sr-only">
+              <caption>
+                {{
+                  __('monthly_spending_trend')
+                }}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">{{ __('month') }}</th>
+                  <th scope="col">{{ __('income') }}</th>
+                  <th scope="col">{{ __('expense') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="d in trendData" :key="d.month">
+                  <td>{{ tickFormatX(d.month) }}</td>
+                  <td>{{ formatAmount(d.income) }}</td>
+                  <td>{{ formatAmount(d.expense) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </template>
+        </CardContent>
+      </Card>
     </div>
 
     <!-- PWA Install Banner (dismissible, once per session) -->
     <div
       v-if="canInstall"
       role="region"
-      aria-label="Install app"
-      class="fixed inset-x-4 bottom-20 z-50 md:inset-x-auto md:bottom-6 md:left-1/2 md:w-full md:max-w-md md:-translate-x-1/2"
+      :aria-label="__('install_banner_title')"
+      class="fixed inset-x-4 bottom-20 z-fab md:inset-x-auto md:bottom-6 md:left-1/2 md:w-full md:max-w-md md:-translate-x-1/2"
     >
       <div
         class="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-3 shadow-lg"

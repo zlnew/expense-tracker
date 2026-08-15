@@ -52,7 +52,7 @@ watch(
 
 const isDirty = computed(() =>
   Object.keys(draft).some(
-    (key) => (draft[key] ?? '') !== (props.model[key as FilterKey] ?? ''),
+    (key) => (draft[key] ?? '') !== (props.defaults[key as FilterKey] ?? ''),
   ),
 )
 

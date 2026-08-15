@@ -628,7 +628,7 @@ const rowActions = (t: Transaction) => [
                   }}{{ formatAmount(t.amount) }}
                 </p>
                 <div class="mt-2 flex items-center justify-end gap-1">
-                  <RowActions :actions="rowActions(t)" />
+                  <RowActions :actions="rowActions(t)" collapse-below="md" />
                 </div>
               </div>
             </div>
@@ -659,7 +659,7 @@ const rowActions = (t: Transaction) => [
           </template>
           <template #cell-6="{ row: t }">
             <div class="flex items-center justify-end gap-2">
-              <RowActions :actions="rowActions(t)" />
+              <RowActions :actions="rowActions(t)" collapse-below="md" />
             </div>
           </template>
         </ResponsiveTable>
