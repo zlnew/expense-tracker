@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Page } from '@inertiajs/core'
 import { useForm } from '@inertiajs/vue3'
 import { computed, nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
@@ -103,45 +104,49 @@ watch(
 )
 
 const submit = () => {
-  form
-    .transform(() => ({
-      name: form.name,
-      target_amount: Number(form.target_amount),
-      cadence: form.cadence,
-      contribution_amount:
-        form.contribution_amount === ''
-          ? null
-          : Number(form.contribution_amount),
-      category_id: form.category_id === '' ? null : Number(form.category_id),
-      next_due: form.next_due === '' ? null : form.next_due,
-      due_interval_months: Number(form.due_interval_months),
-      notes: form.notes === '' ? null : form.notes,
-    }))
-    .post(props.fund ? updateFund.url({ fund: props.fund }) : storeFund.url(), {
-      preserveScroll: true,
-      onSuccess: (res) => {
-        emit('update:open', false)
+  const payload = () => ({
+    name: form.name,
+    target_amount: Number(form.target_amount),
+    cadence: form.cadence,
+    contribution_amount:
+      form.contribution_amount === '' ? null : Number(form.contribution_amount),
+    category_id: form.category_id === '' ? null : Number(form.category_id),
+    next_due: form.next_due === '' ? null : form.next_due,
+    due_interval_months: Number(form.due_interval_months),
+    notes: form.notes === '' ? null : form.notes,
+  })
 
-        if (!props.fund) {
-          form.reset()
-        }
+  const options = {
+    preserveScroll: true,
+    onSuccess: (res: Page) => {
+      emit('update:open', false)
 
-        toast.success(
-          (res.props.flash as any)?.success ??
-            (props.fund
-              ? __('updated_data', { data: __('fund') })
-              : __('created_data', { data: __('fund') })),
-        )
-      },
-      onError: () => {
-        nextTick(() => {
-          document.querySelector('[role="alert"]')?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          })
+      if (!props.fund) {
+        form.reset()
+      }
+
+      toast.success(
+        (res.props.flash as any)?.success ??
+          (props.fund
+            ? __('updated_data', { data: __('fund') })
+            : __('created_data', { data: __('fund') })),
+      )
+    },
+    onError: () => {
+      nextTick(() => {
+        document.querySelector('[role="alert"]')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
         })
-      },
-    })
+      })
+    },
+  }
+
+  if (props.fund) {
+    form.transform(payload).put(updateFund.url({ fund: props.fund }), options)
+  } else {
+    form.transform(payload).post(storeFund.url(), options)
+  }
 }
 </script>
 
