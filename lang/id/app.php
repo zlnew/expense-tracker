@@ -53,6 +53,7 @@ return [
     'category_delete_description' => 'Apakah Anda yakin ingin menghapus kategori anggaran ini secara permanen?',
     'category_list_description' => 'Kelola kategori anggaran Anda',
     'category_update_description' => 'Perbarui kategori anggaran',
+    'close' => 'Tutup',
     'confirm_delete_recurring' => 'Apakah Anda yakin ingin menghapus transaksi berulang ini?',
     'confirm_password' => 'Konfirmasi Kata Sandi',
     'create' => 'Buat',

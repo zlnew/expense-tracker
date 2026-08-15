@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
-import { watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
+import InputError from '@/components/InputError.vue'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 import { useLang } from '@/composables/useLang'
 import { update as updateCategory } from '@/routes/categories'
 import type { Category } from '@/types'
@@ -43,15 +45,32 @@ const form = useForm({
   name: '',
 })
 
+const firstFieldRef = ref<HTMLElement | null>(null)
+
+const onOpenAutoFocus = () => {
+  nextTick(() => {
+    firstFieldRef.value
+      ?.querySelector<HTMLElement>(
+        'input, textarea, [data-slot="select-trigger"]',
+      )
+      ?.focus()
+  })
+}
+
 watch(
-  () => props.category,
-  (category) => {
-    if (category) {
-      form.type = category.type
-      form.name = category.name
+  () => props.open,
+  (isOpen) => {
+    if (!isOpen) {
+      return
+    }
+
+    form.clearErrors()
+
+    if (props.category) {
+      form.type = props.category.type
+      form.name = props.category.name
     }
   },
-  { immediate: true },
 )
 
 const submit = () => {
@@ -66,13 +85,24 @@ const submit = () => {
       emit('update:open', false)
       toast.success(res.props.success as string)
     },
+    onError: () => {
+      nextTick(() => {
+        document.querySelector('[role="alert"]')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      })
+    },
   })
 }
 </script>
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[425px]">
+    <SheetDialogContent
+      class="md:max-w-[425px]"
+      @open-auto-focus.prevent="onOpenAutoFocus"
+    >
       <DialogHeader>
         <DialogTitle>
           {{ __('edit_data', { data: __('category') }) }}
@@ -82,7 +112,7 @@ const submit = () => {
         </DialogDescription>
       </DialogHeader>
 
-      <form @submit.prevent="submit">
+      <form ref="firstFieldRef" @submit.prevent="submit">
         <div class="grid gap-4 py-4">
           <AlertError
             v-if="Object.keys(form.errors).length > 0"
@@ -111,6 +141,7 @@ const submit = () => {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <InputError :message="form.errors.type" />
           </div>
 
           <div class="grid gap-2">
@@ -122,7 +153,10 @@ const submit = () => {
               v-model="form.name"
               placeholder="e.g. Food"
               required
+              :disabled="form.processing"
+              :aria-invalid="form.errors.name ? true : undefined"
             />
+            <InputError :message="form.errors.name" />
           </div>
         </div>
 
@@ -131,10 +165,12 @@ const submit = () => {
             type="button"
             variant="outline"
             @click="$emit('update:open', false)"
+            :disabled="form.processing"
           >
             {{ __('cancel') }}
           </Button>
           <Button type="submit" :disabled="form.processing">
+            <Spinner v-if="form.processing" class="mr-2" />
             {{ form.processing ? __('updating') : __('update') }}
           </Button>
         </DialogFooter>

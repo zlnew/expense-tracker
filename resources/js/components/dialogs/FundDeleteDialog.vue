@@ -26,7 +26,7 @@ const { __ } = useLang()
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="sm:max-w-[425px]">
+    <SheetDialogContent class="md:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>
           {{ __('delete_data', { data: __('fund') }) }}
@@ -36,14 +36,20 @@ const { __ } = useLang()
         </DialogDescription>
       </DialogHeader>
 
-      <DialogFooter class="pt-4">
-        <Button variant="outline" @click="$emit('update:open', false)">
-          {{ __('cancel') }}
-        </Button>
-        <Button variant="destructive" @click="$emit('confirm')">
-          {{ __('delete') }}
-        </Button>
-      </DialogFooter>
+      <form @submit.prevent="$emit('confirm')">
+        <DialogFooter class="pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            @click="$emit('update:open', false)"
+          >
+            {{ __('cancel') }}
+          </Button>
+          <Button type="submit" variant="destructive">
+            {{ __('delete') }}
+          </Button>
+        </DialogFooter>
+      </form>
     </SheetDialogContent>
   </Dialog>
 </template>

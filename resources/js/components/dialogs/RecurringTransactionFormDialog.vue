@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
-import { computed, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
+import InputError from '@/components/InputError.vue'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -23,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 import { useLang } from '@/composables/useLang'
 import {
   store as storeRecurring,
@@ -56,29 +58,55 @@ const form = useForm({
   is_active: true,
 })
 
+const firstFieldRef = ref<HTMLElement | null>(null)
+
+const onOpenAutoFocus = () => {
+  nextTick(() => {
+    firstFieldRef.value
+      ?.querySelector<HTMLElement>(
+        'input, textarea, [data-slot="select-trigger"]',
+      )
+      ?.focus()
+  })
+}
+
 const isEdit = computed(() => Boolean(props.recurring?.id))
 
-// Prefill the form when editing a recurring transaction.
+const resetForCreate = () => {
+  form.reset()
+  form.clearErrors()
+  form.type = 'expense'
+  form.frequency = 'monthly'
+  form.is_active = true
+}
+
+const fillForEdit = (r: RecurringTransaction) => {
+  form.clearErrors()
+  form.type = r.type
+  form.balance_id = String(r.balance_id)
+  form.category_id = r.category_id ? String(r.category_id) : ''
+  form.amount = String(r.amount)
+  form.description = r.description ?? ''
+  form.frequency = r.frequency
+  form.start_date = r.start_date.slice(0, 10)
+  form.end_date = r.end_date ? r.end_date.slice(0, 10) : ''
+  form.next_run_date = r.next_run_date.slice(0, 10)
+  form.is_active = r.is_active
+}
+
 watch(
-  () => props.recurring,
-  (r) => {
-    if (!r?.id) {
+  () => props.open,
+  (isOpen) => {
+    if (!isOpen) {
       return
     }
 
-    form.clearErrors()
-    form.type = r.type
-    form.balance_id = String(r.balance_id)
-    form.category_id = r.category_id ? String(r.category_id) : ''
-    form.amount = String(r.amount)
-    form.description = r.description ?? ''
-    form.frequency = r.frequency
-    form.start_date = r.start_date.slice(0, 10)
-    form.end_date = r.end_date ? r.end_date.slice(0, 10) : ''
-    form.next_run_date = r.next_run_date.slice(0, 10)
-    form.is_active = r.is_active
+    if (props.recurring?.id) {
+      fillForEdit(props.recurring)
+    } else {
+      resetForCreate()
+    }
   },
-  { deep: true },
 )
 
 const submit = () => {
@@ -87,16 +115,26 @@ const submit = () => {
     emit('update:open', false)
     toast.success(res.props.success as string)
   }
+  const onError = () => {
+    nextTick(() => {
+      document.querySelector('[role="alert"]')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    })
+  }
 
   if (isEdit.value) {
     form.put(updateRecurring.url(props.recurring!), {
       preserveScroll: true,
       onSuccess,
+      onError,
     })
   } else {
     form.post(storeRecurring.url(), {
       preserveScroll: true,
       onSuccess,
+      onError,
     })
   }
 }
@@ -108,7 +146,10 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[425px]">
+    <SheetDialogContent
+      class="md:max-w-[425px]"
+      @open-auto-focus.prevent="onOpenAutoFocus"
+    >
       <DialogHeader>
         <DialogTitle>
           {{
@@ -126,7 +167,7 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
         </DialogDescription>
       </DialogHeader>
 
-      <form @submit.prevent="submit">
+      <form ref="firstFieldRef" @submit.prevent="submit">
         <div class="grid gap-4 py-4">
           <AlertError
             v-if="Object.keys(form.errors).length > 0"
@@ -148,6 +189,7 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <InputError :message="form.errors.type" />
           </div>
 
           <div class="grid gap-2">
@@ -161,7 +203,10 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
               min="1"
               placeholder="100000"
               required
+              :disabled="form.processing"
+              :aria-invalid="form.errors.amount ? true : undefined"
             />
+            <InputError :message="form.errors.amount" />
           </div>
 
           <div class="grid gap-2">
@@ -170,6 +215,7 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
               id="rec_description"
               v-model="form.description"
               placeholder="e.g. Salary, Rent, Netflix"
+              :disabled="form.processing"
             />
           </div>
 
@@ -195,6 +241,7 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <InputError :message="form.errors.balance_id" />
           </div>
 
           <div class="grid gap-2">
@@ -218,6 +265,7 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <InputError :message="form.errors.category_id" />
           </div>
 
           <div class="grid gap-2">
@@ -237,6 +285,7 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <InputError :message="form.errors.frequency" />
           </div>
 
           <div class="grid gap-2">
@@ -248,7 +297,10 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
               v-model="form.start_date"
               type="date"
               required
+              :disabled="form.processing"
+              :aria-invalid="form.errors.start_date ? true : undefined"
             />
+            <InputError :message="form.errors.start_date" />
           </div>
 
           <div class="grid gap-2">
@@ -260,12 +312,20 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
               v-model="form.next_run_date"
               type="date"
               required
+              :disabled="form.processing"
+              :aria-invalid="form.errors.next_run_date ? true : undefined"
             />
+            <InputError :message="form.errors.next_run_date" />
           </div>
 
           <div class="grid gap-2">
             <Label for="rec_end">{{ __('end_date') }}</Label>
-            <Input id="rec_end" v-model="form.end_date" type="date" />
+            <Input
+              id="rec_end"
+              v-model="form.end_date"
+              type="date"
+              :disabled="form.processing"
+            />
           </div>
 
           <div v-if="isEdit" class="flex items-center gap-2">
@@ -285,10 +345,12 @@ const onActiveChange = (value: boolean | 'indeterminate') => {
             type="button"
             variant="outline"
             @click="$emit('update:open', false)"
+            :disabled="form.processing"
           >
             {{ __('cancel') }}
           </Button>
           <Button type="submit" :disabled="form.processing">
+            <Spinner v-if="form.processing" class="mr-2" />
             {{ form.processing ? __('saving') : __('save') }}
           </Button>
         </DialogFooter>

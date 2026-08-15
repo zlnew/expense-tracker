@@ -2,7 +2,7 @@
 import { useForm } from '@inertiajs/vue3'
 import { Plus, Trash2 } from 'lucide-vue-next'
 import type { AcceptableValue } from 'reka-ui'
-import { computed, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -62,6 +63,18 @@ const form = useForm({
     },
   ],
 })
+
+const firstFieldRef = ref<HTMLElement | null>(null)
+
+const onOpenAutoFocus = () => {
+  nextTick(() => {
+    firstFieldRef.value
+      ?.querySelector<HTMLElement>(
+        'input, textarea, [data-slot="select-trigger"]',
+      )
+      ?.focus()
+  })
+}
 
 const addItem = () => {
   const lastItem = form.items[form.items.length - 1]
@@ -149,6 +162,14 @@ const submit = () => {
           __('updated_data', { data: __('transactions') }),
       )
     },
+    onError: () => {
+      nextTick(() => {
+        document.querySelector('[role="alert"]')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      })
+    },
   })
 }
 
@@ -157,6 +178,7 @@ watch(
   (val) => {
     if (val) {
       form.reset()
+      form.clearErrors()
       form.items = [
         {
           balance_id: props.primaryBalanceId || '',
@@ -176,7 +198,10 @@ watch(
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <SheetDialogContent class="w-full sm:max-w-6xl">
+    <SheetDialogContent
+      class="w-full md:max-w-[calc(100%-2rem)] xl:max-w-6xl"
+      @open-auto-focus.prevent="onOpenAutoFocus"
+    >
       <DialogHeader>
         <DialogTitle>{{ __('multiple_transactions') }}</DialogTitle>
         <DialogDescription>
@@ -184,188 +209,199 @@ watch(
         </DialogDescription>
       </DialogHeader>
 
-      <AlertError
-        v-if="Object.keys(form.errors).length > 0"
-        :errors="Object.values(form.errors)"
-      />
+      <form ref="firstFieldRef" @submit.prevent="submit">
+        <AlertError
+          v-if="Object.keys(form.errors).length > 0"
+          :errors="Object.values(form.errors)"
+        />
 
-      <div class="max-h-[60vh] space-y-4 overflow-y-auto p-1">
+        <div class="space-y-4 py-4">
+          <div
+            v-for="(item, index) in form.items"
+            :key="index"
+            class="relative flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm transition-all hover:border-primary/50 lg:grid lg:grid-cols-4"
+          >
+            <Button
+              v-if="form.items.length > 1"
+              variant="ghost"
+              size="icon"
+              class="absolute top-2 right-2 z-10 text-destructive hover:bg-destructive/10"
+              @click="removeItem(index)"
+            >
+              <Trash2 class="size-4" />
+            </Button>
+
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-1">
+              <div class="space-y-2">
+                <Label>{{ __('balance') }}</Label>
+                <Select v-model="item.balance_id">
+                  <SelectTrigger>
+                    <SelectValue
+                      :placeholder="__('select_data', { data: __('balance') })"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="b in balances" :key="b.id" :value="b.id">
+                      {{ b.name }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div class="space-y-2">
+                <Label>{{ __('budget') }}</Label>
+                <Select v-model="item.budget_id">
+                  <SelectTrigger>
+                    <SelectValue
+                      :placeholder="__('select_data', { data: __('budget') })"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="b in budgets" :key="b.id" :value="b.id">
+                      {{ formatDate(b.period_start, 'DD MMM YYYY') }}
+                      -
+                      {{ formatDate(b.period_end, 'DD MMM YYYY') }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+              <div class="space-y-2">
+                <Label>{{ __('category') }}</Label>
+                <Select
+                  v-model="item.category_id"
+                  @update:model-value="onCategoryChange(index, $event)"
+                  :disabled="!item.budget_id"
+                >
+                  <SelectTrigger>
+                    <span v-if="item.type" class="text-muted-foreground">
+                      {{ __(item.type) }}
+                    </span>
+                    <SelectValue
+                      :placeholder="__('select_data', { data: __('category') })"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup
+                      v-if="
+                        getGroupedCategories(item.budget_id).expense.length > 0
+                      "
+                    >
+                      <SelectLabel>{{ __('expense') }}</SelectLabel>
+                      <SelectItem
+                        v-for="c in getGroupedCategories(item.budget_id)
+                          .expense"
+                        :key="c.id"
+                        :value="c.id"
+                      >
+                        {{ c.name }}
+                      </SelectItem>
+                    </SelectGroup>
+                    <SelectGroup
+                      v-if="
+                        getGroupedCategories(item.budget_id).income.length > 0
+                      "
+                    >
+                      <SelectLabel>{{ __('income') }}</SelectLabel>
+                      <SelectItem
+                        v-for="c in getGroupedCategories(item.budget_id).income"
+                        :key="c.id"
+                        :value="c.id"
+                      >
+                        {{ c.name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div class="space-y-2">
+                <Label>{{ __('date') }}</Label>
+                <Input type="date" v-model="item.date" />
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <Label>{{ __('amount') }}</Label>
+              <Input
+                type="number"
+                inputmode="decimal"
+                pattern="[0-9]*[.,]?[0-9]*"
+                v-model="item.amount"
+                placeholder="0"
+              />
+            </div>
+
+            <div class="space-y-2 sm:col-span-2 lg:col-span-1">
+              <Label>{{ __('description') }}</Label>
+              <Input
+                v-model="item.description"
+                :placeholder="__('description')"
+              />
+            </div>
+          </div>
+        </div>
+
         <div
-          v-for="(item, index) in form.items"
-          :key="index"
-          class="relative flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm transition-all hover:border-primary/50 lg:grid lg:grid-cols-4"
+          class="flex flex-col gap-4 border-t pt-4 lg:flex-row lg:items-center lg:justify-between"
         >
           <Button
-            v-if="form.items.length > 1"
-            variant="ghost"
-            size="icon"
-            class="absolute top-2 right-2 z-10 text-destructive hover:bg-destructive/10"
-            @click="removeItem(index)"
+            type="button"
+            variant="outline"
+            size="sm"
+            @click="addItem"
+            class="w-full sm:w-auto"
+            :disabled="form.processing"
           >
-            <Trash2 class="size-4" />
+            <Plus class="mr-2 size-4" />
+            {{ __('add_data', { data: __('item') }) }}
           </Button>
 
-          <div class="grid grid-cols-1 gap-4 lg:grid-cols-1">
-            <div class="space-y-2">
-              <Label>{{ __('balance') }}</Label>
-              <Select v-model="item.balance_id">
-                <SelectTrigger>
-                  <SelectValue
-                    :placeholder="__('select_data', { data: __('balance') })"
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="b in balances" :key="b.id" :value="b.id">
-                    {{ b.name }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div class="space-y-2">
-              <Label>{{ __('budget') }}</Label>
-              <Select v-model="item.budget_id">
-                <SelectTrigger>
-                  <SelectValue
-                    :placeholder="__('select_data', { data: __('budget') })"
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="b in budgets" :key="b.id" :value="b.id">
-                    {{ formatDate(b.period_start, 'DD MMM YYYY') }}
-                    -
-                    {{ formatDate(b.period_end, 'DD MMM YYYY') }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 gap-4">
-            <div class="space-y-2">
-              <Label>{{ __('category') }}</Label>
-              <Select
-                v-model="item.category_id"
-                @update:model-value="onCategoryChange(index, $event)"
-                :disabled="!item.budget_id"
+          <div
+            class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm sm:flex-nowrap"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-muted-foreground"
+                >{{ __('total_items') }}:</span
               >
-                <SelectTrigger>
-                  <span v-if="item.type" class="text-muted-foreground">
-                    {{ __(item.type) }}
-                  </span>
-                  <SelectValue
-                    :placeholder="__('select_data', { data: __('category') })"
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup
-                    v-if="
-                      getGroupedCategories(item.budget_id).expense.length > 0
-                    "
-                  >
-                    <SelectLabel>{{ __('expense') }}</SelectLabel>
-                    <SelectItem
-                      v-for="c in getGroupedCategories(item.budget_id).expense"
-                      :key="c.id"
-                      :value="c.id"
-                    >
-                      {{ c.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                  <SelectGroup
-                    v-if="
-                      getGroupedCategories(item.budget_id).income.length > 0
-                    "
-                  >
-                    <SelectLabel>{{ __('income') }}</SelectLabel>
-                    <SelectItem
-                      v-for="c in getGroupedCategories(item.budget_id).income"
-                      :key="c.id"
-                      :value="c.id"
-                    >
-                      {{ c.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <span class="font-bold">{{ form.items.length }}</span>
             </div>
-
-            <div class="space-y-2">
-              <Label>{{ __('date') }}</Label>
-              <Input type="date" v-model="item.date" />
+            <div class="flex items-center gap-2">
+              <span class="text-muted-foreground"
+                >{{ __('total_expense') }}:</span
+              >
+              <span class="font-bold text-red-600 dark:text-red-400">
+                Rp {{ formatNumber(totalExpense) }}
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-muted-foreground"
+                >{{ __('total_income') }}:</span
+              >
+              <span class="font-bold text-green-600 dark:text-green-400">
+                Rp {{ formatNumber(totalIncome) }}
+              </span>
             </div>
           </div>
-
-          <div class="space-y-2">
-            <Label>{{ __('amount') }}</Label>
-            <Input
-              type="number"
-              inputmode="decimal"
-              pattern="[0-9]*[.,]?[0-9]*"
-              v-model="item.amount"
-              placeholder="0"
-            />
-          </div>
-
-          <div class="space-y-2 sm:col-span-2 lg:col-span-1">
-            <Label>{{ __('description') }}</Label>
-            <Input
-              v-model="item.description"
-              :placeholder="__('description')"
-            />
-          </div>
         </div>
-      </div>
 
-      <div
-        class="flex flex-col gap-4 border-t pt-4 lg:flex-row lg:items-center lg:justify-between"
-      >
-        <Button
-          variant="outline"
-          size="sm"
-          @click="addItem"
-          class="w-full sm:w-auto"
-        >
-          <Plus class="mr-2 size-4" />
-          {{ __('add_data', { data: __('item') }) }}
-        </Button>
-
-        <div
-          class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm sm:flex-nowrap"
-        >
-          <div class="flex items-center gap-2">
-            <span class="text-muted-foreground">{{ __('total_items') }}:</span>
-            <span class="font-bold">{{ form.items.length }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-muted-foreground"
-              >{{ __('total_expense') }}:</span
-            >
-            <span class="font-bold text-red-600 dark:text-red-400">
-              Rp {{ formatNumber(totalExpense) }}
-            </span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-muted-foreground">{{ __('total_income') }}:</span>
-            <span class="font-bold text-green-600 dark:text-green-400">
-              Rp {{ formatNumber(totalIncome) }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <DialogFooter>
-        <Button
-          variant="outline"
-          @click="$emit('update:open', false)"
-          :disabled="form.processing"
-        >
-          {{ __('cancel') }}
-        </Button>
-        <Button @click="submit" :disabled="form.processing">
-          {{ form.processing ? __('saving') : __('save') }}
-        </Button>
-      </DialogFooter>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            @click="$emit('update:open', false)"
+            :disabled="form.processing"
+          >
+            {{ __('cancel') }}
+          </Button>
+          <Button type="submit" :disabled="form.processing">
+            <Spinner v-if="form.processing" class="mr-2" />
+            {{ form.processing ? __('saving') : __('save') }}
+          </Button>
+        </DialogFooter>
+      </form>
     </SheetDialogContent>
   </Dialog>
 </template>
