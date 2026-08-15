@@ -1,5 +1,4 @@
 import { createInertiaApp } from '@inertiajs/vue3'
-import { registerSW } from 'virtual:pwa-register'
 import { createApp, h } from 'vue'
 import { initializeTheme } from '@/composables/useAppearance'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
@@ -9,7 +8,10 @@ import AuthLayout from '@/layouts/AuthLayout.vue'
 import SettingsLayout from '@/layouts/settings/Layout.vue'
 import { initializeFlashToast } from '@/lib/flashToast'
 
-registerSW({ immediate: true })
+// NOTE: no registerSW({ immediate: true }) here — the service worker is
+// registered with registerType: 'prompt' via PwaUpdatePrompt (mounted in
+// AppSidebarLayout), which surfaces a "new version available" toast instead
+// of force-reloading the app when a deploy lands mid-use.
 
 // Capture the browser's install prompt as early as possible so the
 // dismissible install banner (Dashboard) can react to it...
