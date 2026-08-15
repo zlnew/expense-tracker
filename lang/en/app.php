@@ -54,6 +54,7 @@ return [
     'category_delete_description' => 'Are you sure you want to delete this budget category permanently?',
     'category_list_description' => 'Manage your buget categories',
     'category_update_description' => 'Update budget category',
+    'close' => 'Close',
     'confirm_delete_recurring' => 'Are you sure you want to delete this recurring transaction?',
     'confirm_password' => 'Confirm Password',
     'create' => 'Create',
