@@ -47,8 +47,8 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         cn(
           'bg-background border fixed z-modal grid w-full gap-4 p-6 shadow-lg duration-200',
           // < md: bottom sheet (thumb-reach)
-          'inset-x-0 bottom-0 top-auto max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl',
-          'md:left-[50%] md:-translate-x-1/2',
+          'inset-x-0 bottom-0 top-auto max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl md:right-auto md:w-auto md:max-w-lg',
+          'md:left-[50%] md:-translate-x-1/2 md:max-w-lg',
           'max-md:pt-4 max-md:pb-[calc(1.5rem+env(safe-area-inset-bottom))]',
           'max-md:data-[state=open]:animate-in max-md:data-[state=closed]:animate-out max-md:data-[state=closed]:fade-out-0 max-md:data-[state=open]:fade-in-0 max-md:data-[state=open]:slide-in-from-bottom max-md:data-[state=closed]:slide-out-to-bottom',
           // md+: centered modal (identical to DialogContent)
@@ -58,12 +58,6 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         )
       "
     >
-      <!-- Drag handle (mobile bottom sheet only) -->
-      <div
-        class="mx-auto mt-2 mb-1 h-1.5 w-10 shrink-0 rounded-full bg-muted md:hidden"
-        aria-hidden="true"
-      />
-
       <slot />
 
       <DialogClose
