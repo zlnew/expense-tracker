@@ -70,7 +70,7 @@ function reset() {
 
 <template>
   <Dialog :open="props.open" @update:open="emit('update:open', $event)">
-    <SheetDialogContent class="sm:max-w-[425px]">
+    <SheetDialogContent class="md:max-w-[425px]">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Filter class="size-4" />

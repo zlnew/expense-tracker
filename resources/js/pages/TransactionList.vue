@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Head, router, setLayoutProps } from '@inertiajs/vue3'
+import { Head, setLayoutProps } from '@inertiajs/vue3'
 import {
   ArrowRightLeft,
-  ChevronDown,
   Download,
   Filter,
   ListPlus,
@@ -28,16 +27,9 @@ import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
+import TransactionTabs from '@/components/TransactionTabs.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -54,7 +46,6 @@ import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { toQuery } from '@/lib/utils'
-import recurringTransactions from '@/routes/recurring-transactions'
 import {
   exportMethod as transactionExport,
   index as transactionIndex,
@@ -86,7 +77,6 @@ const updateDialogOpen = ref(false)
 const bulkCreateDialogOpen = ref(false)
 const transferDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
-const addSheetOpen = ref(false)
 const targetData = ref<Transaction | null>(null)
 
 const loading = ref(false)
@@ -114,11 +104,6 @@ const {
 })
 
 const filterSheetOpen = ref(false)
-
-// Which tab the segmented control shows. 'recurring' navigates away, so the
-// local state is only ever 'transactions' in practice; kept as a ref so the
-// control can reflect a pressed state before the visit.
-const viewMode = ref<'transactions' | 'recurring'>('transactions')
 
 const groupedCategories = computed(() => {
   const items = props.categories
@@ -204,42 +189,29 @@ const rowActions = (t: Transaction) => [
           :description="__('transaction_list_description')"
           class="mb-0"
         />
-        <div class="flex items-center gap-2">
-          <!-- Desktop: dropdown with all three actions -->
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button class="hidden sm:inline-flex">
-                <Plus class="mr-2 size-4" />
-                {{ __('add_data', { data: __('transaction') }) }}
-                <ChevronDown class="ml-2 size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem @click="openCreateDialog">
-                <Plus class="mr-2 size-4" />
-                {{ __('single_transaction') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="openBulkCreateDialog">
-                <ListPlus class="mr-2 size-4" />
-                {{ __('multiple_transactions') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="openTransferDialog">
-                <ArrowRightLeft class="mr-2 size-4" />
-                {{ __('transfer') }}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <!-- Mobile: compact add button opens a bottom-sheet action menu.
-               Chevron signals that a selection (single/bulk/transfer) follows. -->
+        <!-- Visible 3-action grid: single / bulk / transfer (mobile + desktop) -->
+        <div class="grid w-full grid-cols-3 gap-2 sm:w-auto">
+          <Button class="min-w-0 px-2" @click="openCreateDialog">
+            <Plus class="size-4 shrink-0" />
+            <span class="min-w-0 truncate">{{ __('single_transaction') }}</span>
+          </Button>
           <Button
-            variant="default"
-            class="h-11 gap-1 rounded-lg px-3 sm:hidden"
-            :aria-label="__('add_data', { data: __('transaction') })"
-            @click="addSheetOpen = true"
+            variant="outline"
+            class="min-w-0 px-2"
+            @click="openBulkCreateDialog"
           >
-            <Plus class="size-5" />
-            <ChevronDown class="size-4" />
+            <ListPlus class="size-4 shrink-0" />
+            <span class="min-w-0 truncate">{{
+              __('multiple_transactions')
+            }}</span>
+          </Button>
+          <Button
+            variant="outline"
+            class="min-w-0 px-2"
+            @click="openTransferDialog"
+          >
+            <ArrowRightLeft class="size-4 shrink-0" />
+            <span class="min-w-0 truncate">{{ __('transfer') }}</span>
           </Button>
         </div>
       </div>
@@ -280,38 +252,9 @@ const rowActions = (t: Transaction) => [
           </Button>
         </div>
 
-        <!-- Segmented [ Transaksi | Berulang ] — the old Repeat icon had no
-             label, so on mobile it was a mystery button. -->
-        <div
-          class="grid w-full grid-cols-2 gap-1 rounded-lg border bg-muted/40 p-1 lg:hidden"
-        >
-          <button
-            type="button"
-            class="touch-target rounded-md px-3 py-2 text-sm font-medium transition-colors"
-            :class="
-              viewMode === 'transactions'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground'
-            "
-            :aria-pressed="viewMode === 'transactions'"
-            @click="viewMode = 'transactions'"
-          >
-            {{ __('transactions') }}
-          </button>
-          <button
-            type="button"
-            class="touch-target rounded-md px-3 py-2 text-sm font-medium transition-colors"
-            :class="
-              viewMode === 'recurring'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground'
-            "
-            :aria-pressed="viewMode === 'recurring'"
-            @click="router.visit(recurringTransactions.index().url)"
-          >
-            {{ __('recurring_transactions') }}
-          </button>
-        </div>
+        <!-- Segmented [ Transactions | Recurring ] — visible at every
+             breakpoint; the old control was mobile-only. -->
+        <TransactionTabs viewMode="transactions" />
 
         <!-- Desktop: inline filter controls (lg+) -->
         <div class="hidden w-full gap-4 lg:flex lg:w-auto">
@@ -482,45 +425,6 @@ const rowActions = (t: Transaction) => [
           </div>
         </template>
       </FilterSheet>
-
-      <!-- Mobile: add-transaction action sheet (sm:hidden equivalent via content) -->
-      <Dialog v-model:open="addSheetOpen">
-        <SheetDialogContent class="sm:hidden">
-          <DialogHeader>
-            <DialogTitle class="flex items-center gap-2">
-              <Plus class="size-4" />
-              {{ __('add_data', { data: __('transaction') }) }}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div class="space-y-2">
-            <Button
-              variant="outline"
-              class="h-12 w-full justify-start gap-3 text-base"
-              @click="openCreateDialog"
-            >
-              <Plus class="size-5" />
-              {{ __('single_transaction') }}
-            </Button>
-            <Button
-              variant="outline"
-              class="h-12 w-full justify-start gap-3 text-base"
-              @click="openBulkCreateDialog"
-            >
-              <ListPlus class="size-5" />
-              {{ __('multiple_transactions') }}
-            </Button>
-            <Button
-              variant="outline"
-              class="h-12 w-full justify-start gap-3 text-base"
-              @click="openTransferDialog"
-            >
-              <ArrowRightLeft class="size-5" />
-              {{ __('transfer') }}
-            </Button>
-          </div>
-        </SheetDialogContent>
-      </Dialog>
 
       <!-- Skeleton / empty / table chain — one owner, no double render -->
       <DataListState

@@ -57,6 +57,7 @@ return [
     'close' => 'Tutup',
     'confirm_delete_recurring' => 'Apakah Anda yakin ingin menghapus transaksi berulang ini?',
     'confirm_password' => 'Konfirmasi Kata Sandi',
+    'contribution_amount' => 'Jumlah kontribusi',
     'create' => 'Buat',
     'create_budget' => 'Buat Anggaran',
     'create_data' => 'Buat :data',

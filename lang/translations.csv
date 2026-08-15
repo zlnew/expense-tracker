@@ -55,6 +55,7 @@ category_update_description,"Update budget category","Perbarui kategori anggaran
 close,Close,Tutup
 confirm_delete_recurring,"Are you sure you want to delete this recurring transaction?","Apakah Anda yakin ingin menghapus transaksi berulang ini?"
 confirm_password,"Confirm Password","Konfirmasi Kata Sandi"
+contribution_amount,"Contribution amount","Jumlah kontribusi"
 create,Create,Buat
 create_budget,"Create Budget","Buat Anggaran"
 create_data,"Create :data","Buat :data"
