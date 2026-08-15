@@ -30,7 +30,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('balances', BalanceApiController::class)
         ->middleware('abilities:balances:read')
         ->name('api.balances');
-  
+
     Route::get('budgets', BudgetApiController::class)
         ->middleware('abilities:budgets:read')
         ->name('api.budgets');
