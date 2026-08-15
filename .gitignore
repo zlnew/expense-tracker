@@ -1,6 +1,8 @@
 /.phpunit.cache
 /bootstrap/ssr
+/database/e2e.sqlite
 /node_modules
+/playwright-report/
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
@@ -10,6 +12,7 @@
 /resources/js/wayfinder
 /storage/*.key
 /storage/pail
+/test-results/
 /vendor
 .env
 .env.backup

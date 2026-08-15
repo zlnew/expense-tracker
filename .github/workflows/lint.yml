@@ -59,5 +59,8 @@ jobs:
       - name: Test Backend
         run: php artisan test
 
+      - name: Test Frontend Unit
+        run: npm run test:unit
+
       - name: Check i18n Drift
         run: php artisan app:generate-language-files && git diff --exit-code resources/js/lang
