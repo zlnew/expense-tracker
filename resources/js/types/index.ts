@@ -118,6 +118,19 @@ export type Transaction = {
   category: Category | null
 }
 
+// Web-only budgets/{budget}/transactions response: the bare TransactionData
+// collection PLUS the envelope extras for client-side actuals (envelope-basis
+// spec 2026-08-16). fund.reserved is a per-item map (item_id => set-aside
+// sum); fund.payout_transaction_ids are budget-exempt payout transactions to
+// exclude from expense item actuals.
+export type BudgetTransactionsResponse = {
+  transactions: Transaction[]
+  fund: {
+    reserved: Record<string, number>
+    payout_transaction_ids: number[]
+  }
+}
+
 export type SummaryCards = {
   total_balance: number
   current_month_expenses: number
