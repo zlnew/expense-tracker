@@ -7,8 +7,8 @@ use App\DTO\BudgetItemData;
 use App\Http\Controllers\Controller;
 use App\Models\Budget;
 use App\Models\BudgetItem;
-use App\Models\Transaction;
 use App\Queries\BudgetQuery;
+use App\Support\BudgetActuals;
 use App\Support\BudgetCycle;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -86,14 +86,8 @@ class BudgetApiController extends Controller
             ? BudgetCycle::currentCycleRange($budget)
             : [$budget->period_start, $budget->period_end];
 
-        return Transaction::query()
-            ->selectRaw('budget_item_id, SUM(amount) as total')
-            ->where('user_id', $budget->user_id)
-            ->where('budget_id', $budget->id)
-            ->whereBetween('date', [$start, $end])
-            ->groupBy('budget_item_id')
-            ->pluck('total', 'budget_item_id')
-            ->map(fn ($total) => (int) $total)
-            ->all();
+        // Envelope-aware actuals (fund set-asides count, payouts exempt) —
+        // same helper every other budget-plane consumer uses.
+        return BudgetActuals::perItem($budget->user, $budget, $start, $end);
     }
 }

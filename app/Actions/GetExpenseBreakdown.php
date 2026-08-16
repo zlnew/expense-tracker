@@ -5,8 +5,8 @@ namespace App\Actions;
 use App\Enums\CategoryType;
 use App\Models\Budget;
 use App\Models\BudgetItem;
-use App\Models\Transaction;
 use App\Models\User;
+use App\Support\BudgetActuals;
 use App\Support\BudgetCycle;
 
 class GetExpenseBreakdown extends Action
@@ -41,24 +41,22 @@ class GetExpenseBreakdown extends Action
             ->where('type', CategoryType::EXPENSE)
             ->get();
 
-        $expenses = Transaction::query()
-            ->selectRaw('budget_item_id, SUM(amount) as total_amount')
-            ->where('user_id', $this->user->id)
-            ->where('budget_id', $this->activeBudget->id)
-            ->where('type', CategoryType::EXPENSE)
-            ->whereBetween('date', [$start, $end])
-            ->groupBy('budget_item_id')
-            ->pluck('total_amount', 'budget_item_id');
+        // Envelope-aware actuals: real expenses + fund set-asides, minus
+        // budget-exempt fund payouts (BudgetActuals).
+        $actuals = BudgetActuals::perItem($this->user, $this->activeBudget, $start, $end);
 
-        $totalExpense = $expenses->sum();
+        // Total over the expense items actually returned — perItem may also
+        // carry income item keys (deliberate; see BudgetActuals::perItem).
+        $totalExpense = collect($budgetItems)
+            ->sum(fn ($item) => $actuals[$item->id] ?? 0);
 
         if ($totalExpense <= 0) {
             return [];
         }
 
         return $budgetItems
-            ->map(function ($budgetItem) use ($expenses, $totalExpense) {
-                $amount = (int) ($expenses[$budgetItem->id] ?? 0);
+            ->map(function ($budgetItem) use ($actuals, $totalExpense) {
+                $amount = $actuals[$budgetItem->id] ?? 0;
                 $percentage = round(($amount / $totalExpense) * 100, 2);
 
                 return [
