@@ -18,15 +18,16 @@ use Illuminate\Validation\ValidationException;
  * 1. lock the fund row (deterministic locking, same discipline as
  *    TransferBetweenAccounts); re-check the accumulated reserve under the lock;
  * 2. resolve the budget link via ResolveTransactionBudgetLink (PR #48) from
- *    the fund's category_id — budget actuals pick the bill up like any other
- *    category spend;
+ *    the fund's category_id — the payout stays budget-linked for the audit
+ *    trail but is EXEMPT from budget actuals (envelope-basis, 2026-08-16:
+ *    the reservation already counted when it was set aside, and the exclusion
+ *    is by id via fund_contributions.transaction_id, so no alert fires here);
  * 3. create a REAL expense Transaction via SaveTransaction (type expense,
  *    user-chosen balance_id) — SaveTransaction calls SyncBalance, so the
  *    paying balance's final_amount drops for real;
- * 4. run CheckBudgetAlerts — same parity as the web transaction store;
- * 5. write a withdrawal ledger row carrying the new transaction_id (audit
+ * 4. write a withdrawal ledger row carrying the new transaction_id (audit
  *    link fund → transaction);
- * 6. roll next_due forward (D6).
+ * 5. roll next_due forward (D6).
  *
  * Guard: amount > accumulated → 422 `insufficient_fund_reserve`.
  */
@@ -89,10 +90,7 @@ class PayFromFund extends Action
                 'description' => $this->data->description,
             ]));
 
-            // 4. Budget alert parity with the web store path.
-            CheckBudgetAlerts::run($locked->user, $transaction);
-
-            // 5. Ledger withdrawal carrying the real transaction id.
+            // 4. Ledger withdrawal carrying the real transaction id.
             $contribution = $locked->contributions()->create([
                 'user_id' => $locked->user_id,
                 'type' => 'withdrawal',
@@ -102,7 +100,7 @@ class PayFromFund extends Action
                 'description' => $this->data->description,
             ]);
 
-            // 6. Roll next_due anchored to the ORIGINAL day-of-month (the
+            // 5. Roll next_due anchored to the ORIGINAL day-of-month (the
             // anchor_day), clamped to the target month's length — a fund due
             // on the 31st stays on the 31st (Jan 31 → Feb 28 → Mar 31), not
             // drifting to the 28th. addMonthsNoOverflow alone drifts because

@@ -180,7 +180,7 @@ on_track,"On track","Sesuai rencana"
 optional,Optional,Opsional
 others,Others,Lainnya
 overfunded,Overfunded,"Melebihi target"
-overspent,Overspent,Melebihi
+overspent,"Over budget",Melebihi
 password,Password,"Kata Sandi"
 password_update_description,"Ensure your account is using a long, random password to stay secure","Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman."
 password_update_title,"Update Password","Perbarui Kata Sandi"
@@ -240,7 +240,7 @@ single_transaction,"Single Transaction","Satu Transaksi"
 sinking_funds,"Sinking Funds","Dana Cadangan"
 skip_to_content,"Skip to content","Langsung ke konten"
 something_went_wrong,"Something went wrong.","Terjadi kesalahan."
-spent,Spent,Terpakai
+spent,Used,Terpakai
 start_date,"Start Date","Tanggal Mulai"
 status,Status,Status
 stop_recurring,"Stop Recurring","Hentikan Berulang"

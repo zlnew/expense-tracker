@@ -6,8 +6,8 @@ use App\DTO\BudgetItemData;
 use App\Enums\CategoryType;
 use App\Models\Budget;
 use App\Models\BudgetItem;
-use App\Models\Transaction;
 use App\Models\User;
+use App\Support\BudgetActuals;
 use App\Support\BudgetCycle;
 use Spatie\LaravelData\DataCollection;
 
@@ -43,19 +43,14 @@ class GetBudgetProgress extends Action
             ->where('type', CategoryType::EXPENSE)
             ->get();
 
-        $expenses = Transaction::query()
-            ->selectRaw('budget_item_id, SUM(amount) as total_amount')
-            ->where('user_id', $this->user->id)
-            ->where('budget_id', $this->activeBudget->id)
-            ->where('type', CategoryType::EXPENSE)
-            ->whereBetween('date', [$start, $end])
-            ->groupBy('budget_item_id')
-            ->pluck('total_amount', 'budget_item_id');
+        // Envelope-aware actuals: real expenses + fund set-asides in the
+        // fund's category, minus budget-exempt fund payouts (BudgetActuals).
+        $actuals = BudgetActuals::perItem($this->user, $this->activeBudget, $start, $end);
 
         $progress = $budgetItems
             ->sortBy(fn ($bi) => $bi->category?->name)
-            ->map(function ($bi) use ($expenses) {
-                $actualAmount = (int) ($expenses[$bi->id] ?? 0);
+            ->map(function ($bi) use ($actuals) {
+                $actualAmount = $actuals[$bi->id] ?? 0;
 
                 return BudgetItemData::from([
                     'id' => $bi->id,

@@ -5,7 +5,6 @@ namespace App\Support;
 use App\Enums\CategoryType;
 use App\Models\Budget;
 use App\Models\BudgetItem;
-use App\Models\Transaction;
 use App\Models\User;
 use Spatie\LaravelData\DataCollection;
 
@@ -83,20 +82,15 @@ class BudgetRollover
             return [];
         }
 
-        $spent = Transaction::query()
-            ->selectRaw('budget_item_id, SUM(amount) as total_amount')
-            ->where('user_id', $budget->user_id)
-            ->where('budget_id', $budget->id)
-            ->where('type', CategoryType::EXPENSE)
-            ->whereBetween('date', [$budget->period_start, $budget->period_end])
-            ->groupBy('budget_item_id')
-            ->pluck('total_amount', 'budget_item_id');
+        // Envelope-aware actuals: set-asides count as used, payouts are
+        // budget-exempt — reserved money never silently rolls over twice.
+        $actuals = BudgetActuals::perItem($budget->user, $budget, $budget->period_start, $budget->period_end);
 
         $leftovers = [];
 
         foreach ($items as $categoryId => $item) {
-            $spentAmount = (int) ($spent[$item->id] ?? 0);
-            $leftover = max(0, $item->planned_amount - $spentAmount);
+            $actualAmount = $actuals[$item->id] ?? 0;
+            $leftover = max(0, $item->planned_amount - $actualAmount);
 
             if ($leftover > 0) {
                 $leftovers[$categoryId] = $leftover;

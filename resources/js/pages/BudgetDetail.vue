@@ -34,7 +34,7 @@ import {
   show as budgetShow,
   transactions as budgetTransactions,
 } from '@/routes/budgets'
-import type { Budget, Transaction } from '@/types'
+import type { Budget, BudgetTransactionsResponse, Transaction } from '@/types'
 
 const props = defineProps<{
   budget: Budget
@@ -115,6 +115,12 @@ const transactionApi = useHttp({
 
 const transactions = ref<Transaction[]>([])
 
+// Envelope extras from the web transactions response (2026-08-16 spec):
+// payout transactions are budget-exempt (excluded from expense actuals) and
+// fund set-asides count as reserved (added to expense actuals).
+const payoutIds = ref<Set<number>>(new Set())
+const reserved = ref<Record<string, number>>({})
+
 // True while the transactions API fetch is in flight — shows the skeleton.
 const transactionsLoading = ref(false)
 
@@ -169,9 +175,14 @@ const expenseBudgetItems = computed(() => {
   const data = props.budget.expenses ?? []
 
   return data.map((d) => {
-    const actualAmount = expenses.value
-      .filter((e) => e.budget_item_id === d.id)
-      .reduce((acc, curr) => acc + curr.amount, 0)
+    // Envelope actuals: sum the month's expense rows for this item EXCLUDING
+    // fund payouts (already reserved when set aside), then add this item's
+    // fund set-asides for the browsed cycle month.
+    const actualAmount =
+      expenses.value
+        .filter((e) => e.budget_item_id === d.id && !payoutIds.value.has(e.id))
+        .reduce((acc, curr) => acc + curr.amount, 0) +
+      (reserved.value[d.id] ?? 0)
 
     const diffAmount = d.planned_amount - actualAmount
 
@@ -267,7 +278,11 @@ const fetchTransactions = async () => {
     const res = await transactionApi.get(
       budgetTransactions.url({ budget: props.budget.id }),
     )
-    transactions.value = res as Transaction[]
+
+    const data = res as unknown as BudgetTransactionsResponse
+    transactions.value = data.transactions
+    payoutIds.value = new Set(data.fund.payout_transaction_ids)
+    reserved.value = data.fund.reserved
   } catch (error) {
     const apiError = error as Error
     transactionsError.value = apiError.message
