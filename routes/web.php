@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\GetTransactionApiController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetTransactionsController;

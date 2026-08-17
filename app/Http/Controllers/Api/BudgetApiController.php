@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\DeleteBudget;
+use App\Actions\SaveBudget;
+use App\Actions\SetActiveBudget;
 use App\DTO\BudgetData;
 use App\DTO\BudgetItemData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BudgetSaveRequest;
 use App\Models\Budget;
 use App\Models\BudgetItem;
 use App\Queries\BudgetQuery;
@@ -16,7 +20,7 @@ use Spatie\LaravelData\DataCollection;
 
 class BudgetApiController extends Controller
 {
-    public function __invoke(Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $budgets = BudgetQuery::make($request->all(), ['items.category'])
             ->forUser($request->user()->id)
@@ -25,6 +29,85 @@ class BudgetApiController extends Controller
         $result = $budgets->map(fn (Budget $budget) => $this->toData($budget));
 
         return response()->json($result);
+    }
+
+    public function store(BudgetSaveRequest $request): JsonResponse
+    {
+        $data = $request->getData();
+
+        // BudgetSaveRequest treats items as optional, but SaveBudget iterates
+        // the collection — an empty budget must get an empty collection, not
+        // null, or the save would 500 on a foreach over null.
+        if ($data->items === null) {
+            $data->items = BudgetItemData::collect([], DataCollection::class);
+        }
+
+        /** @var Budget $budget */
+        $budget = SaveBudget::run(new Budget, $data);
+
+        // refresh() reloads DB defaults (is_active etc.) that SaveBudget
+        // never sets in memory — the response must reflect the stored row.
+        return response()->json($this->toData($budget->fresh()->load('items.category')), 201);
+    }
+
+    public function update(BudgetSaveRequest $request, int $budget): JsonResponse
+    {
+        $budget = Budget::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($budget);
+
+        $budget->load('items');
+
+        // Merge the payload over the current row so SaveBudget always gets a
+        // complete items list. A partial update that omits `items` must NOT
+        // fall into SaveBudget's prune path, which would silently delete
+        // every item the client didn't resubmit.
+        $data = BudgetData::from(array_merge(
+            [
+                'period_start' => $budget->period_start->toDateString(),
+                'period_end' => $budget->period_end->toDateString(),
+                'cutoff_day' => $budget->cutoff_day,
+                'carry_over' => $budget->carry_over,
+                'notes' => $budget->notes,
+                'items' => $budget->items
+                    ->map(fn (BudgetItem $item) => [
+                        'id' => $item->id,
+                        'category_id' => $item->category_id,
+                        'type' => $item->type->value,
+                        'planned_amount' => $item->planned_amount,
+                    ])
+                    ->values()
+                    ->all(),
+            ],
+            $request->validated(),
+        ));
+
+        /** @var Budget $budget */
+        $budget = SaveBudget::run($budget, $data);
+
+        return response()->json($this->toData($budget->load('items.category')));
+    }
+
+    public function destroy(Request $request, int $budget): JsonResponse
+    {
+        $budget = Budget::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($budget);
+
+        DeleteBudget::run($budget);
+
+        return response()->json(null, 204);
+    }
+
+    public function setActive(Request $request, int $budget): JsonResponse
+    {
+        $budget = Budget::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($budget);
+
+        SetActiveBudget::run($budget);
+
+        return response()->json($this->toData($budget->load('items.category')));
     }
 
     /**
