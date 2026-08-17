@@ -2,17 +2,67 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\CheckBudgetAlerts;
+use App\Actions\DeleteTransaction;
 use App\Actions\ResolveTransactionBudgetLink;
 use App\Actions\SaveTransaction;
 use App\DTO\TransactionData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TransactionSaveRequest;
 use App\Http\Requests\TransactionUpdateRequest;
 use App\Models\Transaction;
+use App\Queries\TransactionQuery;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Spatie\LaravelData\PaginatedDataCollection;
 
-class UpdateTransactionApiController extends Controller
+/**
+ * Full CRUD for /api/transactions. Consolidates the former
+ * Get/Store/Update split controllers into one class so the resource has a
+ * single home; destroy is new (user-scoped, hard delete + balance resync).
+ */
+class TransactionApiController extends Controller
 {
-    public function __invoke(TransactionUpdateRequest $request, int $transaction): JsonResponse
+    public function index(Request $request): JsonResponse
+    {
+        $transactions = TransactionQuery::make($request->all())
+            ->forUser($request->user()->id)
+            ->result();
+
+        $isPaginated = $request->boolean('is_paginate');
+
+        $collection = $isPaginated
+            ? TransactionData::collect($transactions, PaginatedDataCollection::class)
+            : TransactionData::collect($transactions);
+
+        return response()->json($collection);
+    }
+
+    public function store(TransactionSaveRequest $request): JsonResponse
+    {
+        $data = $request->getData();
+
+        ['budget_id' => $budgetId, 'budget_item_id' => $budgetItemId] = ResolveTransactionBudgetLink::run(
+            $request->user()->id,
+            $data->category_id,
+            $data->budget_id,
+            $data->budget_item_id,
+        );
+
+        $data->budget_id = $budgetId;
+        $data->budget_item_id = $budgetItemId;
+
+        $transaction = SaveTransaction::run(new Transaction, $data);
+
+        CheckBudgetAlerts::run($request->user(), $transaction);
+
+        return response()->json(
+            TransactionData::from($transaction->load(['balance', 'category'])),
+            201,
+        );
+    }
+
+    public function update(TransactionUpdateRequest $request, int $transaction): JsonResponse
     {
         // User-scoped lookup: another user's id resolves to 404, never 403.
         $transaction = Transaction::query()
@@ -70,5 +120,16 @@ class UpdateTransactionApiController extends Controller
         return response()->json(
             TransactionData::from($transaction->load(['balance', 'category'])),
         );
+    }
+
+    public function destroy(Request $request, int $transaction): JsonResponse
+    {
+        $transaction = Transaction::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($transaction);
+
+        DeleteTransaction::run($transaction);
+
+        return response()->json(null, 204);
     }
 }
