@@ -26,12 +26,12 @@ test('the contract lists all api routes grouped by feature for a full token', fu
         ->getJson('/api/contract')
         ->assertOk()
         ->assertJsonStructure([
-            'transactions' => [['method', 'uri', 'ability', 'description']],
-            'categories' => [['method', 'uri', 'ability', 'description']],
-            'balances' => [['method', 'uri', 'ability', 'description']],
-            'budgets' => [['method', 'uri', 'ability', 'description']],
-            'funds' => [['method', 'uri', 'ability', 'description']],
-            'recurring_transactions' => [['method', 'uri', 'ability', 'description']],
+            'transactions' => [['method', 'uri', 'ability', 'description', 'request_example', 'response_example']],
+            'categories' => [['method', 'uri', 'ability', 'description', 'request_example', 'response_example']],
+            'balances' => [['method', 'uri', 'ability', 'description', 'request_example', 'response_example']],
+            'budgets' => [['method', 'uri', 'ability', 'description', 'request_example', 'response_example']],
+            'funds' => [['method', 'uri', 'ability', 'description', 'request_example', 'response_example']],
+            'recurring_transactions' => [['method', 'uri', 'ability', 'description', 'request_example', 'response_example']],
         ]);
 });
 
@@ -103,6 +103,43 @@ test('the contract lists the recurring transactions routes for a token with that
         ->assertOk()
         ->assertJsonCount(1, 'transactions')
         ->assertJsonMissing(['recurring_transactions' => []]);
+});
+
+test('the contract includes request and response examples for every route', function () {
+    $user = User::factory()->create();
+    $token = contractToken(
+        $user,
+        'transactions:read,transactions:write,categories:read,categories:write,balances:read,balances:write,budgets:read,budgets:write,funds:read,funds:write,recurring_transactions:read,recurring_transactions:write',
+    );
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->getJson('/api/contract')
+        ->assertOk();
+
+    $data = $response->json();
+
+    // Every route in every feature group has request_example + response_example keys.
+    foreach ($data as $feature => $routes) {
+        foreach ($routes as $route) {
+            expect($route)->toHaveKeys(['request_example', 'response_example'], "Route {$route['method']} {$route['uri']} missing example keys");
+        }
+    }
+
+    // GET routes have null request_example; POST/PATCH routes have array examples.
+    $transactions = collect($data['transactions']);
+    expect($transactions->firstWhere('method', 'GET')['request_example'])->toBeNull()
+        ->and($transactions->firstWhere('method', 'POST')['request_example'])->toBeArray()
+        ->and($transactions->firstWhere('method', 'POST')['request_example'])->toHaveKey('balance_id');
+
+    // Transfer endpoint has from_account_id / to_account_id in its request example.
+    $balances = collect($data['balances']);
+    $transfer = $balances->firstWhere('uri', '/api/balances/transfer');
+    expect($transfer)->not->toBeNull()
+        ->and($transfer['request_example'])->toHaveKeys(['from_account_id', 'to_account_id', 'amount'])
+        ->and($transfer['response_example'])->toHaveKey('message');
+
+    // DELETE routes have null response_example (204 no content).
+    expect($transactions->firstWhere('method', 'DELETE')['response_example'])->toBeNull();
 });
 
 test('a token with only funds ability sees funds routes and nothing else', function () {

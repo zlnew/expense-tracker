@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\DeleteBalance;
 use App\Actions\SaveBalance;
+use App\Actions\TransferBetweenAccounts;
 use App\DTO\BalanceData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BalanceSaveRequest;
+use App\Http\Requests\TransferBetweenAccountsRequest;
 use App\Models\Balance;
 use App\Queries\BalanceQuery;
 use Illuminate\Http\JsonResponse;
@@ -72,5 +74,12 @@ class BalanceApiController extends Controller
         DeleteBalance::run($balance);
 
         return response()->json(null, 204);
+    }
+
+    public function transfer(TransferBetweenAccountsRequest $request): JsonResponse
+    {
+        TransferBetweenAccounts::run($request->getData());
+
+        return response()->json(['message' => 'Transfer completed'], 200);
     }
 }
