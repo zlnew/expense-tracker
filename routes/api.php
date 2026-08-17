@@ -1,14 +1,21 @@
 <?php
 
+use App\Http\Controllers\Api\ApiContractController;
 use App\Http\Controllers\Api\BalanceApiController;
 use App\Http\Controllers\Api\BudgetApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\FundApiController;
+use App\Http\Controllers\Api\RecurringTransactionApiController;
 use App\Http\Controllers\Api\TransactionApiController;
 use App\Http\Controllers\Api\UpcomingFundApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    // API contract — discoverable endpoints for any valid token. No ability
+    // middleware: it filters the route table by the token's own abilities.
+    Route::get('contract', ApiContractController::class)
+        ->name('api.contract');
+
     // Transactions — GET is read, everything else is write. Per-method
     // abilities can't ride on a single apiResource (Sanctum's abilities
     // middleware ANDs a comma list), so routes stay explicit with the
@@ -107,4 +114,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('funds/{fund}/withdrawals', [FundApiController::class, 'storeWithdrawal'])
         ->middleware('abilities:funds:write')
         ->name('api.funds.withdrawals.store');
+
+    // Recurring transactions — same per-method abilities split as the other
+    // resources (a single apiResource can't express read-vs-write).
+    Route::middleware('abilities:recurring_transactions:read')
+        ->group(function () {
+            Route::get('recurring-transactions', [RecurringTransactionApiController::class, 'index'])
+                ->name('api.recurring-transactions');
+            Route::get('recurring-transactions/{recurring_transaction}', [RecurringTransactionApiController::class, 'show'])
+                ->name('api.recurring-transactions.show');
+        });
+
+    Route::middleware('abilities:recurring_transactions:write')
+        ->group(function () {
+            Route::post('recurring-transactions', [RecurringTransactionApiController::class, 'store'])
+                ->name('api.recurring-transactions.store');
+            Route::patch('recurring-transactions/{recurring_transaction}', [RecurringTransactionApiController::class, 'update'])
+                ->name('api.recurring-transactions.update');
+            Route::delete('recurring-transactions/{recurring_transaction}', [RecurringTransactionApiController::class, 'destroy'])
+                ->name('api.recurring-transactions.destroy');
+        });
 });
