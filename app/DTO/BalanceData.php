@@ -15,6 +15,10 @@ class BalanceData extends Data
         public ?string $description,
         public int $initial_amount = 0,
         public int $final_amount = 0,
+        public ?int $reconciled_amount = null,
+        public ?string $reconciled_at = null,
+        public ?int $drift = null,
+        public bool $is_drift_flagged = false,
         public bool $is_primary = false,
         public ?UserData $user = null,
         #[DataCollectionOf(TransactionData::class)]

@@ -37,6 +37,10 @@ export type Balance = {
   description: string | null
   initial_amount: number
   final_amount: number
+  reconciled_amount: number | null
+  reconciled_at: string | null
+  drift: number | null
+  is_drift_flagged: boolean
   is_primary: boolean
   user: User | null
   transactions: Transaction[] | null

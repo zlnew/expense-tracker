@@ -63,6 +63,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->group(function () {
             Route::post('balances/transfer', [BalanceApiController::class, 'transfer'])
                 ->name('api.balances.transfer');
+            Route::post('balances/{balance}/reconcile', [BalanceApiController::class, 'reconcile'])
+                ->name('api.balances.reconcile');
             Route::post('balances', [BalanceApiController::class, 'store'])
                 ->name('api.balances.store');
             Route::patch('balances/{balance}', [BalanceApiController::class, 'update'])

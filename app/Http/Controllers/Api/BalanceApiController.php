@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\DeleteBalance;
+use App\Actions\ReconcileBalance;
 use App\Actions\SaveBalance;
 use App\Actions\TransferBetweenAccounts;
 use App\DTO\BalanceData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BalanceSaveRequest;
+use App\Http\Requests\ReconcileBalanceRequest;
 use App\Http\Requests\TransferBetweenAccountsRequest;
 use App\Models\Balance;
 use App\Queries\BalanceQuery;
@@ -81,5 +83,20 @@ class BalanceApiController extends Controller
         TransferBetweenAccounts::run($request->getData());
 
         return response()->json(['message' => 'Transfer completed'], 200);
+    }
+
+    public function reconcile(ReconcileBalanceRequest $request, int $balance): JsonResponse
+    {
+        $balance = Balance::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($balance);
+
+        ReconcileBalance::run(
+            $balance,
+            (int) $request->validated('reconciled_amount'),
+            (string) $request->validated('reconciled_at'),
+        );
+
+        return response()->json(BalanceData::from($balance->fresh()));
     }
 }

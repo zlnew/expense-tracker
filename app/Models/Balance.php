@@ -18,9 +18,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $description
  * @property int $initial_amount
  * @property int $final_amount
+ * @property int|null $reconciled_amount
+ * @property string|null $reconciled_at
  * @property bool $is_primary
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ * @property-read int|null $drift
+ * @property-read bool $is_drift_flagged
  * @property-read Collection<int, Transaction> $transactions
  * @property-read int|null $transactions_count
  * @property-read User $user
@@ -40,7 +44,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['name', 'description', 'initial_amount', 'final_amount', 'is_primary'])]
+#[Fillable(['name', 'description', 'initial_amount', 'final_amount', 'is_primary', 'reconciled_amount', 'reconciled_at'])]
 class Balance extends Model
 {
     use HasFactory, SoftDeletes;
@@ -51,7 +55,33 @@ class Balance extends Model
             'initial_amount' => 'integer',
             'final_amount' => 'integer',
             'is_primary' => 'boolean',
+            'reconciled_amount' => 'integer',
+            'reconciled_at' => 'date',
         ];
+    }
+
+    protected $appends = ['drift', 'is_drift_flagged'];
+
+    public const DRIFT_TOLERANCE = 500;
+
+    public function getDriftAttribute(): ?int
+    {
+        if ($this->reconciled_amount === null) {
+            return null;
+        }
+
+        return (int) $this->reconciled_amount - (int) $this->final_amount;
+    }
+
+    public function getIsDriftFlaggedAttribute(): bool
+    {
+        $drift = $this->drift;
+
+        if ($drift === null) {
+            return false;
+        }
+
+        return abs($drift) > self::DRIFT_TOLERANCE;
     }
 
     public function user(): BelongsTo

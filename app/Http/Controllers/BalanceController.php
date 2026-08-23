@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DeleteBalance;
+use App\Actions\ReconcileBalance;
 use App\Actions\SaveBalance;
 use App\Actions\SetPrimaryBalance;
 use App\DTO\BalanceData;
 use App\DTO\TransactionData;
 use App\Http\Requests\BalanceSaveRequest;
+use App\Http\Requests\ReconcileBalanceRequest;
 use App\Models\Balance;
 use App\Queries\BalanceQuery;
 use Illuminate\Http\RedirectResponse;
@@ -67,6 +69,17 @@ class BalanceController extends Controller
     public function setPrimary(Balance $balance): RedirectResponse
     {
         SetPrimaryBalance::run($balance);
+
+        return back()->with('success', __('app.updated_data', ['data' => __('app.balance')]));
+    }
+
+    public function reconcile(Balance $balance, ReconcileBalanceRequest $request): RedirectResponse
+    {
+        ReconcileBalance::run(
+            $balance,
+            (int) $request->validated('reconciled_amount'),
+            (string) $request->validated('reconciled_at'),
+        );
 
         return back()->with('success', __('app.updated_data', ['data' => __('app.balance')]));
     }
