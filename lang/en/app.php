@@ -136,6 +136,8 @@ return [
     'install_banner_title' => 'Install Expense Tracker',
     'insufficient_balance' => 'Insufficient balance',
     'insufficient_fund_reserve' => 'Insufficient fund reserve',
+    'delete_will_cascade_fund_withdrawal' => 'Deleting this transaction will also delete its linked fund withdrawal. Add ?cascade=1 to confirm.',
+    'delete_will_cascade_fund_expense' => 'Deleting this withdrawal will also delete its linked expense. Add ?cascade=1 to confirm.',
     'invalid_account_destination' => 'Invalid account destination',
     'invalid_account_source' => 'Invalid account source',
     'is_primary' => 'Primary Balance',

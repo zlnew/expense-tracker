@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DeleteFund;
+use App\Actions\DeleteFundContribution;
 use App\Actions\GetFundProgress;
 use App\Actions\PayFromFund;
 use App\Actions\SaveFund;
@@ -16,6 +17,7 @@ use App\Http\Requests\FundSaveRequest;
 use App\Http\Requests\FundWithdrawalRequest;
 use App\Models\Balance;
 use App\Models\Category;
+use App\Models\FundContribution;
 use App\Models\SinkingFund;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -84,6 +86,26 @@ class FundController extends Controller
         PayFromFund::run($fund, $request->getData());
 
         return back()->with('success', __('app.created_data', ['data' => __('app.fund_withdrawal')]));
+    }
+
+    public function destroyContribution(FundContribution $contribution, Request $request): RedirectResponse
+    {
+        // Withdrawal with a linked expense shares a group_id; need cascade to acknowledge both will die.
+        if ($contribution->group_id && $contribution->type === 'withdrawal' && ! $request->boolean('cascade')) {
+            $hasLinkedExpense = \App\Models\Transaction::query()
+                ->where('transfer_group_id', $contribution->group_id)
+                ->exists();
+
+            if ($hasLinkedExpense) {
+                return back()->withErrors([
+                    'contribution' => __('delete_will_cascade_fund_expense'),
+                ])->setStatusCode(409);
+            }
+        }
+
+        DeleteFundContribution::run($contribution);
+
+        return back()->with('success', __('app.deleted_data', ['data' => __('app.fund_contribution')]));
     }
 
     private function withProgress(SinkingFund $fund): FundData

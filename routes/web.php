@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('funds', FundController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::post('funds/{fund}/contributions', [FundController::class, 'storeContribution'])->name('funds.contributions.store');
         Route::post('funds/{fund}/withdrawals', [FundController::class, 'storeWithdrawal'])->name('funds.withdrawals.store');
+        Route::delete('fund-contributions/{contribution}', [FundController::class, 'destroyContribution'])->name('fund-contributions.destroy');
     });
 });
 

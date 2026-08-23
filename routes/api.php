@@ -117,6 +117,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('abilities:funds:write')
         ->name('api.funds.withdrawals.store');
 
+    Route::delete('fund-contributions/{contribution}', [FundApiController::class, 'destroyContribution'])
+        ->middleware('abilities:funds:write')
+        ->name('api.fund-contributions.destroy');
+
     // Recurring transactions — same per-method abilities split as the other
     // resources (a single apiResource can't express read-vs-write).
     Route::middleware('abilities:recurring_transactions:read')
