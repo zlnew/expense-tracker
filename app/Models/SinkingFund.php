@@ -50,7 +50,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['name', 'target_amount', 'cadence', 'contribution_amount', 'category_id', 'next_due', 'due_interval_months', 'anchor_day', 'notes'])]
+#[Fillable(['name', 'target_amount', 'cadence', 'contribution_amount', 'category_id', 'from_balance_id', 'next_due', 'due_interval_months', 'anchor_day', 'notes'])]
 class SinkingFund extends Model
 {
     use HasFactory, SoftDeletes;
@@ -74,6 +74,11 @@ class SinkingFund extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function sourceBalance(): BelongsTo
+    {
+        return $this->belongsTo(Balance::class, 'from_balance_id');
     }
 
     public function contributions(): HasMany
