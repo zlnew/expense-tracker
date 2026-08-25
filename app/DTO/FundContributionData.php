@@ -21,6 +21,7 @@ class FundContributionData extends Data
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
         public ?CarbonImmutable $date = null,
         public ?int $transaction_id = null,
+        public ?string $group_id = null,
         public ?string $description = null,
         public ?int $balance_id = null,
         public ?TransactionData $transaction = null,

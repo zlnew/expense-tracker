@@ -138,6 +138,8 @@ return [
     'install_banner_title' => 'Pasang Expense Tracker',
     'insufficient_balance' => 'Saldo tidak mencukupi',
     'insufficient_fund_reserve' => 'Saldo dana tidak mencukupi',
+    'delete_will_cascade_fund_withdrawal' => 'Menghapus transaksi ini juga akan menghapus penarikan dana terkait. Tambahkan ?cascade=1 untuk konfirmasi.',
+    'delete_will_cascade_fund_expense' => 'Menghapus penarikan ini juga akan menghapus pengeluaran terkait. Tambahkan ?cascade=1 untuk konfirmasi.',
     'invalid_account_destination' => 'Tujuan akun tidak valid',
     'invalid_account_source' => 'Sumber akun tidak valid',
     'is_primary' => 'Saldo Utama',

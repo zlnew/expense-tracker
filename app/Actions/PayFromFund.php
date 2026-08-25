@@ -10,6 +10,7 @@ use App\Models\SinkingFund;
 use App\Models\Transaction;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -24,9 +25,11 @@ use Illuminate\Validation\ValidationException;
  *    is by id via fund_contributions.transaction_id, so no alert fires here);
  * 3. create a REAL expense Transaction via SaveTransaction (type expense,
  *    user-chosen balance_id) — SaveTransaction calls SyncBalance, so the
- *    paying balance's final_amount drops for real;
- * 4. write a withdrawal ledger row carrying the new transaction_id (audit
- *    link fund → transaction);
+ *    paying balance's final_amount drops for real; the withdrawal's
+ *    group_id (fund_contributions) and the expense's transfer_group_id
+ *    (transactions) share one uuid so deletes can cascade the pair;
+ * 4. write a withdrawal ledger row carrying the new transaction_id AND
+ *    group_id (audit link fund → transaction);
  * 5. roll next_due forward (D6).
  *
  * Guard: amount > accumulated → 422 `insufficient_fund_reserve`.
@@ -78,7 +81,12 @@ class PayFromFund extends Action
                 $locked->category_id,
             );
 
+            // Shared key so deleting either leg can cascade the pair (M4).
+            $groupId = Str::uuid()->toString();
+
             // 3. Real expense — SaveTransaction runs SyncBalance internally.
+            //    Exempt from envelope budget actuals via payout id exclusion;
+            //    the expense is an audit link, not double spend.
             $transaction = SaveTransaction::run(new Transaction, TransactionData::from([
                 'balance_id' => $this->data->balance_id,
                 'budget_id' => $budgetId,
@@ -88,15 +96,17 @@ class PayFromFund extends Action
                 'date' => $this->data->date,
                 'amount' => $this->data->amount,
                 'description' => $this->data->description,
+                'transfer_group_id' => $groupId,
             ]));
 
-            // 4. Ledger withdrawal carrying the real transaction id.
+            // 4. Ledger withdrawal carrying the real transaction id + group.
             $contribution = $locked->contributions()->create([
                 'user_id' => $locked->user_id,
                 'type' => 'withdrawal',
                 'amount' => $this->data->amount,
                 'date' => $this->data->date,
                 'transaction_id' => $transaction->id,
+                'group_id' => $groupId,
                 'description' => $this->data->description,
             ]);
 

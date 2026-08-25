@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\DeleteFund;
+use App\Actions\DeleteFundContribution;
 use App\Actions\GetFundProgress;
 use App\Actions\PayFromFund;
 use App\Actions\SaveFund;
@@ -14,6 +15,7 @@ use App\Http\Requests\FundContributionRequest;
 use App\Http\Requests\FundSaveRequest;
 use App\Http\Requests\FundUpdateRequest;
 use App\Http\Requests\FundWithdrawalRequest;
+use App\Models\FundContribution;
 use App\Models\SinkingFund;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -99,6 +101,29 @@ class FundApiController extends Controller
         PayFromFund::run($fund, $request->getData());
 
         return response()->json($this->withProgress($fund->load('category')), 201);
+    }
+
+    public function destroyContribution(Request $request, int $contribution): JsonResponse
+    {
+        $contribution = FundContribution::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($contribution);
+
+        if ($contribution->group_id && $contribution->type === 'withdrawal' && ! $request->boolean('cascade')) {
+            $hasLinkedExpense = \App\Models\Transaction::query()
+                ->where('transfer_group_id', $contribution->group_id)
+                ->exists();
+
+            if ($hasLinkedExpense) {
+                return response()->json([
+                    'message' => __('delete_will_cascade_fund_expense'),
+                ], 409);
+            }
+        }
+
+        DeleteFundContribution::run($contribution);
+
+        return response()->json(null, 204);
     }
 
     private function withProgress(SinkingFund $fund): FundData
