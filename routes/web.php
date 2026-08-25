@@ -18,6 +18,13 @@ Route::inertia('/', 'Welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
+    // Session-auth mirror for the 30/60/90 window filter — browser sessions
+    // can't call /api/* (Sanctum token-only), so the card fetches here.
+    Route::get('dashboard/impending-drains', function (\Illuminate\Http\Request $request) {
+        $window = max(1, min(365, (int) $request->integer('window', 60)));
+        return response()->json(\App\Actions\GetImpendingDrains::run($request->user()->id, $window));
+    })->name('dashboard.impending-drains');
+
     Route::middleware('ownership')->group(function () {
         Route::resource('balances', BalanceController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::post('balances/{balance}/set-primary', [BalanceController::class, 'setPrimary'])->name('balances.set-primary');

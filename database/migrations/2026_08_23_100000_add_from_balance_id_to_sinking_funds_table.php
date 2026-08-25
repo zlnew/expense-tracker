@@ -19,6 +19,7 @@ return new class extends Migration
         });
 
         // Backfill existing funds to the user's primary balance (M1 decision §11.4).
+        // One-time, idempotent: only touches rows where from_balance_id is still null.
         BackfillFundSourceBalance::run();
     }
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BalanceApiController;
 use App\Http\Controllers\Api\BudgetApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\FundApiController;
+use App\Http\Controllers\Api\ImpendingDrainsApiController;
 use App\Http\Controllers\Api\RecurringTransactionApiController;
 use App\Http\Controllers\Api\TransactionApiController;
 use App\Http\Controllers\Api\UpcomingFundApiController;
@@ -92,6 +93,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('funds/upcoming', UpcomingFundApiController::class)
         ->middleware('abilities:funds:read')
         ->name('api.funds.upcoming');
+
+    Route::get('impending-drains', ImpendingDrainsApiController::class)
+        ->middleware('abilities:balances:read')
+        ->name('api.impending-drains');
 
     Route::get('funds', [FundApiController::class, 'index'])
         ->middleware('abilities:funds:read')
