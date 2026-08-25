@@ -14,6 +14,7 @@ use App\Support\BackfillFundSourceBalance;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 function realMakeFundData(array $o = []): FundData
@@ -119,6 +120,34 @@ test('dashboard headlines real; total_balance equals sum real', function () {
         ->where('summary_cards.total_active', 600_000)
         ->where('summary_cards.total_reserved', 80_000)
     );
+});
+
+test('web balance list serves reserved and real legs', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 600_000, 'final_amount' => 600_000]);
+    $cat = realExpenseCategory($user);
+    $fund = SaveFund::run(new SinkingFund, realMakeFundData(['category_id' => $cat->id, 'from_balance_id' => $balance->id]));
+    SaveFundContribution::run($fund, realMakeContrib(['amount' => 80_000]));
+
+    $this->get(route('balances.index'))->assertInertia(fn ($p) => $p
+        ->where('balances.data.0.reserved', 80_000)
+        ->where('balances.data.0.real', 520_000)
+    );
+});
+
+test('api balance list serves reserved and real legs', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user, ['balances:read']);
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 500_000, 'final_amount' => 500_000]);
+    $cat = realExpenseCategory($user);
+    $fund = SaveFund::run(new SinkingFund, realMakeFundData(['category_id' => $cat->id, 'from_balance_id' => $balance->id]));
+    SaveFundContribution::run($fund, realMakeContrib(['amount' => 50_000]));
+
+    $this->getJson('/api/balances')
+        ->assertOk()
+        ->assertJsonPath('0.reserved', 50_000)
+        ->assertJsonPath('0.real', 450_000);
 });
 
 test('backfill anchors legacy funds to the primary balance', function () {

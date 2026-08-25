@@ -53,7 +53,7 @@ class BalancePresenter
         if ($isPaginated) {
             // Rebuild a paginator-like collection for the data layer.
             return BalanceData::collect(
-                new LengthAwarePaginator(
+                new \Illuminate\Pagination\LengthAwarePaginator(
                     $mapped->all(),
                     $balances->total(),
                     $balances->perPage(),
