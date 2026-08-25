@@ -11,6 +11,7 @@ use App\Http\Requests\BalanceSaveRequest;
 use App\Http\Requests\TransferBetweenAccountsRequest;
 use App\Models\Balance;
 use App\Queries\BalanceQuery;
+use App\Support\BalancePresenter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,7 @@ class BalanceApiController extends Controller
             ->forUser($request->user()->id)
             ->get();
 
-        return response()->json(BalanceData::collect($balances));
+        return response()->json(BalancePresenter::collect($balances));
     }
 
     public function store(BalanceSaveRequest $request): JsonResponse
@@ -31,7 +32,7 @@ class BalanceApiController extends Controller
 
         SaveBalance::run($balance, $request->getData());
 
-        return response()->json(BalanceData::from($balance->fresh()), 201);
+        return response()->json(BalancePresenter::fromModel($balance->fresh()), 201);
     }
 
     public function show(Request $request, int $balance): JsonResponse
@@ -40,7 +41,7 @@ class BalanceApiController extends Controller
             ->where('user_id', $request->user()->id)
             ->findOrFail($balance);
 
-        return response()->json(BalanceData::from($balance));
+        return response()->json(BalancePresenter::fromModel($balance));
     }
 
     public function update(BalanceSaveRequest $request, int $balance): JsonResponse
@@ -62,7 +63,7 @@ class BalanceApiController extends Controller
 
         SaveBalance::run($balance, $data);
 
-        return response()->json(BalanceData::from($balance->fresh()));
+        return response()->json(BalancePresenter::fromModel($balance->fresh()));
     }
 
     public function destroy(Request $request, int $balance): JsonResponse

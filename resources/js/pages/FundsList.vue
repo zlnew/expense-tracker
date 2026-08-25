@@ -284,6 +284,7 @@ const daysUntilDue = (fund: SinkingFund) => {
         v-model:open="formDialogOpen"
         :fund="targetData"
         :categories="categories"
+        :balances="balances"
       />
       <FundSetAsideDialog v-model:open="setAsideOpen" :fund="targetData" />
       <FundPayDialog

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\GetBalanceInsight;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
@@ -62,5 +63,27 @@ class Balance extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Sinking funds that reserve against this balance.
+     */
+    public function sinkingFunds(): HasMany
+    {
+        return $this->hasMany(SinkingFund::class, 'from_balance_id');
+    }
+
+    /**
+     * Reserved = Σ reserves of funds whose from_balance_id is this balance.
+     * Real = final_amount − reserved. Both derived — never stored.
+     */
+    public function getReservedAttribute(): int
+    {
+        return (int) GetBalanceInsight::run($this)['reserved'];
+    }
+
+    public function getRealAttribute(): int
+    {
+        return (int) GetBalanceInsight::run($this)['real'];
     }
 }

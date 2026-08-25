@@ -18,6 +18,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -25,16 +26,47 @@ uses(RefreshDatabase::class);
 
 function makeFundData(array $overrides = []): FundData
 {
-    return FundData::from(array_merge([
+    $user = Auth::user() ?? User::query()->latest('id')->first();
+    $defaults = [
         'name' => 'Moto Maintenance',
         'target_amount' => 400_000,
         'cadence' => 'cycle',
         'contribution_amount' => null,
-        'category_id' => null,
         'next_due' => CarbonImmutable::now()->addMonths(2)->toDateString(),
         'due_interval_months' => 2,
         'notes' => null,
-    ], $overrides));
+    ];
+    if ($user) {
+        if (! array_key_exists('category_id', $overrides)) {
+            $cat = Category::query()->where('user_id', $user->id)->where('type', CategoryType::EXPENSE->value)->first();
+            if (! $cat) {
+                $cat = Category::factory()->for($user)->create(['type' => CategoryType::EXPENSE, 'name' => 'Maintenance']);
+            }
+            $defaults['category_id'] = $cat->id;
+        } else {
+            $defaults['category_id'] = $overrides['category_id'];
+            unset($overrides['category_id']);
+        }
+        if (! array_key_exists('from_balance_id', $overrides)) {
+            $bal = Balance::query()->where('user_id', $user->id)->first();
+            if (! $bal) {
+                $bal = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
+            }
+            $defaults['from_balance_id'] = $bal->id;
+        }
+    } else {
+        $defaults['category_id'] = null;
+        $defaults['from_balance_id'] = null;
+    }
+    $merged = array_merge($defaults, $overrides);
+    if (array_key_exists('category_id', $overrides)) {
+        $merged['category_id'] = $overrides['category_id'];
+    }
+    if (array_key_exists('from_balance_id', $overrides)) {
+        $merged['from_balance_id'] = $overrides['from_balance_id'];
+    }
+
+    return FundData::from($merged);
 }
 
 function makeContributionData(array $overrides = []): FundContributionData
@@ -189,7 +221,7 @@ test('pay from fund without a category is rejected with fund_requires_category',
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     // Legacy row: a fund created before category became required.
-    $fund = SaveFund::run(new SinkingFund, makeFundData());
+    $fund = SaveFund::run(new SinkingFund, makeFundData(['category_id' => null]));
     SaveFundContribution::run($fund, makeContributionData(['amount' => 50_000]));
 
     expect(fn () => PayFromFund::run($fund, makeContributionData([
