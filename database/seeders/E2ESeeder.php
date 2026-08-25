@@ -83,6 +83,7 @@ class E2ESeeder extends Seeder
             'name' => 'Dana Darurat',
             'target_amount' => 10_000_000,
             'cadence' => 'cycle',
+            'from_balance_id' => $balance->id,
         ]);
         FundContribution::factory()->for($user)->for($fund, 'fund')->create([
             'type' => 'contribution',

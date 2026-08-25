@@ -28,7 +28,7 @@ class FundController extends Controller
     public function index(Request $request): Response
     {
         $funds = SinkingFund::query()
-            ->with('category')
+            ->with(['category', 'sourceBalance'])
             ->where('user_id', Auth::id())
             ->orderBy('name')
             ->get()
@@ -97,6 +97,7 @@ class FundController extends Controller
                 'cadence',
                 'contribution_amount',
                 'category_id',
+                'from_balance_id',
                 'next_due',
                 'due_interval_months',
                 'notes',
@@ -105,6 +106,7 @@ class FundController extends Controller
             [
                 'next_due' => $fund->next_due?->toDateString(),
                 'category' => $fund->category ? CategoryData::from($fund->category) : null,
+                'source_balance' => $fund->sourceBalance ? BalanceData::from($fund->sourceBalance) : null,
             ],
         ));
     }

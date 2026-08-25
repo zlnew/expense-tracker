@@ -23,7 +23,7 @@ class FundApiController extends Controller
     public function index(Request $request): JsonResponse
     {
         $funds = SinkingFund::query()
-            ->with('category')
+            ->with(['category', 'sourceBalance'])
             ->where('user_id', $request->user()->id)
             ->orderBy('name')
             ->get()
@@ -55,6 +55,7 @@ class FundApiController extends Controller
                 'cadence' => $fund->cadence,
                 'contribution_amount' => $fund->contribution_amount,
                 'category_id' => $fund->category_id,
+                'from_balance_id' => $fund->from_balance_id,
                 'next_due' => $fund->next_due?->toDateString(),
                 'due_interval_months' => $fund->due_interval_months,
                 'notes' => $fund->notes,
@@ -111,6 +112,7 @@ class FundApiController extends Controller
                 'cadence',
                 'contribution_amount',
                 'category_id',
+                'from_balance_id',
                 'next_due',
                 'due_interval_months',
                 'notes',

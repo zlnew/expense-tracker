@@ -8,7 +8,9 @@ use App\Models\Budget;
 use App\Models\BudgetItem;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\BalancePresenter;
 use App\Support\BudgetCycle;
+use Carbon\CarbonImmutable;
 
 class GetSummaryCardsData extends Action
 {
@@ -16,11 +18,15 @@ class GetSummaryCardsData extends Action
 
     private readonly ?Budget $activeBudget;
 
-    public function __construct(User|int $user)
+    private readonly ?CarbonImmutable $today;
+
+    public function __construct(User|int $user, ?CarbonImmutable $today = null)
     {
         $this->user = $user instanceof User
             ? $user
             : User::query()->findOrFail($user);
+
+        $this->today = $today;
 
         $this->activeBudget = Budget::query()
             ->where('user_id', $this->user->id)
@@ -28,15 +34,22 @@ class GetSummaryCardsData extends Action
             ->first();
     }
 
-    public function handle()
+    /**
+     * @return array{total_balance:int,total_active:int,total_reserved:int,current_month_expenses:int,current_month_incomes:int,budget_remaining:int,has_active_budget:bool,active_budget_id:?int}
+     */
+    public function handle(): array
     {
-        $totalBalance = $this->getTotalBalance();
+        [$totalBalance, $totalActive, $totalReserved] = $this->getBalanceTotals();
         $currentMonthExpenses = $this->getCurrentMonthExpenses();
         $currentMonthIncomes = $this->getCurrentMonthIncomes();
         $budgetRemaining = $this->getPlannedBudget() - $currentMonthExpenses;
 
         return [
+            // Contract: total_balance = Σ Real (headline). Also expose the
+            // composed legs so the UI can show the breakdown.
             'total_balance' => $totalBalance,
+            'total_active' => $totalActive,
+            'total_reserved' => $totalReserved,
             'current_month_expenses' => $currentMonthExpenses,
             'current_month_incomes' => $currentMonthIncomes,
             'budget_remaining' => $budgetRemaining,
@@ -45,11 +58,37 @@ class GetSummaryCardsData extends Action
         ];
     }
 
-    private function getTotalBalance(): int
+    /**
+     * @return array{0:int,1:int,2:int} [netWorthReal, totalActive, totalReserved]
+     */
+    private function getBalanceTotals(): array
     {
-        return (int) Balance::query()
+        // Net worth = Σ Real (Active − Reserved) — spec §7.1 / US-1.
+        // Reserved comes from SinkingFund reserves anchored to each balance.
+        $today = $this->today ?? CarbonImmutable::now()->startOfDay();
+
+        $balances = Balance::query()
             ->where('user_id', $this->user->id)
-            ->sum('final_amount');
+            ->get(['id', 'final_amount', 'initial_amount']);
+
+        if ($balances->isEmpty()) {
+            return [0, 0, 0];
+        }
+
+        $ids = $balances->pluck('id')->all();
+        $reservedById = BalancePresenter::reservedByBalanceId($ids, $today);
+
+        $totalActive = 0;
+        $totalReserved = 0;
+
+        foreach ($balances as $b) {
+            $active = (int) ($b->final_amount ?? $b->initial_amount ?? 0);
+            $reserved = (int) ($reservedById[$b->id] ?? 0);
+            $totalActive += $active;
+            $totalReserved += $reserved;
+        }
+
+        return [$totalActive - $totalReserved, $totalActive, $totalReserved];
     }
 
     private function getCurrentMonthExpenses(): int

@@ -186,10 +186,24 @@ const rowActions = (b: Balance) => [
               <div class="space-y-4">
                 <div class="flex items-end justify-between">
                   <span class="text-sm text-muted-foreground">{{
-                    __('final_amount')
+                    __('active')
                   }}</span>
                   <span class="text-2xl font-bold tracking-tight">
                     {{ formatAmount(b.final_amount) }}
+                  </span>
+                </div>
+                <div
+                  class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
+                >
+                  <span>{{ __('reserved') }}</span>
+                  <span>{{ formatAmount(b.reserved ?? 0) }}</span>
+                </div>
+                <div
+                  class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
+                >
+                  <span>{{ __('real_balance') }}</span>
+                  <span class="text-sm font-semibold text-foreground">
+                    {{ formatAmount(b.real ?? 0) }}
                   </span>
                 </div>
                 <div

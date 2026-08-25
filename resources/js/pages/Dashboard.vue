@@ -276,14 +276,14 @@ const statCards = computed(() => [
         </p>
       </div>
 
-      <!-- Hero balance -->
+      <!-- Hero balance — US-1: headline Real, secondary Active/Reserved -->
       <Card class="border-border/50 bg-card shadow-xs">
         <CardContent class="flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <CardTitle
               class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
-              {{ __('total_balance') }}
+              {{ __('real_balance') }}
             </CardTitle>
             <div
               class="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400"
@@ -296,6 +296,14 @@ const statCards = computed(() => [
           >
             {{ formatAmount(summary_cards.total_balance) }}
           </div>
+          <p
+            v-if="summary_cards.total_active !== undefined"
+            class="text-xs text-muted-foreground tabular-nums"
+          >
+            {{ __('active') }} {{ formatAmount(summary_cards.total_active) }} ·
+            {{ __('reserved') }}
+            {{ formatAmount(summary_cards.total_reserved ?? 0) }}
+          </p>
           <Link
             :href="balanceIndex.url()"
             class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
