@@ -277,3 +277,9 @@ warning,Warning,Peringatan
 weekly,Weekly,Mingguan
 year,Year,Tahun
 yearly,Yearly,Tahunan
+reconcile_balance,"Reconcile balance","Rekonsiliasi saldo"
+reconcile_balance_description,"Enter the actual amount from your bank or wallet to compare with the computed balance and flag any drift.","Masukkan jumlah aktual dari bank atau dompet Anda untuk membandingkan dengan saldo terhitung dan menandai selisih."
+reconciled_amount,"Reconciled amount","Jumlah rekonsiliasi"
+reconciled_at,"Reconciled on","Tanggal rekonsiliasi"
+drift_flagged,"Drift flagged","Selisih terdeteksi"
+drift_ok,"Within tolerance","Dalam toleransi"

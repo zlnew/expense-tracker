@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
-import { CheckCircle2, Plus, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
+import { AlertTriangle, CheckCircle2, Plus, Scale, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import DataListState from '@/components/DataListState.vue'
 import BalanceDeleteDialog from '@/components/dialogs/BalanceDeleteDialog.vue'
+import BalanceReconcileDialog from '@/components/dialogs/BalanceReconcileDialog.vue'
 import BalanceSaveDialog from '@/components/dialogs/BalanceSaveDialog.vue'
 import Heading from '@/components/Heading.vue'
 import RowActions from '@/components/RowActions.vue'
@@ -48,6 +49,7 @@ setLayoutProps({
 
 const saveDialogOpen = ref(false)
 const deleteDialogOpen = ref(false)
+const reconcileDialogOpen = ref(false)
 const targetData = ref<Balance | null>(null)
 
 const loading = ref(false)
@@ -77,6 +79,11 @@ const openDeleteDialog = (data: Balance) => {
   deleteDialogOpen.value = true
 }
 
+const openReconcileDialog = (data: Balance) => {
+  targetData.value = data
+  reconcileDialogOpen.value = true
+}
+
 const setPrimary = (balance: Balance) => {
   router.post(
     setPrimaryRoute.url({ balance }),
@@ -98,6 +105,11 @@ const rowActions = (b: Balance) => [
     label: __('edit_data', { data: __('balance') }),
     icon: SquarePen,
     onClick: () => openEditDialog(b),
+  },
+  {
+    label: __('reconcile_balance'),
+    icon: Scale,
+    onClick: () => openReconcileDialog(b),
   },
   {
     label: __('delete_data', { data: __('balance') }),
@@ -155,7 +167,11 @@ const rowActions = (b: Balance) => [
           <Card
             v-for="b in balances.data"
             :key="b.id"
-            class="group relative overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-primary/5"
+            :data-testid="`balance-card-${String(b.id)}`"
+            :class="[
+              'group relative overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-primary/5',
+              b.is_drift_flagged ? 'border-destructive/60 ring-1 ring-destructive/30' : '',
+            ]"
           >
             <div v-if="b.is_primary" class="absolute top-0 right-0 p-2">
               <Badge
@@ -212,6 +228,35 @@ const rowActions = (b: Balance) => [
                   <span>{{ __('initial_amount') }}</span>
                   <span>{{ formatAmount(b.initial_amount) }}</span>
                 </div>
+
+                <!-- Drift (reconciled) row — only when this balance has been reconciled. -->
+                <div
+                  v-if="b.reconciled_amount !== null && b.drift !== null"
+                  :data-testid="`balance-drift-${String(b.id)}`"
+                  :class="[
+                    'flex items-center justify-between rounded-md border px-3 py-2 text-sm',
+                    b.is_drift_flagged
+                      ? 'border-destructive/40 bg-destructive/10 text-destructive'
+                      : 'border-border bg-muted/40 text-muted-foreground',
+                  ]"
+                >
+                  <span class="inline-flex items-center gap-1.5 font-medium">
+                    <AlertTriangle v-if="b.is_drift_flagged" class="size-4 shrink-0" />
+                    <Scale v-else class="size-4 shrink-0 opacity-60" />
+                    {{ b.is_drift_flagged ? __('drift_flagged') : __('drift_ok') }}
+                  </span>
+                  <span :class="['font-mono font-semibold tabular-nums', b.is_drift_flagged ? 'text-destructive' : '']">
+                    {{ formatAmount(b.drift) }}
+                  </span>
+                </div>
+
+                <p
+                  v-if="b.reconciled_at"
+                  class="text-xs text-muted-foreground"
+                  :data-testid="`balance-reconciled-at-${String(b.id)}`"
+                >
+                  {{ __('reconciled_at') }}: {{ b.reconciled_at }}
+                </p>
               </div>
             </CardContent>
 
@@ -248,4 +293,5 @@ const rowActions = (b: Balance) => [
 
   <BalanceSaveDialog v-model:open="saveDialogOpen" :balance="targetData" />
   <BalanceDeleteDialog v-model:open="deleteDialogOpen" :balance="targetData" />
+  <BalanceReconcileDialog v-model:open="reconcileDialogOpen" :balance="targetData" />
 </template>

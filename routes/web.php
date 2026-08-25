@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('ownership')->group(function () {
         Route::resource('balances', BalanceController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::post('balances/{balance}/set-primary', [BalanceController::class, 'setPrimary'])->name('balances.set-primary');
+        Route::post('balances/{balance}/reconcile', [BalanceController::class, 'reconcile'])->name('balances.reconcile');
 
         Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
 
