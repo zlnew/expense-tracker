@@ -17,6 +17,7 @@ use App\Http\Requests\FundUpdateRequest;
 use App\Http\Requests\FundWithdrawalRequest;
 use App\Models\FundContribution;
 use App\Models\SinkingFund;
+use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -110,7 +111,7 @@ class FundApiController extends Controller
             ->findOrFail($contribution);
 
         if ($contribution->group_id && $contribution->type === 'withdrawal' && ! $request->boolean('cascade')) {
-            $hasLinkedExpense = \App\Models\Transaction::query()
+            $hasLinkedExpense = Transaction::query()
                 ->where('transfer_group_id', $contribution->group_id)
                 ->exists();
 

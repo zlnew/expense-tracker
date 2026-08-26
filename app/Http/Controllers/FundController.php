@@ -19,6 +19,7 @@ use App\Models\Balance;
 use App\Models\Category;
 use App\Models\FundContribution;
 use App\Models\SinkingFund;
+use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,7 +93,7 @@ class FundController extends Controller
     {
         // Withdrawal with a linked expense shares a group_id; need cascade to acknowledge both will die.
         if ($contribution->group_id && $contribution->type === 'withdrawal' && ! $request->boolean('cascade')) {
-            $hasLinkedExpense = \App\Models\Transaction::query()
+            $hasLinkedExpense = Transaction::query()
                 ->where('transfer_group_id', $contribution->group_id)
                 ->exists();
 

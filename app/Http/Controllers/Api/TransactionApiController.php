@@ -10,6 +10,7 @@ use App\DTO\TransactionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransactionSaveRequest;
 use App\Http\Requests\TransactionUpdateRequest;
+use App\Models\FundContribution;
 use App\Models\Transaction;
 use App\Queries\TransactionQuery;
 use Illuminate\Http\JsonResponse;
@@ -131,7 +132,7 @@ class TransactionApiController extends Controller
         // Same fund-payout guard as TransactionController: linked withdrawal
         // row shares the same group_id; require cascade=true to proceed.
         if ($transaction->transfer_group_id) {
-            $hasLinkedWithdrawal = \App\Models\FundContribution::query()
+            $hasLinkedWithdrawal = FundContribution::query()
                 ->where('group_id', $transaction->transfer_group_id)
                 ->where('type', 'withdrawal')
                 ->exists();

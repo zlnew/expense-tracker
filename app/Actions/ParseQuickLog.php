@@ -20,8 +20,8 @@ use Illuminate\Support\Collection;
 class ParseQuickLog extends Action
 {
     /**
-     * @param Collection<int, Category> $categories
-     * @param Collection<int, Balance>  $balances
+     * @param  Collection<int, Category>  $categories
+     * @param  Collection<int, Balance>  $balances
      * @return array{category_id: int|null, amount: int|null, balance_id: int|null, note: string, type: string|null}
      */
     public function __construct(
@@ -136,7 +136,7 @@ class ParseQuickLog extends Action
             $parts = explode('.', $n);
             if (count($parts) === 2 && strlen($parts[1]) <= 2 && $mult > 1) {
                 // Likely decimal (1.5k)
-                $n = $parts[0] . '.' . $parts[1];
+                $n = $parts[0].'.'.$parts[1];
             } else {
                 // Thousands separators — strip all dots
                 $n = str_replace('.', '', $n);

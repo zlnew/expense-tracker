@@ -7,6 +7,7 @@ use App\Actions\PayFromFund;
 use App\Actions\SaveFund;
 use App\Actions\SaveFundContribution;
 use App\DTO\FundContributionData;
+use App\DTO\FundData;
 use App\Enums\CategoryType;
 use App\Models\Balance;
 use App\Models\Budget;
@@ -39,7 +40,7 @@ test('withdrawal posts a linked expense with the same group_id on both legs', fu
         'planned_amount' => 500_000,
     ]);
 
-    $fund = SaveFund::run(new SinkingFund, \App\DTO\FundData::from([
+    $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle',
         'contribution_amount' => null, 'category_id' => $category->id,
         'next_due' => CarbonImmutable::now()->addMonths(2)->toDateString(),
@@ -68,7 +69,7 @@ test('reserve drops and balance syncs in one atomic withdrawal', function () {
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     $category = Category::factory()->for($user)->create(['type' => CategoryType::EXPENSE, 'name' => 'Maintenance']);
-    $fund = SaveFund::run(new SinkingFund, \App\DTO\FundData::from([
+    $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle',
         'contribution_amount' => null, 'category_id' => $category->id,
         'next_due' => null, 'due_interval_months' => 2, 'notes' => null,
@@ -90,7 +91,7 @@ test('empty reserve still 422s on withdrawal', function () {
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     $category = Category::factory()->for($user)->create(['type' => CategoryType::EXPENSE, 'name' => 'Maintenance']);
-    $fund = SaveFund::run(new SinkingFund, \App\DTO\FundData::from([
+    $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle',
         'contribution_amount' => null, 'category_id' => $category->id,
         'next_due' => null, 'due_interval_months' => 2, 'notes' => null,
@@ -116,7 +117,7 @@ test('withdrawal expense is budget-linked but excluded from envelope actuals (no
         'type' => CategoryType::EXPENSE, 'planned_amount' => 500_000,
     ]);
 
-    $fund = SaveFund::run(new SinkingFund, \App\DTO\FundData::from([
+    $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle',
         'contribution_amount' => null, 'category_id' => $category->id,
         'next_due' => null, 'due_interval_months' => 2, 'notes' => null,
@@ -145,7 +146,7 @@ test('deleting the linked expense without cascade returns 409', function () {
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     $category = Category::factory()->for($user)->create(['type' => CategoryType::EXPENSE, 'name' => 'Maintenance']);
-    $fund = SaveFund::run(new SinkingFund, \App\DTO\FundData::from([
+    $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle',
         'contribution_amount' => null, 'category_id' => $category->id, 'next_due' => null, 'due_interval_months' => 2, 'notes' => null,
     ]));
@@ -167,7 +168,7 @@ test('deleting with cascade removes both the expense and its withdrawal', functi
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     $category = Category::factory()->for($user)->create(['type' => CategoryType::EXPENSE, 'name' => 'Maintenance']);
-    $fund = SaveFund::run(new SinkingFund, \App\DTO\FundData::from([
+    $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle',
         'contribution_amount' => null, 'category_id' => $category->id, 'next_due' => null, 'due_interval_months' => 2, 'notes' => null,
     ]));
@@ -191,7 +192,7 @@ test('deleting the withdrawal without cascade returns 409, with cascade removes 
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
     $category = Category::factory()->for($user)->create(['type' => CategoryType::EXPENSE, 'name' => 'Maintenance']);
-    $fund = SaveFund::run(new SinkingFund, \App\DTO\FundData::from([
+    $fund = SaveFund::run(new SinkingFund, FundData::from([
         'name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle',
         'contribution_amount' => null, 'category_id' => $category->id, 'next_due' => null, 'due_interval_months' => 2, 'notes' => null,
     ]));

@@ -17,6 +17,7 @@ use App\Http\Requests\TransferBetweenAccountsRequest;
 use App\Models\Balance;
 use App\Models\Budget;
 use App\Models\Category;
+use App\Models\FundContribution;
 use App\Models\Transaction;
 use App\Queries\TransactionQuery;
 use Illuminate\Http\RedirectResponse;
@@ -115,7 +116,7 @@ class TransactionController extends Controller
         // withdrawal ledger row (same group_id). Require explicit confirmation
         // unless the caller opts into cascade.
         if ($transaction->transfer_group_id) {
-            $hasLinkedWithdrawal = \App\Models\FundContribution::query()
+            $hasLinkedWithdrawal = FundContribution::query()
                 ->where('group_id', $transaction->transfer_group_id)
                 ->where('type', 'withdrawal')
                 ->exists();

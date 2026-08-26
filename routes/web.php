@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\GetImpendingDrains;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetTransactionsController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FundController;
 use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\TransactionController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -20,9 +22,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Session-auth mirror for the 30/60/90 window filter — browser sessions
     // can't call /api/* (Sanctum token-only), so the card fetches here.
-    Route::get('dashboard/impending-drains', function (\Illuminate\Http\Request $request) {
+    Route::get('dashboard/impending-drains', function (Request $request) {
         $window = max(1, min(365, (int) $request->integer('window', 60)));
-        return response()->json(\App\Actions\GetImpendingDrains::run($request->user()->id, $window));
+
+        return response()->json(GetImpendingDrains::run($request->user()->id, $window));
     })->name('dashboard.impending-drains');
 
     Route::middleware('ownership')->group(function () {
