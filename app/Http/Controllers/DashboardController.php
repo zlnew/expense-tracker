@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\GetBudgetProgress;
 use App\Actions\GetExpenseBreakdown;
+use App\Actions\GetImpendingDrains;
 use App\Actions\GetMonthlySpendingTrend;
 use App\Actions\GetRecentTransactions;
 use App\Actions\GetSummaryCardsData;
@@ -41,6 +42,7 @@ class DashboardController extends Controller
             'expense_breakdown' => Inertia::defer(fn () => GetExpenseBreakdown::run($userId)),
             'monthly_spending_trend' => Inertia::defer(fn () => GetMonthlySpendingTrend::run($userId)),
             'recent_transactions' => $recentTransactions,
+            'impending_drains' => GetImpendingDrains::run($userId, 60),
         ]);
     }
 }

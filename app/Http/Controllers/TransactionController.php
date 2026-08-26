@@ -17,6 +17,7 @@ use App\Http\Requests\TransferBetweenAccountsRequest;
 use App\Models\Balance;
 use App\Models\Budget;
 use App\Models\Category;
+use App\Models\FundContribution;
 use App\Models\Transaction;
 use App\Queries\TransactionQuery;
 use Illuminate\Http\RedirectResponse;
@@ -109,8 +110,24 @@ class TransactionController extends Controller
         return back()->with('success', __('app.updated_data', ['data' => __('app.transaction')]));
     }
 
-    public function destroy(Transaction $transaction): RedirectResponse
+    public function destroy(Transaction $transaction, Request $request): RedirectResponse
     {
+        // Fund-payout expense: deleting the expense also deletes the paired
+        // withdrawal ledger row (same group_id). Require explicit confirmation
+        // unless the caller opts into cascade.
+        if ($transaction->transfer_group_id) {
+            $hasLinkedWithdrawal = FundContribution::query()
+                ->where('group_id', $transaction->transfer_group_id)
+                ->where('type', 'withdrawal')
+                ->exists();
+
+            if ($hasLinkedWithdrawal && ! $request->boolean('cascade')) {
+                return back()->withErrors([
+                    'transaction' => __('delete_will_cascade_fund_withdrawal'),
+                ])->setStatusCode(409);
+            }
+        }
+
         DeleteTransaction::run($transaction);
 
         return back()->with('success', __('app.deleted_data', ['data' => __('app.transaction')]));

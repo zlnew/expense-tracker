@@ -37,7 +37,13 @@ export type Balance = {
   description: string | null
   initial_amount: number
   final_amount: number
+  reconciled_amount: number | null
+  reconciled_at: string | null
+  drift: number | null
+  is_drift_flagged: boolean
   is_primary: boolean
+  reserved: number
+  real: number
   user: User | null
   transactions: Transaction[] | null
 }
@@ -87,6 +93,7 @@ export type SinkingFund = {
   cadence: 'cycle' | 'monthly'
   contribution_amount: number | null
   category_id: number | null
+  from_balance_id: number
   next_due: string | null
   due_interval_months: number
   notes: string | null
@@ -96,6 +103,7 @@ export type SinkingFund = {
   auto_contribution: number
   last_contribution_date: string | null
   category: Category | null
+  source_balance: Balance | null
 }
 
 export type Transaction = {
@@ -133,6 +141,8 @@ export type BudgetTransactionsResponse = {
 
 export type SummaryCards = {
   total_balance: number
+  total_active: number
+  total_reserved: number
   current_month_expenses: number
   current_month_incomes: number
   budget_remaining: number

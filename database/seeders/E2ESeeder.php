@@ -64,7 +64,14 @@ class E2ESeeder extends Seeder
             'is_active' => false,
         ]);
 
-        $budgetOneItems = $expenseCategories->take(3)->map(
+        // Quick-capture chips render the ACTIVE budget's item categories
+        // (TransactionCreateDialog::filteredCategories), so the primary
+        // budget must carry exactly Food / Transportation / Home — the
+        // categories the US-5 specs assert as chips.
+        $chipCategories = $expenseCategories->filter(
+            fn (Category $c) => in_array($c->name, ['Food', 'Transportation', 'Home'], true)
+        )->values();
+        $budgetOneItems = $chipCategories->map(
             fn (Category $category) => BudgetItem::factory()
                 ->for($budgetOne)
                 ->for($category)
@@ -78,11 +85,16 @@ class E2ESeeder extends Seeder
                 ->create(['type' => CategoryType::EXPENSE, 'planned_amount' => 300_000])
         );
 
-        // Sinking fund with one contribution.
+        // Sinking fund with one contribution. Category is REQUIRED for
+        // pay-from-fund (PayFromFund rejects category-less funds because
+        // they would mint an orphan expense), so the e2e fixture wires the
+        // first expense category the same way FundFormDialog does.
         $fund = SinkingFund::factory()->for($user)->create([
             'name' => 'Dana Darurat',
             'target_amount' => 10_000_000,
             'cadence' => 'cycle',
+            'category_id' => $expenseCategories->first()?->id,
+            'from_balance_id' => $balance->id,
         ]);
         FundContribution::factory()->for($user)->for($fund, 'fund')->create([
             'type' => 'contribution',

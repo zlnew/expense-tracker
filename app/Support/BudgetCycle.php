@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Budget;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Single source of truth for budget cutoff-cycle math.
@@ -81,6 +82,29 @@ class BudgetCycle
     {
         $effectiveCutoff = self::effectiveCutoffSql($dateColumn, $cutoffExpression);
 
+        if (self::isSqlite()) {
+            // SQLite has no EXTRACT/INTERVAL, and its bare '+1 month'
+            // modifier OVERFLOWS instead of clamping (2026-01-31 → 2026-03-03,
+            // while Postgres gives 2026-02-28). Build the clamped equivalent:
+            // first day of next month + (min(day, len(nextMonth)) − 1) days.
+            return "
+            CASE
+                WHEN CAST(strftime('%d', {$dateColumn}) AS INTEGER) > ({$effectiveCutoff})
+                    THEN DATE(
+                        {$dateColumn},
+                        'start of month', '+1 month',
+                        '+' || (
+                            MIN(
+                                CAST(strftime('%d', {$dateColumn}) AS INTEGER),
+                                CAST(strftime('%d', DATE({$dateColumn}, 'start of month', '+2 month', '-1 day')) AS INTEGER)
+                            ) - 1
+                        ) || ' days'
+                    )
+                ELSE {$dateColumn}
+            END
+        ";
+        }
+
         return "
             CASE
                 WHEN EXTRACT(DAY FROM {$dateColumn}) > ({$effectiveCutoff})
@@ -96,9 +120,44 @@ class BudgetCycle
      */
     public static function effectiveCutoffSql(string $dateColumn, string $cutoffExpression): string
     {
+        if (self::isSqlite()) {
+            return "MIN(
+            {$cutoffExpression},
+            CAST(strftime('%d', DATE({$dateColumn}, 'start of month', '+1 month', '-1 day')) AS INTEGER)
+        )";
+        }
+
         return "LEAST(
             {$cutoffExpression},
             EXTRACT(DAY FROM (DATE_TRUNC('month', {$dateColumn}) + INTERVAL '1 month' - INTERVAL '1 day'))
         )";
+    }
+
+    /**
+     * Extractor for the cycle month/year used by cycle-month consumers
+     * (trend + reserved-per-cycle). Dialect-aware so the sqlite e2e stack
+     * can run the same code paths as production Postgres.
+     */
+    public static function extractMonthSql(string $expression): string
+    {
+        if (self::isSqlite()) {
+            return "CAST(strftime('%m', {$expression}) AS INTEGER)";
+        }
+
+        return "CAST(EXTRACT(MONTH FROM ({$expression})) AS INTEGER)";
+    }
+
+    public static function extractYearSql(string $expression): string
+    {
+        if (self::isSqlite()) {
+            return "CAST(strftime('%Y', {$expression}) AS INTEGER)";
+        }
+
+        return "CAST(EXTRACT(YEAR FROM ({$expression})) AS INTEGER)";
+    }
+
+    private static function isSqlite(): bool
+    {
+        return DB::getDriverName() === 'sqlite';
     }
 }

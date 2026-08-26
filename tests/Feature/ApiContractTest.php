@@ -149,7 +149,7 @@ test('a token with only funds ability sees funds routes and nothing else', funct
     $this->withHeader('Authorization', "Bearer {$token}")
         ->getJson('/api/contract')
         ->assertOk()
-        ->assertJsonCount(7, 'funds')
+        ->assertJsonCount(8, 'funds')
         ->assertJsonPath('funds.0.uri', '/api/funds/upcoming')
         ->assertJsonPath('funds.0.ability', 'funds:read')
         ->assertJsonMissing(['transactions' => []])

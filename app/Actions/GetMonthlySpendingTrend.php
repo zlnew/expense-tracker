@@ -54,11 +54,11 @@ class GetMonthlySpendingTrend extends Action
         return DB::query()
             ->fromSub($subquery, 'txn')
             ->selectRaw('
-                CAST(EXTRACT(MONTH FROM cycle_date) AS INTEGER) AS month,
+                '.BudgetCycle::extractMonthSql('cycle_date').' AS month,
                 type,
                 SUM(amount) AS total_amount
             ')
-            ->whereRaw('CAST(EXTRACT(YEAR FROM cycle_date) AS INTEGER) = ?', [$currentYear])
+            ->whereRaw(BudgetCycle::extractYearSql('cycle_date').' = ?', [$currentYear])
             ->groupBy('month', 'type');
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\GetImpendingDrains;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetTransactionsController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FundController;
 use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\TransactionController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -18,9 +20,18 @@ Route::inertia('/', 'Welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
+    // Session-auth mirror for the 30/60/90 window filter — browser sessions
+    // can't call /api/* (Sanctum token-only), so the card fetches here.
+    Route::get('dashboard/impending-drains', function (Request $request) {
+        $window = max(1, min(365, (int) $request->integer('window', 60)));
+
+        return response()->json(GetImpendingDrains::run($request->user()->id, $window));
+    })->name('dashboard.impending-drains');
+
     Route::middleware('ownership')->group(function () {
         Route::resource('balances', BalanceController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::post('balances/{balance}/set-primary', [BalanceController::class, 'setPrimary'])->name('balances.set-primary');
+        Route::post('balances/{balance}/reconcile', [BalanceController::class, 'reconcile'])->name('balances.reconcile');
 
         Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
 
@@ -45,6 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('funds', FundController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::post('funds/{fund}/contributions', [FundController::class, 'storeContribution'])->name('funds.contributions.store');
         Route::post('funds/{fund}/withdrawals', [FundController::class, 'storeWithdrawal'])->name('funds.withdrawals.store');
+        Route::delete('fund-contributions/{contribution}', [FundController::class, 'destroyContribution'])->name('fund-contributions.destroy');
     });
 });
 

@@ -37,6 +37,7 @@ class FundUpdateRequest extends FormRequest
                     ->where('type', CategoryType::EXPENSE->value),
             ],
             'next_due' => ['sometimes', 'nullable', 'date'],
+            'from_balance_id' => ['sometimes', 'required', Rule::exists('balances', 'id')->where('user_id', $this->user()?->id)],
             'due_interval_months' => ['sometimes', 'integer', 'min:1', 'max:60'],
             'notes' => ['sometimes', 'nullable', 'string'],
         ];

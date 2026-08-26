@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $amount
  * @property CarbonImmutable $date
  * @property int|null $transaction_id
+ * @property string|null $group_id
  * @property string|null $description
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -39,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['fund_id', 'user_id', 'type', 'amount', 'date', 'transaction_id', 'description'])]
+#[Fillable(['fund_id', 'user_id', 'type', 'amount', 'date', 'transaction_id', 'group_id', 'description'])]
 class FundContribution extends Model
 {
     use HasFactory;

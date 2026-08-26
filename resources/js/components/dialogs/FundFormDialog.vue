@@ -28,12 +28,13 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { useLang } from '@/composables/useLang'
 import { store as storeFund, update as updateFund } from '@/routes/funds'
-import type { Category, SinkingFund } from '@/types'
+import type { Balance, Category, SinkingFund } from '@/types'
 
 const props = defineProps<{
   open: boolean
   fund: SinkingFund | null
   categories: Category[]
+  balances: Balance[]
 }>()
 
 const emit = defineEmits<{
@@ -48,6 +49,7 @@ const form = useForm({
   cadence: 'cycle',
   contribution_amount: '',
   category_id: '',
+  from_balance_id: '',
   next_due: '',
   due_interval_months: 1,
   notes: '',
@@ -83,6 +85,7 @@ const fillForEdit = (fund: SinkingFund) => {
   form.contribution_amount =
     fund.contribution_amount === null ? '' : String(fund.contribution_amount)
   form.category_id = fund.category_id ? String(fund.category_id) : ''
+  form.from_balance_id = String(fund.from_balance_id)
   form.next_due = fund.next_due ?? ''
   form.due_interval_months = fund.due_interval_months
   form.notes = fund.notes ?? ''
@@ -110,7 +113,8 @@ const submit = () => {
     cadence: form.cadence,
     contribution_amount:
       form.contribution_amount === '' ? null : Number(form.contribution_amount),
-    category_id: form.category_id === '' ? null : Number(form.category_id),
+    category_id: Number(form.category_id),
+    from_balance_id: Number(form.from_balance_id),
     next_due: form.next_due === '' ? null : form.next_due,
     due_interval_months: Number(form.due_interval_months),
     notes: form.notes === '' ? null : form.notes,
@@ -282,6 +286,34 @@ const submit = () => {
               <InputError :message="form.errors.category_id" />
             </div>
 
+            <div class="grid gap-2">
+              <Label for="fund_source_balance">
+                {{ __('source_balance') }}
+                <span class="text-destructive">*</span>
+              </Label>
+              <Select v-model="form.from_balance_id">
+                <SelectTrigger id="fund_source_balance">
+                  <SelectValue
+                    :placeholder="__('select_data', { data: __('balance') })"
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="b in balances"
+                      :key="b.id"
+                      :value="String(b.id)"
+                    >
+                      {{ b.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <InputError :message="form.errors.from_balance_id" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="grid gap-2">
               <Label for="fund_next_due">{{ __('next_due') }}</Label>
               <Input

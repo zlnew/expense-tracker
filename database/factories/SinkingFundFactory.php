@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Balance;
 use App\Models\SinkingFund;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +24,7 @@ class SinkingFundFactory extends Factory
             'cadence' => 'cycle',
             'contribution_amount' => null,
             'category_id' => null,
+            'from_balance_id' => Balance::factory(),
             'next_due' => null,
             'due_interval_months' => 1,
             'notes' => null,
