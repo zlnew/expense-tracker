@@ -10,6 +10,7 @@ use App\DTO\TransactionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransactionSaveRequest;
 use App\Http\Requests\TransactionUpdateRequest;
+use App\Models\FundContribution;
 use App\Models\Transaction;
 use App\Queries\TransactionQuery;
 use Illuminate\Http\JsonResponse;
@@ -127,6 +128,21 @@ class TransactionApiController extends Controller
         $transaction = Transaction::query()
             ->where('user_id', $request->user()->id)
             ->findOrFail($transaction);
+
+        // Same fund-payout guard as TransactionController: linked withdrawal
+        // row shares the same group_id; require cascade=true to proceed.
+        if ($transaction->transfer_group_id) {
+            $hasLinkedWithdrawal = FundContribution::query()
+                ->where('group_id', $transaction->transfer_group_id)
+                ->where('type', 'withdrawal')
+                ->exists();
+
+            if ($hasLinkedWithdrawal && ! $request->boolean('cascade')) {
+                return response()->json([
+                    'message' => __('delete_will_cascade_fund_withdrawal'),
+                ], 409);
+            }
+        }
 
         DeleteTransaction::run($transaction);
 

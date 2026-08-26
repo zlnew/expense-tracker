@@ -32,6 +32,7 @@ class UpcomingFundApiController extends Controller
                     'cadence',
                     'contribution_amount',
                     'category_id',
+                    'from_balance_id',
                     'next_due',
                     'due_interval_months',
                     'notes',

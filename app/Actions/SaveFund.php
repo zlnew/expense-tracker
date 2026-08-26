@@ -28,6 +28,7 @@ class SaveFund extends Action
                 'cadence' => $this->data->cadence,
                 'contribution_amount' => $this->data->contribution_amount,
                 'category_id' => $this->data->category_id,
+                'from_balance_id' => $this->data->from_balance_id,
                 'next_due' => $this->data->next_due,
                 'due_interval_months' => $this->data->due_interval_months,
                 // Re-anchor the cadence whenever next_due is set (create or

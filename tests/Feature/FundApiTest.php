@@ -29,6 +29,34 @@ function apiExpenseCategory(User $user): Category
     ]);
 }
 
+function apiMakeFundData(User $user, array $overrides = []): FundData
+{
+    $defaults = ['name' => 'Moto', 'target_amount' => 400_000, 'cadence' => 'cycle', 'due_interval_months' => 2];
+    if (! array_key_exists('category_id', $overrides)) {
+        $cat = Category::query()->where('user_id', $user->id)->where('type', CategoryType::EXPENSE->value)->first();
+        if (! $cat) {
+            $cat = Category::factory()->for($user)->create(['type' => CategoryType::EXPENSE, 'name' => 'Maintenance']);
+        }
+        $defaults['category_id'] = $cat->id;
+    }
+    if (! array_key_exists('from_balance_id', $overrides)) {
+        $bal = Balance::query()->where('user_id', $user->id)->first();
+        if (! $bal) {
+            $bal = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
+        }
+        $defaults['from_balance_id'] = $bal->id;
+    }
+    $merged = array_merge($defaults, $overrides);
+    if (array_key_exists('category_id', $overrides)) {
+        $merged['category_id'] = $overrides['category_id'];
+    }
+    if (array_key_exists('from_balance_id', $overrides)) {
+        $merged['from_balance_id'] = $overrides['from_balance_id'];
+    }
+
+    return FundData::from($merged);
+}
+
 test('unauthenticated requests to every fund api endpoint return 401', function () {
     $this->getJson('/api/funds')->assertUnauthorized();
     $this->postJson('/api/funds', [])->assertUnauthorized();
@@ -60,6 +88,7 @@ test('creating a fund via the api returns 201 with progress and the picked categ
     $user = User::factory()->create();
     $token = fundApiToken($user, 'funds:write');
     $category = apiExpenseCategory($user);
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
 
     $this->withHeader('Authorization', "Bearer {$token}")
         ->postJson('/api/funds', [
@@ -68,6 +97,7 @@ test('creating a fund via the api returns 201 with progress and the picked categ
             'cadence' => 'cycle',
             'contribution_amount' => null,
             'category_id' => $category->id,
+            'from_balance_id' => $balance->id,
             'next_due' => CarbonImmutable::now()->addMonths(2)->toDateString(),
             'due_interval_months' => 2,
         ])
@@ -106,6 +136,7 @@ test('a fund is scoped to its user in every endpoint', function () {
     // avoids the actingAs default-guard leak documented in ApiTest).
     $ownerToken = fundApiToken($owner, 'funds:read,funds:write');
     $category = apiExpenseCategory($owner);
+    $ownerBalance = Balance::factory()->for($owner)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
 
     $created = $this->withHeader('Authorization', "Bearer {$ownerToken}")
         ->postJson('/api/funds', [
@@ -113,6 +144,7 @@ test('a fund is scoped to its user in every endpoint', function () {
             'target_amount' => 400_000,
             'cadence' => 'cycle',
             'category_id' => $category->id,
+            'from_balance_id' => $ownerBalance->id,
             'due_interval_months' => 1,
         ])
         ->assertCreated();
@@ -145,12 +177,7 @@ test('set-aside via api creates no transaction and updates progress', function (
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $fund = SaveFund::run(new SinkingFund, FundData::from([
-        'name' => 'Moto',
-        'target_amount' => 400_000,
-        'cadence' => 'cycle',
-        'due_interval_months' => 2,
-    ]));
+    $fund = SaveFund::run(new SinkingFund, apiMakeFundData($user));
 
     $token = fundApiToken($user, 'funds:write');
 
@@ -171,14 +198,7 @@ test('withdrawal via api creates a real expense and returns progress', function 
     $this->actingAs($user);
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
-    $category = apiExpenseCategory($user);
-    $fund = SaveFund::run(new SinkingFund, FundData::from([
-        'name' => 'Moto',
-        'target_amount' => 400_000,
-        'cadence' => 'cycle',
-        'category_id' => $category->id,
-        'due_interval_months' => 2,
-    ]));
+    $fund = SaveFund::run(new SinkingFund, apiMakeFundData($user));
     SaveFundContribution::run($fund, FundContributionData::from([
         'amount' => 200_000,
         'date' => now()->toDateString(),
@@ -204,14 +224,7 @@ test('withdrawal above the reserve returns 422 insufficient_fund_reserve', funct
     $this->actingAs($user);
 
     $balance = Balance::factory()->for($user)->create(['initial_amount' => 1_000_000, 'final_amount' => 1_000_000]);
-    $category = apiExpenseCategory($user);
-    $fund = SaveFund::run(new SinkingFund, FundData::from([
-        'name' => 'Moto',
-        'target_amount' => 400_000,
-        'cadence' => 'cycle',
-        'category_id' => $category->id,
-        'due_interval_months' => 2,
-    ]));
+    $fund = SaveFund::run(new SinkingFund, apiMakeFundData($user));
     SaveFundContribution::run($fund, FundContributionData::from([
         'amount' => 50_000,
         'date' => now()->toDateString(),
@@ -234,10 +247,9 @@ test('upcoming endpoint returns due funds with days_until_due and shortfall', fu
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $fund = SaveFund::run(new SinkingFund, FundData::from([
+    $fund = SaveFund::run(new SinkingFund, apiMakeFundData($user, [
         'name' => 'Moto Maintenance',
         'target_amount' => 400_000,
-        'cadence' => 'cycle',
         'next_due' => CarbonImmutable::now()->addDays(10)->toDateString(),
         'due_interval_months' => 2,
     ]));
@@ -267,12 +279,7 @@ test('patching a fund updates only the sent fields', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $fund = SaveFund::run(new SinkingFund, FundData::from([
-        'name' => 'Moto Maintenance',
-        'target_amount' => 400_000,
-        'cadence' => 'cycle',
-        'due_interval_months' => 2,
-    ]));
+    $fund = SaveFund::run(new SinkingFund, apiMakeFundData($user));
 
     $token = fundApiToken($user, 'funds:write');
 
@@ -280,13 +287,12 @@ test('patching a fund updates only the sent fields', function () {
         ->patchJson("/api/funds/{$fund->id}", ['target_amount' => 500_000])
         ->assertOk()
         ->assertJsonPath('target_amount', 500_000)
-        ->assertJsonPath('name', 'Moto Maintenance');
+        ->assertJsonPath('name', 'Moto');
 
     // A fund with a next_due can be detached via explicit null.
-    $fund2 = SaveFund::run(new SinkingFund, FundData::from([
+    $fund2 = SaveFund::run(new SinkingFund, apiMakeFundData($user, [
         'name' => 'Taxes',
         'target_amount' => 300_000,
-        'cadence' => 'cycle',
         'next_due' => now()->addMonth()->toDateString(),
         'due_interval_months' => 12,
     ]));
@@ -301,12 +307,7 @@ test('deleting a fund soft-deletes it', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $fund = SaveFund::run(new SinkingFund, FundData::from([
-        'name' => 'Moto',
-        'target_amount' => 400_000,
-        'cadence' => 'cycle',
-        'due_interval_months' => 2,
-    ]));
+    $fund = SaveFund::run(new SinkingFund, apiMakeFundData($user));
 
     $token = fundApiToken($user, 'funds:write');
 

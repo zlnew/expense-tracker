@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BalanceApiController;
 use App\Http\Controllers\Api\BudgetApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\FundApiController;
+use App\Http\Controllers\Api\ImpendingDrainsApiController;
 use App\Http\Controllers\Api\RecurringTransactionApiController;
 use App\Http\Controllers\Api\TransactionApiController;
 use App\Http\Controllers\Api\UpcomingFundApiController;
@@ -63,6 +64,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->group(function () {
             Route::post('balances/transfer', [BalanceApiController::class, 'transfer'])
                 ->name('api.balances.transfer');
+            Route::post('balances/{balance}/reconcile', [BalanceApiController::class, 'reconcile'])
+                ->name('api.balances.reconcile');
             Route::post('balances', [BalanceApiController::class, 'store'])
                 ->name('api.balances.store');
             Route::patch('balances/{balance}', [BalanceApiController::class, 'update'])
@@ -93,6 +96,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('abilities:funds:read')
         ->name('api.funds.upcoming');
 
+    Route::get('impending-drains', ImpendingDrainsApiController::class)
+        ->middleware('abilities:balances:read')
+        ->name('api.impending-drains');
+
     Route::get('funds', [FundApiController::class, 'index'])
         ->middleware('abilities:funds:read')
         ->name('api.funds');
@@ -116,6 +123,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('funds/{fund}/withdrawals', [FundApiController::class, 'storeWithdrawal'])
         ->middleware('abilities:funds:write')
         ->name('api.funds.withdrawals.store');
+
+    Route::delete('fund-contributions/{contribution}', [FundApiController::class, 'destroyContribution'])
+        ->middleware('abilities:funds:write')
+        ->name('api.fund-contributions.destroy');
 
     // Recurring transactions — same per-method abilities split as the other
     // resources (a single apiResource can't express read-vs-write).

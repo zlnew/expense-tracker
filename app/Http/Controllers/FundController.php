@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DeleteFund;
+use App\Actions\DeleteFundContribution;
 use App\Actions\GetFundProgress;
 use App\Actions\PayFromFund;
 use App\Actions\SaveFund;
@@ -16,7 +17,9 @@ use App\Http\Requests\FundSaveRequest;
 use App\Http\Requests\FundWithdrawalRequest;
 use App\Models\Balance;
 use App\Models\Category;
+use App\Models\FundContribution;
 use App\Models\SinkingFund;
+use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +31,7 @@ class FundController extends Controller
     public function index(Request $request): Response
     {
         $funds = SinkingFund::query()
-            ->with('category')
+            ->with(['category', 'sourceBalance'])
             ->where('user_id', Auth::id())
             ->orderBy('name')
             ->get()
@@ -86,6 +89,26 @@ class FundController extends Controller
         return back()->with('success', __('app.created_data', ['data' => __('app.fund_withdrawal')]));
     }
 
+    public function destroyContribution(FundContribution $contribution, Request $request): RedirectResponse
+    {
+        // Withdrawal with a linked expense shares a group_id; need cascade to acknowledge both will die.
+        if ($contribution->group_id && $contribution->type === 'withdrawal' && ! $request->boolean('cascade')) {
+            $hasLinkedExpense = Transaction::query()
+                ->where('transfer_group_id', $contribution->group_id)
+                ->exists();
+
+            if ($hasLinkedExpense) {
+                return back()->withErrors([
+                    'contribution' => __('delete_will_cascade_fund_expense'),
+                ])->setStatusCode(409);
+            }
+        }
+
+        DeleteFundContribution::run($contribution);
+
+        return back()->with('success', __('app.deleted_data', ['data' => __('app.fund_contribution')]));
+    }
+
     private function withProgress(SinkingFund $fund): FundData
     {
         return FundData::from(array_merge(
@@ -97,6 +120,7 @@ class FundController extends Controller
                 'cadence',
                 'contribution_amount',
                 'category_id',
+                'from_balance_id',
                 'next_due',
                 'due_interval_months',
                 'notes',
@@ -105,6 +129,7 @@ class FundController extends Controller
             [
                 'next_due' => $fund->next_due?->toDateString(),
                 'category' => $fund->category ? CategoryData::from($fund->category) : null,
+                'source_balance' => $fund->sourceBalance ? BalanceData::from($fund->sourceBalance) : null,
             ],
         ));
     }

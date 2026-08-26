@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\DeleteBalance;
+use App\Actions\ReconcileBalance;
 use App\Actions\SaveBalance;
 use App\Actions\TransferBetweenAccounts;
 use App\DTO\BalanceData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BalanceSaveRequest;
+use App\Http\Requests\ReconcileBalanceRequest;
 use App\Http\Requests\TransferBetweenAccountsRequest;
 use App\Models\Balance;
 use App\Queries\BalanceQuery;
+use App\Support\BalancePresenter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,7 +25,7 @@ class BalanceApiController extends Controller
             ->forUser($request->user()->id)
             ->get();
 
-        return response()->json(BalanceData::collect($balances));
+        return response()->json(BalancePresenter::collect($balances));
     }
 
     public function store(BalanceSaveRequest $request): JsonResponse
@@ -31,7 +34,7 @@ class BalanceApiController extends Controller
 
         SaveBalance::run($balance, $request->getData());
 
-        return response()->json(BalanceData::from($balance->fresh()), 201);
+        return response()->json(BalancePresenter::fromModel($balance->fresh()), 201);
     }
 
     public function show(Request $request, int $balance): JsonResponse
@@ -40,7 +43,7 @@ class BalanceApiController extends Controller
             ->where('user_id', $request->user()->id)
             ->findOrFail($balance);
 
-        return response()->json(BalanceData::from($balance));
+        return response()->json(BalancePresenter::fromModel($balance));
     }
 
     public function update(BalanceSaveRequest $request, int $balance): JsonResponse
@@ -62,7 +65,7 @@ class BalanceApiController extends Controller
 
         SaveBalance::run($balance, $data);
 
-        return response()->json(BalanceData::from($balance->fresh()));
+        return response()->json(BalancePresenter::fromModel($balance->fresh()));
     }
 
     public function destroy(Request $request, int $balance): JsonResponse
@@ -81,5 +84,20 @@ class BalanceApiController extends Controller
         TransferBetweenAccounts::run($request->getData());
 
         return response()->json(['message' => 'Transfer completed'], 200);
+    }
+
+    public function reconcile(ReconcileBalanceRequest $request, int $balance): JsonResponse
+    {
+        $balance = Balance::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($balance);
+
+        ReconcileBalance::run(
+            $balance,
+            (int) $request->validated('reconciled_amount'),
+            (string) $request->validated('reconciled_at'),
+        );
+
+        return response()->json(BalanceData::from($balance->fresh()));
     }
 }

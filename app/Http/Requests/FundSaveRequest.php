@@ -40,6 +40,7 @@ class FundSaveRequest extends FormRequest
                     ->where('type', CategoryType::EXPENSE->value),
             ],
             'next_due' => ['nullable', 'date'],
+            'from_balance_id' => ['required', Rule::exists('balances', 'id')->where('user_id', $this->user()?->id)],
             'due_interval_months' => ['required', 'integer', 'min:1', 'max:60'],
             'notes' => ['nullable', 'string'],
         ];

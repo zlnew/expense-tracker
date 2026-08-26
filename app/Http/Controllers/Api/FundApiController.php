@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\DeleteFund;
+use App\Actions\DeleteFundContribution;
 use App\Actions\GetFundProgress;
 use App\Actions\PayFromFund;
 use App\Actions\SaveFund;
@@ -14,7 +15,9 @@ use App\Http\Requests\FundContributionRequest;
 use App\Http\Requests\FundSaveRequest;
 use App\Http\Requests\FundUpdateRequest;
 use App\Http\Requests\FundWithdrawalRequest;
+use App\Models\FundContribution;
 use App\Models\SinkingFund;
+use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -23,7 +26,7 @@ class FundApiController extends Controller
     public function index(Request $request): JsonResponse
     {
         $funds = SinkingFund::query()
-            ->with('category')
+            ->with(['category', 'sourceBalance'])
             ->where('user_id', $request->user()->id)
             ->orderBy('name')
             ->get()
@@ -55,6 +58,7 @@ class FundApiController extends Controller
                 'cadence' => $fund->cadence,
                 'contribution_amount' => $fund->contribution_amount,
                 'category_id' => $fund->category_id,
+                'from_balance_id' => $fund->from_balance_id,
                 'next_due' => $fund->next_due?->toDateString(),
                 'due_interval_months' => $fund->due_interval_months,
                 'notes' => $fund->notes,
@@ -100,6 +104,29 @@ class FundApiController extends Controller
         return response()->json($this->withProgress($fund->load('category')), 201);
     }
 
+    public function destroyContribution(Request $request, int $contribution): JsonResponse
+    {
+        $contribution = FundContribution::query()
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($contribution);
+
+        if ($contribution->group_id && $contribution->type === 'withdrawal' && ! $request->boolean('cascade')) {
+            $hasLinkedExpense = Transaction::query()
+                ->where('transfer_group_id', $contribution->group_id)
+                ->exists();
+
+            if ($hasLinkedExpense) {
+                return response()->json([
+                    'message' => __('delete_will_cascade_fund_expense'),
+                ], 409);
+            }
+        }
+
+        DeleteFundContribution::run($contribution);
+
+        return response()->json(null, 204);
+    }
+
     private function withProgress(SinkingFund $fund): FundData
     {
         return FundData::from(array_merge(
@@ -111,6 +138,7 @@ class FundApiController extends Controller
                 'cadence',
                 'contribution_amount',
                 'category_id',
+                'from_balance_id',
                 'next_due',
                 'due_interval_months',
                 'notes',

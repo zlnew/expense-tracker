@@ -19,6 +19,7 @@ class FundData extends Data
         public string $cadence,
         public ?int $contribution_amount,
         public ?int $category_id,
+        public ?int $from_balance_id,
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
         public ?CarbonImmutable $next_due,

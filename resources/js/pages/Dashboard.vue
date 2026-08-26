@@ -24,6 +24,7 @@ import {
 import { computed } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import ChartEmpty from '@/components/ChartEmpty.vue'
+import ImpendingDrainsCard from '@/components/dashboard/ImpendingDrainsCard.vue'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -64,6 +65,31 @@ const props = defineProps<{
   expense_breakdown?: ExpenseBreakdown[]
   monthly_spending_trend?: MonthlySpendingTrend[]
   recent_transactions: RecentTransactions
+  impending_drains: {
+    window_days: number
+    from: string
+    until: string
+    total_impending_outflow: number
+    items: Array<{
+      kind: 'fund_due' | 'recurring'
+      id: number
+      label: string
+      amount: number
+      balance_id: number
+      balance_name: string
+      due_date: string
+      source: string
+    }>
+    per_balance: Array<{
+      balance_id: number
+      balance_name: string
+      real: number
+      impending: number
+      projected_free_after: number
+      would_go_negative: boolean
+    }>
+    has_negative_warning: boolean
+  }
 }>()
 
 const { __ } = useLang()
@@ -276,14 +302,14 @@ const statCards = computed(() => [
         </p>
       </div>
 
-      <!-- Hero balance -->
+      <!-- Hero balance — US-1: headline Real, secondary Active/Reserved -->
       <Card class="border-border/50 bg-card shadow-xs">
         <CardContent class="flex flex-col gap-4">
           <div class="flex items-center justify-between">
             <CardTitle
               class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase sm:text-xs"
             >
-              {{ __('total_balance') }}
+              {{ __('real_balance') }}
             </CardTitle>
             <div
               class="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400"
@@ -296,6 +322,14 @@ const statCards = computed(() => [
           >
             {{ formatAmount(summary_cards.total_balance) }}
           </div>
+          <p
+            v-if="summary_cards.total_active !== undefined"
+            class="text-xs text-muted-foreground tabular-nums"
+          >
+            {{ __('active') }} {{ formatAmount(summary_cards.total_active) }} ·
+            {{ __('reserved') }}
+            {{ formatAmount(summary_cards.total_reserved ?? 0) }}
+          </p>
           <Link
             :href="balanceIndex.url()"
             class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
@@ -409,6 +443,11 @@ const statCards = computed(() => [
           </Button>
         </Link>
       </div>
+
+      <ImpendingDrainsCard
+        :window-days="60"
+        :impending-drains-initial="props.impending_drains"
+      />
 
       <!-- Budget progress (top-5) + Recent transactions -->
       <div class="grid items-start gap-4 sm:gap-6 md:grid-cols-2">
