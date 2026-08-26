@@ -5,7 +5,12 @@ const baseURL = `http://127.0.0.1:${port}`
 
 export default defineConfig({
   testDir: './tests/e2e',
-  workers: 2,
+  // Serial only: every spec mutates ONE shared seeded sqlite database
+  // (balances, fund reserve, recurring rows), so parallel workers would
+  // race each other's fixtures. Isolation comes from per-test navigation
+  // and self-calibrating assertions instead.
+  workers: 1,
+  globalTeardown: './tests/e2e/global-teardown.ts',
   timeout: 30_000,
   expect: {
     timeout: 5_000,

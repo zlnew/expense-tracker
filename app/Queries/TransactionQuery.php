@@ -114,7 +114,7 @@ class TransactionQuery extends BaseQuery
         $cycleDateSql = $this->getCycleDateSql();
 
         $this->query->whereRaw(
-            "CAST(EXTRACT(MONTH FROM ({$cycleDateSql})) AS INTEGER) = ?",
+            BudgetCycle::extractMonthSql($cycleDateSql).' = ?',
             [(int) $value],
         );
 
@@ -128,7 +128,7 @@ class TransactionQuery extends BaseQuery
         $cycleDateSql = $this->getCycleDateSql();
 
         $this->query->whereRaw(
-            "CAST(EXTRACT(YEAR FROM ({$cycleDateSql})) AS INTEGER) = ?",
+            BudgetCycle::extractYearSql($cycleDateSql).' = ?',
             [(int) $value],
         );
 
