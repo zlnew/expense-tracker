@@ -65,7 +65,7 @@ const props = defineProps<{
   expense_breakdown?: ExpenseBreakdown[]
   monthly_spending_trend?: MonthlySpendingTrend[]
   recent_transactions: RecentTransactions
-  impending_drains: { window_days: number; from: string; until: string; total_impending_outflow: number; items: Array<{ kind: string; id: number; label: string; amount: number; balance_id: number; balance_name: string; due_date: string; source: string }>; per_balance: Array<{ balance_id: number; balance_name: string; real: number; impending: number; projected_free_after: number; would_go_negative: boolean }>; has_negative_warning: boolean }
+  impending_drains: { window_days: number; from: string; until: string; total_impending_outflow: number; items: Array<{ kind: 'fund_due' | 'recurring'; id: number; label: string; amount: number; balance_id: number; balance_name: string; due_date: string; source: string }>; per_balance: Array<{ balance_id: number; balance_name: string; real: number; impending: number; projected_free_after: number; would_go_negative: boolean }>; has_negative_warning: boolean }
 }>()
 
 const { __ } = useLang()

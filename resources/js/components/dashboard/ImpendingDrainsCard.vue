@@ -29,7 +29,11 @@ type DrainResponse = {
   has_negative_warning: boolean
 }
 
-const props = withDefaults(defineProps<{ windowDays?: number; impendingDrainsInitial?: DrainResponse | null }>(), { windowDays: 60, impendingDrainsInitial: null as unknown as DrainResponse | null })
+const props = withDefaults(defineProps<{ windowDays?: number; impendingDrainsInitial?: DrainResponse | null }>(), { windowDays: 60, impendingDrainsInitial: null })
+
+// Local mutable copy — the window switcher updates this ref (never the
+// readonly prop) and every fetch re-runs off it.
+const windowDays = ref<number>(props.windowDays)
 
 const { __ } = useLang()
 const { formatDate } = useDate()

@@ -321,8 +321,8 @@ const submit = () => {
                 />
               </div>
               <div class="flex items-end">
-                <Button type="button" data-testid="quick-log-submit" class="w-full" :disabled="!quickCanSubmit || (form as unknown as { processing: boolean }).processing" @click="submitQuick">
-                  <Spinner v-if="(form as unknown as { processing: boolean }).processing" class="mr-2" />
+                <Button type="button" data-testid="quick-log-submit" class="w-full" :disabled="!quickCanSubmit || form.processing" @click="submitQuick">
+                  <Spinner v-if="form.processing" class="mr-2" />
                   Quick save
                 </Button>
               </div>
