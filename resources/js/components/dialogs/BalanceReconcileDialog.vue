@@ -32,12 +32,14 @@ const firstFieldRef = ref<HTMLElement | null>(null)
 const errors = ref<Record<string, string>>({})
 
 function resetForm(balance: Balance | null) {
-  amount.value = balance?.reconciled_amount != null
-    ? String(balance.reconciled_amount)
-    : balance != null
-      ? String(balance.final_amount)
-      : '0'
-  reconcileDate.value = balance?.reconciled_at ?? new Date().toISOString().slice(0, 10)
+  amount.value =
+    balance?.reconciled_amount != null
+      ? String(balance.reconciled_amount)
+      : balance != null
+        ? String(balance.final_amount)
+        : '0'
+  reconcileDate.value =
+    balance?.reconciled_at ?? new Date().toISOString().slice(0, 10)
   errors.value = {}
 }
 
@@ -55,7 +57,9 @@ watch(open, (isOpen) => {
     resetForm(props.balance)
     nextTick(() => {
       firstFieldRef.value
-        ?.querySelector<HTMLElement>('input, textarea, [data-slot="select-trigger"]')
+        ?.querySelector<HTMLElement>(
+          'input, textarea, [data-slot="select-trigger"]',
+        )
         ?.focus()
     })
   }
@@ -70,11 +74,13 @@ function submit() {
 
   if (Number.isNaN(reconciledAmount)) {
     toast.error(__('validation_error'))
+
     return
   }
 
   if (!reconcileDate.value) {
     toast.error(__('validation_error'))
+
     return
   }
 
@@ -90,14 +96,19 @@ function submit() {
     {
       preserveScroll: true,
       onSuccess: (res) => {
-        toast.success((res.props.flash as any)?.success ?? __('updated_data', { data: __('balance') }))
+        toast.success(
+          (res.props.flash as any)?.success ??
+            __('updated_data', { data: __('balance') }),
+        )
         open.value = false
       },
       onError: (errs: Record<string, string>) => {
         errors.value = errs ?? {}
         toast.error(__('validation_error'))
         nextTick(() => {
-          document.querySelector('[role="alert"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          document
+            .querySelector('[role="alert"]')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         })
       },
       onFinish: () => {
@@ -110,7 +121,9 @@ function submit() {
 function onOpenAutoFocus() {
   nextTick(() => {
     firstFieldRef.value
-      ?.querySelector<HTMLElement>('input, textarea, [data-slot="select-trigger"]')
+      ?.querySelector<HTMLElement>(
+        'input, textarea, [data-slot="select-trigger"]',
+      )
       ?.focus()
   })
 }
@@ -118,10 +131,15 @@ function onOpenAutoFocus() {
 
 <template>
   <Dialog v-model:open="open">
-    <SheetDialogContent class="md:max-w-[425px]" @open-auto-focus.prevent="onOpenAutoFocus">
+    <SheetDialogContent
+      class="md:max-w-[425px]"
+      @open-auto-focus.prevent="onOpenAutoFocus"
+    >
       <DialogHeader>
         <DialogTitle>{{ __('reconcile_balance') }}</DialogTitle>
-        <DialogDescription>{{ __('reconcile_balance_description') }}</DialogDescription>
+        <DialogDescription>{{
+          __('reconcile_balance_description')
+        }}</DialogDescription>
       </DialogHeader>
 
       <form ref="firstFieldRef" @submit.prevent="submit">
@@ -160,7 +178,12 @@ function onOpenAutoFocus() {
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" :disabled="submitting" @click="open = false">
+          <Button
+            type="button"
+            variant="outline"
+            :disabled="submitting"
+            @click="open = false"
+          >
             {{ __('cancel') }}
           </Button>
           <Button type="submit" :disabled="submitting">

@@ -49,6 +49,7 @@ function normalizeCategoryName(s: string): string {
 function parseAmountToken(tok: string): number | null {
   let n = tok.trim().toLowerCase()
   let mult = 1
+
   if (n.endsWith('ribu')) {
     mult = 1000
     n = n.slice(0, -4)
@@ -59,16 +60,23 @@ function parseAmountToken(tok: string): number | null {
     mult = 1000
     n = n.slice(0, -1)
   }
+
   n = n.trim().replace(/,/g, '')
+
   if (n.includes('.')) {
     const parts = n.split('.')
+
     if (parts.length === 2 && parts[1].length <= 2 && mult > 1) {
       // decimal
     } else {
       n = n.replace(/\./g, '')
     }
   }
-  if (n === '' || Number.isNaN(Number(n))) return null
+
+  if (n === '' || Number.isNaN(Number(n))) {
+    return null
+  }
+
   return Math.round(Number.parseFloat(n) * mult)
 }
 
@@ -85,12 +93,20 @@ export function parseQuickLogClient(
   primaryBalanceId: number | null | undefined,
 ): QuickParseResult {
   const trimmed = raw.trim()
+
   if (!trimmed) {
-    return { note: '', amount: null, balanceNameHint: null, categoryId: null, balanceId: null }
+    return {
+      note: '',
+      amount: null,
+      balanceNameHint: null,
+      categoryId: null,
+      balanceId: null,
+    }
   }
 
   const tokens = trimmed.split(/\s+/).filter(Boolean)
   let amountIdx: number | null = null
+
   for (let i = 0; i < tokens.length; i++) {
     if (isAmountToken(tokens[i])) {
       amountIdx = i
@@ -100,54 +116,100 @@ export function parseQuickLogClient(
 
   const resolveBalanceFromTail = (): number | null => {
     if (amountIdx != null && amountIdx + 1 < tokens.length) {
-      const tail = tokens.slice(amountIdx + 1).join(' ').trim().toLowerCase()
+      const tail = tokens
+        .slice(amountIdx + 1)
+        .join(' ')
+        .trim()
+        .toLowerCase()
       const exact = balances.find((b) => b.name.toLowerCase() === tail)
-      if (exact) return exact.id
+
+      if (exact) {
+        return exact.id
+      }
+
       const cands = balances.filter(
         (b) =>
-          b.name.toLowerCase().includes(tail) || tail.includes(b.name.toLowerCase()),
+          b.name.toLowerCase().includes(tail) ||
+          tail.includes(b.name.toLowerCase()),
       )
-      if (cands.length === 1) return cands[0].id
+
+      if (cands.length === 1) {
+        return cands[0].id
+      }
     }
-    if (lastUsedBalanceId != null && balances.some((b) => b.id === lastUsedBalanceId)) {
+
+    if (
+      lastUsedBalanceId != null &&
+      balances.some((b) => b.id === lastUsedBalanceId)
+    ) {
       return lastUsedBalanceId
     }
-    if (primaryBalanceId != null) return primaryBalanceId
+
+    if (primaryBalanceId != null) {
+      return primaryBalanceId
+    }
+
     return null
   }
 
   const fallbackCategory = (): number | null => {
-    if (lastUsedCategoryId != null && categories.some((c) => c.id === lastUsedCategoryId)) {
+    if (
+      lastUsedCategoryId != null &&
+      categories.some((c) => c.id === lastUsedCategoryId)
+    ) {
       return lastUsedCategoryId
     }
+
     return null
   }
 
   const resolveCategory = (note: string): number | null => {
-    if (!categories.length) return fallbackCategory()
+    if (!categories.length) {
+      return fallbackCategory()
+    }
+
     const needle = normalizeCategoryName(note)
-    if (!needle) return fallbackCategory()
+
+    if (!needle) {
+      return fallbackCategory()
+    }
 
     const exact = categories.find((c) => c.name.toLowerCase() === needle)
-    if (exact) return exact.id
+
+    if (exact) {
+      return exact.id
+    }
 
     for (const [alias, canonical] of Object.entries(CATEGORY_ALIASES)) {
       if (needle.includes(alias) || alias.includes(needle)) {
         const hit = categories.find((c) => c.name === canonical)
-        if (hit) return hit.id
+
+        if (hit) {
+          return hit.id
+        }
       }
     }
 
     const cands = categories.filter(
-      (c) => c.name.toLowerCase().includes(needle) || needle.includes(c.name.toLowerCase()),
+      (c) =>
+        c.name.toLowerCase().includes(needle) ||
+        needle.includes(c.name.toLowerCase()),
     )
-    if (cands.length === 1) return cands[0].id
-    if (cands.length > 1) return fallbackCategory()
+
+    if (cands.length === 1) {
+      return cands[0].id
+    }
+
+    if (cands.length > 1) {
+      return fallbackCategory()
+    }
+
     return fallbackCategory()
   }
 
   if (amountIdx === null) {
     const note = trimmed
+
     return {
       note,
       amount: null,

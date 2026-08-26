@@ -24,6 +24,7 @@ import {
 import { computed } from 'vue'
 import AppContent from '@/components/AppContent.vue'
 import ChartEmpty from '@/components/ChartEmpty.vue'
+import ImpendingDrainsCard from '@/components/dashboard/ImpendingDrainsCard.vue'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -46,7 +47,10 @@ import { useDate } from '@/composables/useDate'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
-import ImpendingDrainsCard from '@/components/dashboard/ImpendingDrainsCard.vue'
+import { dashboard } from '@/routes'
+import { index as balanceIndex } from '@/routes/balances'
+import { index as budgetIndex } from '@/routes/budgets'
+import { index as transactionIndex } from '@/routes/transactions'
 import type {
   BudgetProgress,
   ExpenseBreakdown,
@@ -54,10 +58,6 @@ import type {
   RecentTransactions,
   SummaryCards,
 } from '@/types'
-import { dashboard } from '@/routes'
-import { index as balanceIndex } from '@/routes/balances'
-import { index as budgetIndex } from '@/routes/budgets'
-import { index as transactionIndex } from '@/routes/transactions'
 
 const props = defineProps<{
   summary_cards: SummaryCards
@@ -65,7 +65,31 @@ const props = defineProps<{
   expense_breakdown?: ExpenseBreakdown[]
   monthly_spending_trend?: MonthlySpendingTrend[]
   recent_transactions: RecentTransactions
-  impending_drains: { window_days: number; from: string; until: string; total_impending_outflow: number; items: Array<{ kind: 'fund_due' | 'recurring'; id: number; label: string; amount: number; balance_id: number; balance_name: string; due_date: string; source: string }>; per_balance: Array<{ balance_id: number; balance_name: string; real: number; impending: number; projected_free_after: number; would_go_negative: boolean }>; has_negative_warning: boolean }
+  impending_drains: {
+    window_days: number
+    from: string
+    until: string
+    total_impending_outflow: number
+    items: Array<{
+      kind: 'fund_due' | 'recurring'
+      id: number
+      label: string
+      amount: number
+      balance_id: number
+      balance_name: string
+      due_date: string
+      source: string
+    }>
+    per_balance: Array<{
+      balance_id: number
+      balance_name: string
+      real: number
+      impending: number
+      projected_free_after: number
+      would_go_negative: boolean
+    }>
+    has_negative_warning: boolean
+  }
 }>()
 
 const { __ } = useLang()
@@ -420,7 +444,10 @@ const statCards = computed(() => [
         </Link>
       </div>
 
-      <ImpendingDrainsCard :window-days="60" :impending-drains-initial="props.impending_drains" />
+      <ImpendingDrainsCard
+        :window-days="60"
+        :impending-drains-initial="props.impending_drains"
+      />
 
       <!-- Budget progress (top-5) + Recent transactions -->
       <div class="grid items-start gap-4 sm:gap-6 md:grid-cols-2">

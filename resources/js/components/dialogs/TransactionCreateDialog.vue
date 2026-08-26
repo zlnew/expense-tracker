@@ -66,11 +66,19 @@ const quickParsed = computed(() =>
     props.primaryBalanceId,
   ),
 )
-const quickEffectiveCategoryId = computed(() => quickPickedCategoryId.value ?? quickParsed.value.categoryId)
-const quickEffectiveAmount = computed(() => quickAmountOverride.value ?? quickParsed.value.amount)
+const quickEffectiveCategoryId = computed(
+  () => quickPickedCategoryId.value ?? quickParsed.value.categoryId,
+)
+const quickEffectiveAmount = computed(
+  () => quickAmountOverride.value ?? quickParsed.value.amount,
+)
 const quickEffectiveBalanceId = computed(() => quickParsed.value.balanceId)
 const quickCanSubmit = computed(
-  () => quickEffectiveAmount.value != null && quickEffectiveAmount.value > 0 && quickEffectiveCategoryId.value != null && quickEffectiveBalanceId.value != null,
+  () =>
+    quickEffectiveAmount.value != null &&
+    quickEffectiveAmount.value > 0 &&
+    quickEffectiveCategoryId.value != null &&
+    quickEffectiveBalanceId.value != null,
 )
 
 function pickQuickCategory(id: number) {
@@ -86,18 +94,34 @@ const submitQuick = () => {
   const amount = quickEffectiveAmount.value
   const categoryId = quickEffectiveCategoryId.value
   const balanceId = quickEffectiveBalanceId.value
-  if (amount == null || !categoryId || !balanceId) return
-  const linkBudget = props.budgets.find((b) => b.id === props.activeBudgetId) ?? props.budgets.find((b) => b.id === form.budget_id)
+
+  if (amount == null || !categoryId || !balanceId) {
+    return
+  }
+
+  const linkBudget =
+    props.budgets.find((b) => b.id === props.activeBudgetId) ??
+    props.budgets.find((b) => b.id === form.budget_id)
   const item = linkBudget?.items?.find((i) => i.category_id === categoryId)
   form.balance_id = balanceId
-  if (props.activeBudgetId) form.budget_id = props.activeBudgetId
+
+  if (props.activeBudgetId) {
+    form.budget_id = props.activeBudgetId
+  }
+
   if (item) {
     form.budget_item_id = item.id
     form.type = item.type
   } else {
-    const cat = filteredCategories.value.find((c) => c.id === categoryId) ?? props.categories.find((c) => c.id === categoryId)
-    if (cat) form.type = (cat as Category & { type: string }).type ?? ''
+    const cat =
+      filteredCategories.value.find((c) => c.id === categoryId) ??
+      props.categories.find((c) => c.id === categoryId)
+
+    if (cat) {
+      form.type = (cat as Category & { type: string }).type ?? ''
+    }
   }
+
   form.category_id = categoryId
   form.amount = amount
   form.description = quickParsed.value.note || quickText.value.trim()
@@ -113,11 +137,19 @@ const submitQuick = () => {
       quickAmountOverride.value = null
       form.reset()
       form.clearErrors()
-      if (props.primaryBalanceId) form.balance_id = props.primaryBalanceId
-      if (props.activeBudgetId) form.budget_id = props.activeBudgetId
+
+      if (props.primaryBalanceId) {
+        form.balance_id = props.primaryBalanceId
+      }
+
+      if (props.activeBudgetId) {
+        form.budget_id = props.activeBudgetId
+      }
+
       form.date = new Date().toISOString().split('T')[0]
       nextTick(() => {
-        const el = firstFieldRef.value?.querySelector<HTMLElement>('#quick-log-input')
+        const el =
+          firstFieldRef.value?.querySelector<HTMLElement>('#quick-log-input')
         el?.focus()
       })
     },
@@ -190,6 +222,7 @@ watch(
       // Quick-log prefs (localStorage) win over server primary — spec §11.2
       const lastBal = quickPrefs.lastBalanceId.value
       const lastCat = quickPrefs.lastCategoryId.value
+
       if (lastBal != null && props.balances.some((b) => b.id === lastBal)) {
         form.balance_id = lastBal
       } else if (props.primaryBalanceId) {
@@ -204,6 +237,7 @@ watch(
       quickText.value = ''
       quickPickedCategoryId.value = null
       quickAmountOverride.value = null
+
       if (lastCat != null) {
         // hint the quick strip; full validation happens in submit/quick pick
         quickPickedCategoryId.value = null
@@ -234,7 +268,13 @@ const submit = () => {
     preserveScroll: true,
     onSuccess: (res) => {
       // persist last-used for quick-log prefill (v3 §11.2)
-      if (form.balance_id) quickPrefs.rememberFromIds(Number(form.balance_id), Number(form.category_id) || null)
+      if (form.balance_id) {
+        quickPrefs.rememberFromIds(
+          Number(form.balance_id),
+          Number(form.category_id) || null,
+        )
+      }
+
       emit('update:open', false)
       form.reset()
       toast.success(res.props.success as string)
@@ -274,31 +314,49 @@ const submit = () => {
           />
 
           <!-- Quick-log strip (US-5): free text + one-tap category + batch-ready -->
-          <div class="rounded-lg border bg-muted/30 p-3 space-y-3" data-testid="quick-log-strip">
+          <div
+            class="space-y-3 rounded-lg border bg-muted/30 p-3"
+            data-testid="quick-log-strip"
+          >
             <div class="grid gap-2">
               <Label for="quick-log-input">Quick log</Label>
               <Input
                 id="quick-log-input"
                 v-model="quickText"
                 data-testid="quick-log-input"
-                placeholder='e.g. &quot;bensin 33k cash&quot;'
+                placeholder='e.g. "bensin 33k cash"'
                 autocomplete="off"
                 @input="onQuickTextInput"
               />
-              <p class="text-xs text-muted-foreground">Type: note + amount (supports k / rb) + optional balance name.</p>
-              <p v-if="quickParsed.balanceNameHint" class="text-xs text-muted-foreground" data-testid="quick-log-balance-hint">
+              <p class="text-xs text-muted-foreground">
+                Type: note + amount (supports k / rb) + optional balance name.
+              </p>
+              <p
+                v-if="quickParsed.balanceNameHint"
+                class="text-xs text-muted-foreground"
+                data-testid="quick-log-balance-hint"
+              >
                 Balance hint: {{ quickParsed.balanceNameHint }}
               </p>
             </div>
             <div class="grid gap-2">
               <Label>Category (one tap)</Label>
-              <div class="flex flex-wrap gap-1.5" data-testid="quick-log-categories">
+              <div
+                class="flex flex-wrap gap-1.5"
+                data-testid="quick-log-categories"
+              >
                 <button
-                  v-for="c in (filteredCategories.length ? filteredCategories : categories)"
+                  v-for="c in filteredCategories.length
+                    ? filteredCategories
+                    : categories"
                   :key="c.id"
                   type="button"
                   class="rounded-full border px-3 py-1 text-xs transition"
-                  :class="quickEffectiveCategoryId === c.id ? 'bg-primary text-primary-foreground border-primary' : 'bg-background hover:bg-muted'"
+                  :class="
+                    quickEffectiveCategoryId === c.id
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'bg-background hover:bg-muted'
+                  "
                   :data-testid="`quick-cat-${c.id}`"
                   :aria-pressed="quickEffectiveCategoryId === c.id"
                   @click="pickQuickCategory(c.id)"
@@ -315,13 +373,25 @@ const submit = () => {
                   type="number"
                   inputmode="decimal"
                   data-testid="quick-log-amount"
-                  :model-value="(quickEffectiveAmount ?? '') as unknown as string"
+                  :model-value="
+                    (quickEffectiveAmount ?? '') as unknown as string
+                  "
                   placeholder="0"
-                  @update:model-value="(v: string | number) => (quickAmountOverride = v === '' || (v as unknown) == null ? null : Number(v))"
+                  @update:model-value="
+                    (v: string | number) =>
+                      (quickAmountOverride =
+                        v === '' || (v as unknown) == null ? null : Number(v))
+                  "
                 />
               </div>
               <div class="flex items-end">
-                <Button type="button" data-testid="quick-log-submit" class="w-full" :disabled="!quickCanSubmit || form.processing" @click="submitQuick">
+                <Button
+                  type="button"
+                  data-testid="quick-log-submit"
+                  class="w-full"
+                  :disabled="!quickCanSubmit || form.processing"
+                  @click="submitQuick"
+                >
                   <Spinner v-if="form.processing" class="mr-2" />
                   Quick save
                 </Button>

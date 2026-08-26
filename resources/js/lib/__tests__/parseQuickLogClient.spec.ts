@@ -21,10 +21,18 @@ describe('parseQuickLogClient', () => {
   })
 
   it('resolves k / rb / ribu / plain', () => {
-    expect(parseQuickLogClient('makan 2.5k', cats, bals, null, null, 10).amount).toBe(2_500)
-    expect(parseQuickLogClient('makan 33rb', cats, bals, null, null, 10).amount).toBe(33_000)
-    expect(parseQuickLogClient('makan 10ribu', cats, bals, null, null, 10).amount).toBe(10_000)
-    expect(parseQuickLogClient('makan 15000', cats, bals, null, null, 10).amount).toBe(15_000)
+    expect(
+      parseQuickLogClient('makan 2.5k', cats, bals, null, null, 10).amount,
+    ).toBe(2_500)
+    expect(
+      parseQuickLogClient('makan 33rb', cats, bals, null, null, 10).amount,
+    ).toBe(33_000)
+    expect(
+      parseQuickLogClient('makan 10ribu', cats, bals, null, null, 10).amount,
+    ).toBe(10_000)
+    expect(
+      parseQuickLogClient('makan 15000', cats, bals, null, null, 10).amount,
+    ).toBe(15_000)
   })
 
   it('falls back to last-used on ambiguous category', () => {
@@ -34,17 +42,34 @@ describe('parseQuickLogClient', () => {
     ]
     const r = parseQuickLogClient('food 10k', ambCats, bals, 20, null, null)
     expect(r.categoryId).toBe(20)
-    expect(parseQuickLogClient('food 10k', ambCats, bals, null, null, null).categoryId).toBeNull()
+    expect(
+      parseQuickLogClient('food 10k', ambCats, bals, null, null, null)
+        .categoryId,
+    ).toBeNull()
   })
 
   it('resolves balance from tail else lastUsed else primary', () => {
-    expect(parseQuickLogClient('makan 10k cash', cats, bals, null, 11, null).balanceId).toBe(10)
-    expect(parseQuickLogClient('makan 10k', cats, bals, null, 11, null).balanceId).toBe(11)
-    expect(parseQuickLogClient('makan 10k', cats, bals, null, null, 10).balanceId).toBe(10)
+    expect(
+      parseQuickLogClient('makan 10k cash', cats, bals, null, 11, null)
+        .balanceId,
+    ).toBe(10)
+    expect(
+      parseQuickLogClient('makan 10k', cats, bals, null, 11, null).balanceId,
+    ).toBe(11)
+    expect(
+      parseQuickLogClient('makan 10k', cats, bals, null, null, 10).balanceId,
+    ).toBe(10)
   })
 
   it('does not invent categories', () => {
-    const r = parseQuickLogClient('unknownxyz 10k', cats, bals, null, null, null)
+    const r = parseQuickLogClient(
+      'unknownxyz 10k',
+      cats,
+      bals,
+      null,
+      null,
+      null,
+    )
     expect(r.categoryId).toBeNull()
   })
 })

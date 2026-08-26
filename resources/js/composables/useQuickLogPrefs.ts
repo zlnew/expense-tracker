@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 const LS_BALANCE = 'et:lastBalanceId'
 const LS_CATEGORY = 'et:lastCategoryId'
@@ -44,7 +44,10 @@ export function useQuickLogPrefs() {
     }
   }
 
-  function rememberFromIds(balanceId: number | null | undefined, categoryId: number | null | undefined) {
+  function rememberFromIds(
+    balanceId: number | null | undefined,
+    categoryId: number | null | undefined,
+  ) {
     rememberBalance(balanceId ?? null)
     rememberCategory(categoryId ?? null)
   }

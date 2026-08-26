@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps } from '@inertiajs/vue3'
-import { AlertTriangle, CheckCircle2, Plus, Scale, SquarePen, Trash2, Wallet } from 'lucide-vue-next'
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Plus,
+  Scale,
+  SquarePen,
+  Trash2,
+  Wallet,
+} from 'lucide-vue-next'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
@@ -170,7 +178,9 @@ const rowActions = (b: Balance) => [
             :data-testid="`balance-card-${String(b.id)}`"
             :class="[
               'group relative overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-primary/5',
-              b.is_drift_flagged ? 'border-destructive/60 ring-1 ring-destructive/30' : '',
+              b.is_drift_flagged
+                ? 'border-destructive/60 ring-1 ring-destructive/30'
+                : '',
             ]"
           >
             <div v-if="b.is_primary" class="absolute top-0 right-0 p-2">
@@ -241,11 +251,21 @@ const rowActions = (b: Balance) => [
                   ]"
                 >
                   <span class="inline-flex items-center gap-1.5 font-medium">
-                    <AlertTriangle v-if="b.is_drift_flagged" class="size-4 shrink-0" />
+                    <AlertTriangle
+                      v-if="b.is_drift_flagged"
+                      class="size-4 shrink-0"
+                    />
                     <Scale v-else class="size-4 shrink-0 opacity-60" />
-                    {{ b.is_drift_flagged ? __('drift_flagged') : __('drift_ok') }}
+                    {{
+                      b.is_drift_flagged ? __('drift_flagged') : __('drift_ok')
+                    }}
                   </span>
-                  <span :class="['font-mono font-semibold tabular-nums', b.is_drift_flagged ? 'text-destructive' : '']">
+                  <span
+                    :class="[
+                      'font-mono font-semibold tabular-nums',
+                      b.is_drift_flagged ? 'text-destructive' : '',
+                    ]"
+                  >
                     {{ formatAmount(b.drift) }}
                   </span>
                 </div>
@@ -293,5 +313,8 @@ const rowActions = (b: Balance) => [
 
   <BalanceSaveDialog v-model:open="saveDialogOpen" :balance="targetData" />
   <BalanceDeleteDialog v-model:open="deleteDialogOpen" :balance="targetData" />
-  <BalanceReconcileDialog v-model:open="reconcileDialogOpen" :balance="targetData" />
+  <BalanceReconcileDialog
+    v-model:open="reconcileDialogOpen"
+    :balance="targetData"
+  />
 </template>
