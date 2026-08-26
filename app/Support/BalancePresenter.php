@@ -70,8 +70,16 @@ class BalancePresenter
     private static function makeData(Balance $balance, int $reserved, ?int $real = null): BalanceData
     {
         return BalanceData::from(array_merge(
-            $balance->only(['id', 'user_id', 'name', 'description', 'initial_amount', 'final_amount', 'is_primary']),
+            $balance->only([
+                'id', 'user_id', 'name', 'description', 'initial_amount',
+                'final_amount', 'is_primary', 'reconciled_amount',
+            ]),
             [
+                // Reconcile legs (US-4): without these the list surfaces can
+                // never render the drift row after a reconcile.
+                'reconciled_at' => $balance->reconciled_at?->toDateString(),
+                'drift' => $balance->drift,
+                'is_drift_flagged' => (bool) $balance->is_drift_flagged,
                 'reserved' => $reserved,
                 'real' => $real ?? ((int) $balance->final_amount - $reserved),
                 'user' => $balance->relationLoaded('user') && $balance->user ? $balance->user : null,

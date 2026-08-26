@@ -22,7 +22,13 @@ if php -m 2>/dev/null | grep -qi 'pdo_sqlite'; then
   php artisan migrate:fresh --seed --seeder=E2ESeeder --force
   exec php artisan serve --host=127.0.0.1 --port="${ET_E2E_PORT:-8015}"
 else
+  # Deterministic name + forced replace: playwright kills this docker CLIENT
+  # on teardown, but the container itself survives — without this, every
+  # suite run leaks a server and the next run dies on "port already used".
+  E2E_CONTAINER="et-e2e-server-${ET_E2E_PORT:-8015}"
+  docker rm -f "$E2E_CONTAINER" >/dev/null 2>&1 || true
   exec docker run --rm \
+    --name "$E2E_CONTAINER" \
     -v "$PWD":/app \
     -w /app \
     -p "127.0.0.1:${ET_E2E_PORT:-8015}:8015" \
