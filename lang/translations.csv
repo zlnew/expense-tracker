@@ -291,8 +291,10 @@ types,Types,Jenis
 underfunded,Underfunded,"Kurang dari target"
 unknown,Unknown,"Tidak diketahui"
 update,Update,Perbarui
+update_data,"{data} Updated","{data} Diperbarui"
 updated_data,":data Updated",":data Diperbarui"
 updating,Updating...,Memperbarui...
+validation_error,"Validation failed. Please check the form.","Validasi gagal. Periksa kembali isian formulir."
 view_detail,"View Detail","Lihat Detail"
 warning,Warning,Peringatan
 weekly,Weekly,Mingguan
