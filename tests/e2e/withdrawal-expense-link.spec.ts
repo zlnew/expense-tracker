@@ -120,7 +120,14 @@ test.describe('US-6 withdrawal → expense link', () => {
     await page.getByRole('button', { name: 'Bayar dari dana' }).last().click()
 
     // PayFromFund guard: 422 with the translated message, dialog stays open.
-    await expect(page.getByText('Saldo dana tidak mencukupi')).toBeVisible()
+    // The message renders twice (dialog error listitem + field-level <p>);
+    // scope to the listitem to avoid strict-mode ambiguity, then assert the
+    // field-level paragraph separately so both surfaces are covered.
+    const dialog = page.getByRole('dialog', { name: 'Bayar dari dana' })
+    await expect(dialog.getByRole('listitem')).toHaveText(
+      'Saldo dana tidak mencukupi',
+    )
+    await expect(dialog.locator('p', { hasText: 'Saldo dana tidak mencukupi' })).toBeVisible()
     await expect(page.locator('#pay_amount')).toBeVisible()
   })
 

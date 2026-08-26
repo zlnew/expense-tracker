@@ -73,8 +73,9 @@ test.describe('US-4 balance reconcile', () => {
     await expect(driftRow.locator('.text-destructive')).toHaveCount(0)
     await expect(driftRow).toContainText('Rp 0')
 
+    // Label prefix ("Tanggal rekonsiliasi:") precedes the ISO date.
     await expect(page.getByTestId('balance-reconciled-at-1')).toContainText(
-      /^\d{4}-\d{2}-\d{2}$/,
+      /\d{4}-\d{2}-\d{2}/,
     )
   })
 
@@ -114,6 +115,8 @@ test.describe('US-4 balance reconcile', () => {
     // HTML5 constraint blocks submission; the dialog stays open.
     await expect(page.locator('#reconciled_amount')).toBeVisible()
     await expect(page.getByText('Saldo Diperbarui')).toHaveCount(0)
-    await expect(page.getByTestId('balance-drift-1')).toHaveCount(0)
+    // NOTE: no absence assert on balance-drift-1 here — earlier tests in
+    // this file already reconciled the shared seeded balance, so the row
+    // legitimately persists across tests on the serial shared DB.
   })
 })
