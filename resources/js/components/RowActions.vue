@@ -83,10 +83,7 @@ function triggerClasses(align: 'left' | 'right') {
   </div>
 
   <!-- Mobile: single dropdown with all actions (avoids 4 x 44px buttons on a card). -->
-  <div
-    v-if="props.collapseBelow"
-    :class="HIDE_CLASSES[props.collapseBelow]"
-  >
+  <div v-if="props.collapseBelow" :class="HIDE_CLASSES[props.collapseBelow]">
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" size="icon" :aria-label="__('actions')">
