@@ -22,6 +22,7 @@ use App\Mcp\Tools\ReconcileBalanceTool;
 use App\Mcp\Tools\ToolInterface;
 use App\Mcp\Tools\TransferBalanceTool;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class McpServer
 {
@@ -183,6 +184,8 @@ class McpServer
         if (! $this->user) {
             throw new \RuntimeException('User not authenticated in MCP server context');
         }
+
+        Auth::setUser($this->user);
 
         return $tool->execute($this->user, $arguments);
     }
