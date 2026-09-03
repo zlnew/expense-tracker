@@ -21,13 +21,15 @@ export function updateTheme(value: Appearance): void {
       : value === 'dark'
 
   document.documentElement.classList.toggle('dark', isDark)
+  document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
 
-  // Update PWA theme-color meta tag
-  const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+  // Update all PWA theme-color meta tags
+  const themeColor = isDark ? '#14131b' : '#faf9f7'
+  const metaThemeColors = document.querySelectorAll('meta[name="theme-color"]')
 
-  if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', isDark ? '#0a0a0a' : '#ffffff')
-  }
+  metaThemeColors.forEach((meta) => {
+    meta.setAttribute('content', themeColor)
+  })
 }
 
 const setCookie = (name: string, value: string, days = 365) => {

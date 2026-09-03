@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 
+        <meta name="color-scheme" content="light dark">
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f7">
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14131b">
         <meta name="theme-color" content="#faf9f7">
@@ -22,10 +23,12 @@
                     document.documentElement.classList.add('dark');
                 }
 
-                const themeMeta = document.querySelector('meta[name="theme-color"]:not([media])');
-                if (themeMeta) {
-                    themeMeta.setAttribute('content', isDark ? '#14131b' : '#faf9f7');
-                }
+                document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+                const themeColor = isDark ? '#14131b' : '#faf9f7';
+                document.querySelectorAll('meta[name="theme-color"]').forEach(function(meta) {
+                    meta.setAttribute('content', themeColor);
+                });
             })();
         </script>
 
