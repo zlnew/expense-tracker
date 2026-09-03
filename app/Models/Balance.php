@@ -71,7 +71,7 @@ class Balance extends Model
             return null;
         }
 
-        return (int) $this->reconciled_amount - (int) $this->final_amount;
+        return (int) $this->final_amount - (int) $this->reconciled_amount;
     }
 
     public function getIsDriftFlaggedAttribute(): bool

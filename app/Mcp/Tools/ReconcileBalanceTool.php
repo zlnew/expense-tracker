@@ -65,8 +65,8 @@ class ReconcileBalanceTool implements ToolInterface
         $status = $drift === 0
             ? '✅ Perfectly reconciled! Zero drift.'
             : ($drift > 0
-                ? "⚠️ Discrepancy: Real balance is {$driftFmt} HIGHER than recorded ledger ({$computedFmt})."
-                : "⚠️ Discrepancy: Real balance is {$driftFmt} LOWER than recorded ledger ({$computedFmt}).");
+                ? "⚠️ Discrepancy: Real balance is {$driftFmt} LOWER than recorded ledger ({$computedFmt})."
+                : "⚠️ Discrepancy: Real balance is {$driftFmt} HIGHER than recorded ledger ({$computedFmt}).");
 
         $msg = "Account '{$fresh->name}' reconciled as of {$reconciledAt}:\n"
             ."- Actual Statement Amount: {$actualFmt}\n"

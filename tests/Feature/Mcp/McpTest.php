@@ -241,6 +241,45 @@ test('mcp server gets balance summary with active, reserved, real, and net worth
         ->toContain('Rp 500.000');
 });
 
+test('mcp server get_balance_summary calculates drift as final_amount minus reconciled_amount', function () {
+    $server = new McpServer($this->user);
+
+    // Account 1: Ledger higher than physical (e.g. BCA Xpresi: Ledger 3,637,969, Physical 869,446 => Expected: +2,768,523)
+    $this->balance->update([
+        'final_amount' => 3_637_969,
+        'reconciled_amount' => 869_446,
+    ]);
+
+    // Account 2: Ledger lower than physical (e.g. Cash: Ledger 69,600, Physical 133,000 => Expected: -63,400)
+    $cash = Balance::factory()->for($this->user)->create([
+        'name' => 'Cash Pocket',
+        'final_amount' => 69_600,
+        'reconciled_amount' => 133_000,
+    ]);
+
+    $response = $server->handle([
+        'jsonrpc' => '2.0',
+        'id' => 99,
+        'method' => 'tools/call',
+        'params' => [
+            'name' => 'get_balance_summary',
+            'arguments' => [],
+        ],
+    ]);
+
+    $text = $response['result']['content'][0]['text'];
+    $json = json_decode(substr($text, strpos($text, '{')), true);
+
+    $bcaRow = collect($json['accounts'])->firstWhere('id', $this->balance->id);
+    $cashRow = collect($json['accounts'])->firstWhere('id', $cash->id);
+
+    // Ledger higher than physical => Positive drift (missing money)
+    expect($bcaRow['drift'])->toBe(2_768_523);
+
+    // Ledger lower than physical => Negative drift (extra money)
+    expect($cashRow['drift'])->toBe(-63_400);
+});
+
 test('mcp server gets budget status for active budget or notifies if none', function () {
     $server = new McpServer($this->user);
 
