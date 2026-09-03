@@ -64,6 +64,7 @@ class TransferBetweenAccounts extends Action
             }
 
             SaveTransaction::run(new Transaction, TransactionData::from([
+                'user_id' => $sourceAccount->user_id,
                 'balance_id' => $sourceAccount->id,
                 'type' => CategoryType::EXPENSE->value,
                 'date' => $this->data->date,
@@ -73,6 +74,7 @@ class TransferBetweenAccounts extends Action
             ]));
 
             SaveTransaction::run(new Transaction, TransactionData::from([
+                'user_id' => $destinationAccount->user_id,
                 'balance_id' => $destinationAccount->id,
                 'type' => CategoryType::INCOME->value,
                 'date' => $this->data->date,

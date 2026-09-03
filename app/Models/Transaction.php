@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable $date
  * @property int $amount
  * @property string|null $description
+ * @property string|null $transfer_group_id
+ * @property-read bool $is_transfer
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Balance $balance
@@ -55,6 +58,10 @@ class Transaction extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $appends = [
+        'is_transfer',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -62,6 +69,22 @@ class Transaction extends Model
             'date' => 'date',
             'amount' => 'integer',
         ];
+    }
+
+    public function getIsTransferAttribute(): bool
+    {
+        return $this->transfer_group_id !== null && $this->category_id === null;
+    }
+
+    /**
+     * Exclude internal balance transfers (which have transfer_group_id and no category).
+     */
+    public function scopeExcludeInternalTransfers(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q) {
+            $q->whereNull('transfer_group_id')
+                ->orWhereNotNull('category_id');
+        });
     }
 
     protected function cycleMonth(): Attribute

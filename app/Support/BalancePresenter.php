@@ -83,6 +83,7 @@ class BalancePresenter
                 'is_drift_flagged' => (bool) $balance->is_drift_flagged,
                 'reserved' => $reserved,
                 'real' => $real ?? ((int) $balance->final_amount - $reserved),
+                'real_balance' => $real ?? ((int) $balance->final_amount - $reserved),
                 'user' => $balance->relationLoaded('user') && $balance->user ? $balance->user : null,
                 'transactions' => null,
             ],

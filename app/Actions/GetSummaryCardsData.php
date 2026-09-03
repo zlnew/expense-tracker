@@ -108,6 +108,7 @@ class GetSummaryCardsData extends Action
             ->where('user_id', $this->user->id)
             ->where('budget_id', $this->activeBudget->id)
             ->where('type', CategoryType::EXPENSE)
+            ->excludeInternalTransfers()
             ->whereBetween('date', [$start, $end])
             ->sum('amount');
     }
@@ -124,6 +125,7 @@ class GetSummaryCardsData extends Action
             ->where('user_id', $this->user->id)
             ->where('budget_id', $this->activeBudget->id)
             ->where('type', CategoryType::INCOME)
+            ->excludeInternalTransfers()
             ->whereBetween('date', [$start, $end])
             ->sum('amount');
     }
