@@ -300,7 +300,7 @@ test('E7a rollover parity: set-aside 1M vs planned 1M → leftover 0 (reserved m
 
     $previous = Budget::factory()->for($user)->create([
         'period_start' => now()->startOfMonth()->subMonthNoOverflow(),
-        'period_end' => now()->endOfMonth()->subMonthNoOverflow(),
+        'period_end' => now()->startOfMonth()->subMonthNoOverflow()->endOfMonth(),
         'cutoff_day' => 1,
     ]);
     BudgetItem::factory()->for($previous)->for($category)->create([
@@ -332,7 +332,7 @@ test('E7b rollover parity: set-aside 1M + payout 12M in the period → leftover 
 
     $previous = Budget::factory()->for($user)->create([
         'period_start' => now()->startOfMonth()->subMonthNoOverflow(),
-        'period_end' => now()->endOfMonth()->subMonthNoOverflow(),
+        'period_end' => now()->startOfMonth()->subMonthNoOverflow()->endOfMonth(),
         'cutoff_day' => 1,
     ]);
     BudgetItem::factory()->for($previous)->for($category)->create([
