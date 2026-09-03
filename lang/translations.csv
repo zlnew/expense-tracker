@@ -75,6 +75,7 @@ date_from,"Date From","Tanggal Mulai"
 date_to,"Date To","Tanggal Selesai"
 days,Days,Hari
 days_overdue,"days overdue","hari terlambat"
+days_remaining,"Days remaining","Hari tersisa"
 december,December,Desember
 delete,Delete,Hapus
 delete_account,"Delete Account","Hapus Akun"

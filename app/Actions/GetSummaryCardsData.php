@@ -44,6 +44,8 @@ class GetSummaryCardsData extends Action
         $currentMonthIncomes = $this->getCurrentMonthIncomes();
         $budgetRemaining = $this->getPlannedBudget() - $currentMonthExpenses;
 
+        [$start, $end] = BudgetCycle::currentCycleRange($this->activeBudget);
+
         return [
             // Contract: total_balance = Σ Real (headline). Also expose the
             // composed legs so the UI can show the breakdown.
@@ -55,6 +57,9 @@ class GetSummaryCardsData extends Action
             'budget_remaining' => $budgetRemaining,
             'has_active_budget' => $this->activeBudget !== null,
             'active_budget_id' => $this->activeBudget?->id,
+            'cycle_start' => $start->toDateString(),
+            'cycle_end' => $end->toDateString(),
+            'cutoff_day' => $this->activeBudget?->cutoff_day,
         ];
     }
 

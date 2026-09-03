@@ -7,6 +7,8 @@ import {
   ShieldCheck,
   ChevronRight,
   PiggyBank,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { Card, CardContent } from '@/components/ui/card'
@@ -25,12 +27,16 @@ const { __ } = useLang()
 const { formatAmount } = useNumber()
 const { masked } = useMasking()
 
-const totalBalance = computed(() => props.summaryCards.total_balance ?? 0)
+// Backend contract:
+// - props.summaryCards.total_balance = Real Spendable Balance (Total Active - Total Reserved)
+// - props.summaryCards.total_active = Total Gross Ledger Balance across all accounts
+// - props.summaryCards.total_reserved = Reserved in Sinking Funds
+const realBalance = computed(() => props.summaryCards.total_balance ?? 0)
 const reservedBalance = computed(() => props.summaryCards.total_reserved ?? 0)
-const realBalance = computed(
+const ledgerBalance = computed(
   () =>
     props.summaryCards.total_active ??
-    totalBalance.value - reservedBalance.value,
+    realBalance.value + reservedBalance.value,
 )
 const monthlyIncome = computed(
   () => props.summaryCards.current_month_incomes ?? 0,
@@ -40,20 +46,20 @@ const monthlyExpense = computed(
 )
 const netCashFlow = computed(() => monthlyIncome.value - monthlyExpense.value)
 
-// Percentages for the liquidity dual-leg bar
+// Percentages for the liquidity dual-leg bar (relative to gross ledger balance)
 const realPercent = computed(() => {
-  if (totalBalance.value <= 0) {
+  if (ledgerBalance.value <= 0) {
     return 100
   }
 
   return Math.max(
     0,
-    Math.min(100, Math.round((realBalance.value / totalBalance.value) * 100)),
+    Math.min(100, Math.round((realBalance.value / ledgerBalance.value) * 100)),
   )
 })
 
 const reservedPercent = computed(() => {
-  if (totalBalance.value <= 0) {
+  if (ledgerBalance.value <= 0) {
     return 0
   }
 
@@ -71,7 +77,7 @@ const reservedPercent = computed(() => {
       class="pointer-events-none absolute -bottom-24 -left-24 size-64 rounded-full bg-primary/5 blur-3xl"
     />
 
-    <CardContent class="relative p-6">
+    <CardContent class="relative space-y-6 p-4 sm:p-6">
       <div
         class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
       >
@@ -108,9 +114,9 @@ const reservedPercent = computed(() => {
           </div>
 
           <p class="text-xs text-muted-foreground">
-            {{ __('total_balance') }}:
+            {{ __('active') || 'Total Balance' }}:
             <span class="font-medium text-foreground">
-              {{ masked ? '••••••' : formatAmount(totalBalance) }}
+              {{ masked ? '••••••' : formatAmount(ledgerBalance) }}
             </span>
             <span
               v-if="reservedBalance > 0"
@@ -129,21 +135,27 @@ const reservedPercent = computed(() => {
         </div>
 
         <!-- Right: Inflow / Outflow Flow Metrics -->
-        <div class="flex flex-wrap items-center gap-3 lg:justify-end">
+        <div
+          class="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3 lg:justify-end"
+        >
           <!-- Income Inflow Card -->
           <div
-            class="flex items-center gap-3 rounded-xl border border-border/50 bg-background/60 p-3 shadow-2xs sm:min-w-[140px]"
+            class="flex items-center gap-2.5 rounded-xl border border-border/50 bg-background/60 p-2.5 shadow-2xs sm:min-w-[140px] sm:p-3"
           >
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-income/10 text-income"
+              class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-income/10 text-income sm:size-9"
             >
-              <TrendingUp class="size-4.5" />
+              <TrendingUp class="size-4 sm:size-4.5" />
             </div>
-            <div>
-              <p class="text-[11px] font-medium text-muted-foreground">
+            <div class="min-w-0">
+              <p
+                class="truncate text-[10px] font-medium text-muted-foreground sm:text-[11px]"
+              >
                 {{ __('current_month_incomes') || 'Income' }}
               </p>
-              <p class="text-sm font-bold text-foreground tabular-nums">
+              <p
+                class="truncate text-xs font-bold text-foreground tabular-nums sm:text-sm"
+              >
                 {{ masked ? '••••' : formatAmount(monthlyIncome) }}
               </p>
             </div>
@@ -151,18 +163,22 @@ const reservedPercent = computed(() => {
 
           <!-- Expense Outflow Card -->
           <div
-            class="flex items-center gap-3 rounded-xl border border-border/50 bg-background/60 p-3 shadow-2xs sm:min-w-[140px]"
+            class="flex items-center gap-2.5 rounded-xl border border-border/50 bg-background/60 p-2.5 shadow-2xs sm:min-w-[140px] sm:p-3"
           >
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-expense/10 text-expense"
+              class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-expense/10 text-expense sm:size-9"
             >
-              <TrendingDown class="size-4.5" />
+              <TrendingDown class="size-4 sm:size-4.5" />
             </div>
-            <div>
-              <p class="text-[11px] font-medium text-muted-foreground">
+            <div class="min-w-0">
+              <p
+                class="truncate text-[10px] font-medium text-muted-foreground sm:text-[11px]"
+              >
                 {{ __('current_month_expenses') || 'Expense' }}
               </p>
-              <p class="text-sm font-bold text-foreground tabular-nums">
+              <p
+                class="truncate text-xs font-bold text-foreground tabular-nums sm:text-sm"
+              >
                 {{ masked ? '••••' : formatAmount(monthlyExpense) }}
               </p>
             </div>
@@ -170,20 +186,20 @@ const reservedPercent = computed(() => {
 
           <!-- Net Cash Flow Badge -->
           <div
-            class="flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold"
+            class="col-span-2 flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold sm:col-span-1"
             :class="
               netCashFlow >= 0
                 ? 'border-income/30 bg-income/10 text-income'
                 : 'border-expense/30 bg-expense/10 text-expense'
             "
           >
-            <span>Net:</span>
-            <span class="font-bold tabular-nums">
-              {{
-                masked
-                  ? '••••'
-                  : (netCashFlow >= 0 ? '+' : '') + formatAmount(netCashFlow)
-              }}
+            <component
+              :is="netCashFlow >= 0 ? ArrowUpRight : ArrowDownRight"
+              class="size-4 shrink-0"
+            />
+            <span class="tabular-nums">
+              {{ netCashFlow >= 0 ? '+' : ''
+              }}{{ masked ? '••••' : formatAmount(netCashFlow) }}
             </span>
           </div>
 
@@ -200,7 +216,7 @@ const reservedPercent = computed(() => {
 
       <!-- Liquidity Proportion Bar (Real vs Sinking Fund Reserves) -->
       <div
-        v-if="reservedBalance > 0 && totalBalance > 0"
+        v-if="reservedBalance > 0 && ledgerBalance > 0"
         class="mt-6 border-t border-border/40 pt-4"
       >
         <div
