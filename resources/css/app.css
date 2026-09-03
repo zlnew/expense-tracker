@@ -108,6 +108,8 @@
 }
 
 :root {
+  color-scheme: light;
+
   /* Warm Canvas Light Mode */
   --background: oklch(0.985 0.005 240);
   --foreground: oklch(0.18 0.015 260);
@@ -163,6 +165,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   /* Deep Obsidian Dark Mode */
   --background: oklch(0.12 0.015 260);
   --foreground: oklch(0.96 0.005 240);
