@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\CategoryType;
 use App\Models\Balance;
 use App\Models\RecurringTransaction;
 use App\Models\SinkingFund;
@@ -58,9 +59,11 @@ class GetImpendingDrains extends Action
             ->get();
 
         // Active recurrings whose next_run_date falls inside [today, until].
+        // Only expense recurrings drain a balance.
         $recurrings = RecurringTransaction::query()
             ->where('user_id', $this->userId)
             ->where('is_active', true)
+            ->where('type', CategoryType::EXPENSE)
             ->where('next_run_date', '>=', $today->toDateString())
             ->where('next_run_date', '<=', $until->toDateString())
             ->with(['balance'])

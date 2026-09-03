@@ -37,14 +37,17 @@ const props = defineProps<{
 
 const { __ } = useLang()
 
+const INCOME_COLOR = '#10b981'
+const EXPENSE_COLOR = '#f43f5e'
+
 const lineChartConfig = {
   income: {
     label: __('income'),
-    color: 'var(--color-income)',
+    color: INCOME_COLOR,
   },
   expense: {
     label: __('expense'),
-    color: 'var(--color-expense)',
+    color: EXPENSE_COLOR,
   },
 }
 
@@ -203,38 +206,42 @@ const tickFormatY = (tick: number): string => {
               <VisLine
                 :x="x"
                 :y="incomeY"
-                color="var(--color-income)"
+                :color="INCOME_COLOR"
                 :lineWidth="2.5"
               />
               <VisLine
                 :x="x"
                 :y="expenseY"
-                color="var(--color-expense)"
+                :color="EXPENSE_COLOR"
                 :lineWidth="2.5"
               />
               <VisArea
                 :x="x"
                 :y="incomeY"
-                color="var(--color-income)"
-                :opacity="0.06"
+                :color="INCOME_COLOR"
+                :opacity="0.08"
               />
               <VisArea
                 :x="x"
                 :y="expenseY"
-                color="var(--color-expense)"
-                :opacity="0.06"
+                :color="EXPENSE_COLOR"
+                :opacity="0.08"
               />
               <VisScatter
                 :x="x"
                 :y="incomeY"
-                color="var(--color-income)"
-                :size="5"
+                :color="INCOME_COLOR"
+                :size="(d: MonthlySpendingTrend) => (d.income > 0 ? 5 : 0)"
+                strokeColor="var(--card)"
+                :strokeWidth="2"
               />
               <VisScatter
                 :x="x"
                 :y="expenseY"
-                color="var(--color-expense)"
-                :size="5"
+                :color="EXPENSE_COLOR"
+                :size="(d: MonthlySpendingTrend) => (d.expense > 0 ? 5 : 0)"
+                strokeColor="var(--card)"
+                :strokeWidth="2"
               />
               <VisAxis type="x" :tickFormat="tickFormatX" :gridLine="false" />
               <VisAxis

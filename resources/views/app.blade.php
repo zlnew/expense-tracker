@@ -4,7 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 
-        <meta name="theme-color" content="#ffffff">
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f7">
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14131b">
+        <meta name="theme-color" content="#faf9f7">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
@@ -20,18 +22,21 @@
                     document.documentElement.classList.add('dark');
                 }
 
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', isDark ? '#0a0a0a' : '#ffffff');
+                const themeMeta = document.querySelector('meta[name="theme-color"]:not([media])');
+                if (themeMeta) {
+                    themeMeta.setAttribute('content', isDark ? '#14131b' : '#faf9f7');
+                }
             })();
         </script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: oklch(0.985 0.005 240);
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: oklch(0.12 0.015 260);
             }
         </style>
 
