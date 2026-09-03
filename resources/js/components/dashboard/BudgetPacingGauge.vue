@@ -50,11 +50,8 @@ const budgetSpent = computed(() => {
   )
 })
 
-const budgetRemaining = computed(() => {
-  return (
-    props.summaryCards.budget_remaining ?? budgetLimit.value - budgetSpent.value
-  )
-})
+// Keep remaining strictly consistent with envelope totals
+const budgetRemaining = computed(() => budgetLimit.value - budgetSpent.value)
 
 const spentPercent = computed(() => {
   if (budgetLimit.value <= 0) {
@@ -69,20 +66,73 @@ const spentPercent = computed(() => {
 
 const isOverspent = computed(() => budgetRemaining.value < 0)
 
-// Calculate calendar month pacing
-const now = new Date()
-const totalDaysInMonth = new Date(
-  now.getFullYear(),
-  now.getMonth() + 1,
-  0,
-).getDate()
-const dayOfMonth = now.getDate()
-const calendarElapsedPercent = Math.round((dayOfMonth / totalDaysInMonth) * 100)
+// Calculate pacing based on the active budget's actual cycle range (or calendar fallback)
+const cycleElapsedPercent = computed(() => {
+  if (props.summaryCards.cycle_start && props.summaryCards.cycle_end) {
+    const start = new Date(props.summaryCards.cycle_start).getTime()
+    const end = new Date(props.summaryCards.cycle_end).getTime()
+    const today = new Date().getTime()
+    const totalCycleMs = Math.max(1, end - start)
+    const elapsedMs = Math.max(0, Math.min(totalCycleMs, today - start))
 
-const pacingDelta = computed(() => spentPercent.value - calendarElapsedPercent)
-const isPacingFast = computed(
-  () => pacingDelta.value > 10 && !isOverspent.value,
+    return Math.round((elapsedMs / totalCycleMs) * 100)
+  }
+
+  const now = new Date()
+  const totalDaysInMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+  ).getDate()
+  const dayOfMonth = now.getDate()
+
+  return Math.round((dayOfMonth / totalDaysInMonth) * 100)
+})
+
+const cycleDaysRemaining = computed(() => {
+  if (props.summaryCards.cycle_end) {
+    const end = new Date(props.summaryCards.cycle_end).setHours(23, 59, 59, 999)
+    const today = new Date().setHours(0, 0, 0, 0)
+
+    return Math.max(0, Math.ceil((end - today) / (1000 * 60 * 60 * 24)))
+  }
+
+  const now = new Date()
+  const totalDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+
+  return Math.max(0, totalDays - now.getDate())
+})
+
+// Pacing delta: spent % minus cycle elapsed %
+const pacingDelta = computed(
+  () => spentPercent.value - cycleElapsedPercent.value,
 )
+
+const pacingStatus = computed(() => {
+  if (isOverspent.value) {
+    return {
+      label: __('overspent') || 'Overspent',
+      variant: 'destructive',
+      class:
+        'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+    }
+  }
+
+  if (pacingDelta.value > 10) {
+    return {
+      label: `+${pacingDelta.value}% vs cycle`,
+      variant: 'warning',
+      class:
+        'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+    }
+  }
+
+  return {
+    label: __('on_track') || 'On track',
+    variant: 'success',
+    class: 'bg-income/10 text-income border-income/20',
+  }
+})
 </script>
 
 <template>
@@ -93,18 +143,20 @@ const isPacingFast = computed(
           <span
             class="inline-flex size-7 items-center justify-center rounded-lg bg-budget-pacing/10 text-budget-pacing"
           >
-            <CircleDollarSign class="size-4" />
+            <Gauge class="size-4" />
           </span>
           <CardTitle class="text-base font-bold text-foreground">
             {{ __('budget_status') || 'Budget Pacing' }}
           </CardTitle>
         </div>
         <CardDescription class="text-xs">
-          {{
-            hasBudget
-              ? `${dayOfMonth} of ${totalDaysInMonth} days elapsed (${calendarElapsedPercent}%)`
-              : __('no_active_budget')
-          }}
+          <template v-if="hasBudget">
+            {{ cycleDaysRemaining }}
+            {{ __('days_remaining') || 'days left in cycle' }}
+          </template>
+          <template v-else>
+            {{ __('no_active_budget') }}
+          </template>
         </CardDescription>
       </div>
 
@@ -112,9 +164,9 @@ const isPacingFast = computed(
         <Button
           variant="ghost"
           size="sm"
-          class="h-8 gap-1 px-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+          class="h-8 gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
-          {{ __('details') || 'Envelopes' }}
+          {{ __('details') || 'Details' }}
           <ChevronRight class="size-3.5" />
         </Button>
       </Link>
@@ -122,35 +174,39 @@ const isPacingFast = computed(
 
     <CardContent class="space-y-5 pt-1">
       <template v-if="hasBudget">
-        <!-- Main Stats Strip -->
+        <!-- Main Stats Strip (Responsive for Mobile) -->
         <div
-          class="grid grid-cols-3 gap-2 rounded-xl border border-border/40 bg-muted/40 p-3 text-center"
+          class="grid grid-cols-3 gap-1.5 rounded-xl border border-border/40 bg-muted/40 p-2.5 text-center sm:gap-2 sm:p-3"
         >
-          <div>
+          <div class="min-w-0">
             <span
               class="text-[10px] font-medium text-muted-foreground uppercase"
               >{{ __('limit') || 'Cap' }}</span
             >
-            <p class="text-sm font-bold text-foreground tabular-nums">
+            <p
+              class="truncate text-xs font-bold text-foreground tabular-nums sm:text-sm"
+            >
               {{ masked ? '••••' : formatAmount(budgetLimit) }}
             </p>
           </div>
-          <div>
+          <div class="min-w-0">
             <span
               class="text-[10px] font-medium text-muted-foreground uppercase"
               >{{ __('spent') }}</span
             >
-            <p class="text-sm font-bold text-expense tabular-nums">
+            <p
+              class="truncate text-xs font-bold text-expense tabular-nums sm:text-sm"
+            >
               {{ masked ? '••••' : formatAmount(budgetSpent) }}
             </p>
           </div>
-          <div>
+          <div class="min-w-0">
             <span
               class="text-[10px] font-medium text-muted-foreground uppercase"
               >{{ __('remaining') }}</span
             >
             <p
-              class="text-sm font-bold tabular-nums"
+              class="truncate text-xs font-bold tabular-nums sm:text-sm"
               :class="
                 isOverspent ? 'font-extrabold text-rose-500' : 'text-income'
               "
@@ -171,25 +227,20 @@ const isPacingFast = computed(
             <span class="flex items-center gap-1.5 font-medium text-foreground">
               <span>{{ spentPercent }}% {{ __('spent') }}</span>
               <span
-                v-if="isOverspent"
-                class="inline-flex items-center gap-0.5 rounded-md bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-600 dark:text-rose-400"
+                class="inline-flex items-center gap-0.5 rounded-md border px-1.5 py-0.5 text-[10px] font-bold"
+                :class="pacingStatus.class"
               >
-                <AlertTriangle class="size-3" />
-                {{ __('overspent') }}
-              </span>
-              <span
-                v-else-if="isPacingFast"
-                class="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400"
-              >
-                <TrendingUp class="size-3" />
-                +{{ pacingDelta }}% vs calendar
-              </span>
-              <span
-                v-else
-                class="inline-flex items-center gap-0.5 rounded-md bg-income/10 px-1.5 py-0.5 text-[10px] font-bold text-income"
-              >
-                <CheckCircle2 class="size-3" />
-                {{ __('on_track') || 'On Track' }}
+                <component
+                  :is="
+                    isOverspent
+                      ? AlertTriangle
+                      : pacingDelta > 10
+                        ? TrendingUp
+                        : CheckCircle2
+                  "
+                  class="size-3"
+                />
+                {{ pacingStatus.label }}
               </span>
             </span>
 
@@ -197,11 +248,11 @@ const isPacingFast = computed(
               class="flex items-center gap-1 text-[11px] text-muted-foreground"
             >
               <Clock class="size-3" />
-              {{ totalDaysInMonth - dayOfMonth }} days left
+              {{ cycleDaysRemaining }} {{ __('days_remaining') || 'days left' }}
             </span>
           </div>
 
-          <!-- Progress Bar with Calendar Marker -->
+          <!-- Progress Bar -->
           <div
             class="relative h-3 w-full overflow-hidden rounded-full bg-muted/60"
           >
@@ -210,12 +261,12 @@ const isPacingFast = computed(
               :class="
                 isOverspent
                   ? 'bg-rose-500'
-                  : isPacingFast
+                  : pacingDelta > 10
                     ? 'bg-amber-500'
                     : 'bg-budget-pacing'
               "
               :style="{
-                width: `${budgetLimit > 0 ? Math.min(100, (budgetSpent / budgetLimit) * 100) : 0}%`,
+                width: `${spentPercent}%`,
               }"
             />
           </div>

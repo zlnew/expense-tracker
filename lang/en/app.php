@@ -77,6 +77,7 @@ return [
     'date_to' => 'Date To',
     'days' => 'Days',
     'days_overdue' => 'days overdue',
+    'days_remaining' => 'Days remaining',
     'december' => 'December',
     'delete' => 'Delete',
     'delete_account' => 'Delete Account',

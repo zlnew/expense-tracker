@@ -60,8 +60,23 @@ const totalExpense = computed(() => {
   return breakdownItems.value.reduce((sum, item) => sum + item.amount, 0)
 })
 
+const CATEGORY_PALETTE = [
+  '#10b981', // emerald
+  '#8b5cf6', // violet
+  '#f59e0b', // amber
+  '#f43f5e', // rose
+  '#06b6d4', // cyan
+  '#3b82f6', // blue
+  '#ec4899', // pink
+  '#14b8a6', // teal
+] as const
+
+const getCategoryColor = (index: number) => {
+  return CATEGORY_PALETTE[index % CATEGORY_PALETTE.length]
+}
+
 const donutColor = (_d: ExpenseBreakdown, i: number) => {
-  return `var(--chart-${(i % 8) + 1})`
+  return getCategoryColor(i)
 }
 
 const donutConfig = {
@@ -168,7 +183,7 @@ const donutTriggers = {
             <div class="flex items-center gap-2 truncate pr-2">
               <span
                 class="size-2.5 shrink-0 rounded-full"
-                :style="{ backgroundColor: `var(--chart-${(i % 8) + 1})` }"
+                :style="{ backgroundColor: getCategoryColor(i) }"
               />
               <span class="truncate font-medium text-foreground">
                 {{ item.category }}

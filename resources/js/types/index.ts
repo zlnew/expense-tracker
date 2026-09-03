@@ -148,6 +148,9 @@ export type SummaryCards = {
   budget_remaining: number
   has_active_budget: boolean
   active_budget_id: number | null
+  cycle_start?: string
+  cycle_end?: string
+  cutoff_day?: number | null
 }
 
 export type BudgetProgress = BudgetItem[]
