@@ -43,13 +43,13 @@ const pageTitle = computed(() => {
 // Hide-on-scroll-down / show-on-scroll-up (modern mobile app bar behavior).
 // Mobile/tablet-only (<lg): the desktop sidebar provides its own chrome, and
 // hiding the desktop trigger/breadcrumbs on scroll is jarring.
-const isMobile = window.matchMedia('(max-width: 1023.98px)')
+const isMobile = ref(false)
 const hidden = ref(false)
 let lastScrollY = 0
 let ticking = false
 
 function onScroll() {
-  if (ticking || !isMobile.matches) {
+  if (ticking || !isMobile.value) {
     return
   }
 
@@ -76,12 +76,17 @@ function onScroll() {
 }
 
 onMounted(() => {
-  lastScrollY = window.scrollY
-  window.addEventListener('scroll', onScroll, { passive: true })
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.matchMedia('(max-width: 1023.98px)').matches
+    lastScrollY = window.scrollY
+    window.addEventListener('scroll', onScroll, { passive: true })
+  }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', onScroll)
+  }
 })
 </script>
 

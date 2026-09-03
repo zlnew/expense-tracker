@@ -418,7 +418,7 @@ const setActive = () => {
                       </span>
                       <span
                         v-if="exp.actual_amount > exp.planned_amount"
-                        class="inline-flex items-center gap-0.5 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-semibold text-rose-600 dark:bg-rose-950/20 dark:text-rose-400"
+                        class="inline-flex items-center gap-0.5 rounded-full bg-expense/15 px-1.5 py-0.5 text-[9px] font-semibold text-expense"
                       >
                         <AlertTriangle class="size-2.5" />
                         {{ __('overspent') }}
@@ -477,8 +477,8 @@ const setActive = () => {
                     <span
                       :class="
                         exp.diff_amount < 0
-                          ? 'text-rose-500'
-                          : 'text-emerald-500'
+                          ? 'font-bold text-expense'
+                          : 'font-medium text-income'
                       "
                     >
                       {{
