@@ -5,8 +5,8 @@ import { login } from './helpers/auth'
  * US-4 — Balance reconcile: record the counted amount on a balance, see the
  * drift vs Active and get flagged when |drift| > tolerance.
  *
- * Drift semantics (app/Models/Balance.php): drift = reconciled_amount −
- * final_amount; flagged when abs(drift) > DRIFT_TOLERANCE = 500. The card
+ * Drift semantics (app/Models/Balance.php): drift = final_amount −
+ * reconciled_amount; flagged when abs(drift) > DRIFT_TOLERANCE = 500. The card
  * shows a drift row only after a reconcile, with id-ID money formatting.
  *
  * NOTE ON ISOLATION: other spec files in this branch create transactions /
@@ -95,8 +95,8 @@ test.describe('US-4 balance reconcile', () => {
     const driftRow = page.getByTestId('balance-drift-1')
     await expect(driftRow).toBeVisible()
     await expect(driftRow.getByText('Selisih terdeteksi')).toBeVisible()
-    // formatAmount renders the sign after the currency prefix: Rp -100.000.
-    await expect(driftRow).toContainText('Rp -100.000')
+    // formatAmount renders the positive drift: Rp 100.000.
+    await expect(driftRow).toContainText('Rp 100.000')
 
     // Flag styling lives on the row itself (border/ring/text).
     await expect(driftRow).toHaveClass(/text-destructive/)

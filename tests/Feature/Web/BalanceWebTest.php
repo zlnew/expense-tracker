@@ -101,7 +101,7 @@ test('balance can be reconciled with drift calculation', function () {
     $response->assertRedirect();
     $fresh = $this->balance->fresh();
     expect($fresh->reconciled_amount)->toBe(950000)
-        ->and($fresh->drift)->toBe(-50000);
+        ->and($fresh->drift)->toBe(50000);
 });
 
 test('balance can be deleted', function () {
