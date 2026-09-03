@@ -64,18 +64,18 @@ const statusVariant = (status: SinkingFund['status']) => {
 
 const progressColor = (status: SinkingFund['status']) => {
   if (status === 'overfunded') {
-    return 'bg-[var(--chart-1)]'
+    return 'bg-income'
   }
 
   if (status === 'due_soon') {
-    return 'bg-[var(--chart-3)]'
+    return 'bg-expense'
   }
 
   if (status === 'underfunded') {
-    return 'bg-[var(--chart-2)]'
+    return 'bg-amber-500'
   }
 
-  return 'bg-[var(--chart-4)]'
+  return 'bg-reserved'
 }
 
 const openCreate = () => {

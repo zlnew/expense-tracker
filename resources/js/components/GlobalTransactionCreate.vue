@@ -23,12 +23,37 @@ function openDialog() {
   open.value = true
 }
 
+function onKeydown(e: KeyboardEvent) {
+  if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) {
+    return
+  }
+
+  const target = e.target as HTMLElement | null
+
+  if (
+    target &&
+    (target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.tagName === 'SELECT' ||
+      target.isContentEditable)
+  ) {
+    return
+  }
+
+  if (e.key === 'c' || e.key === 'C') {
+    e.preventDefault()
+    openDialog()
+  }
+}
+
 onMounted(() => {
   window.addEventListener('open:transaction-create', openDialog)
+  window.addEventListener('keydown', onKeydown)
 })
 
 onUnmounted(() => {
   window.removeEventListener('open:transaction-create', openDialog)
+  window.removeEventListener('keydown', onKeydown)
 })
 </script>
 

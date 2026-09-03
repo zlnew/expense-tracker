@@ -32,11 +32,11 @@ const props = defineProps<Props>()
 <template>
   <!-- Desktop: table (md+) -->
   <div
-    class="hidden overflow-x-clip rounded-md border bg-background md:block"
+    class="hidden overflow-x-clip rounded-xl border border-border/70 bg-card md:block"
     :class="props.class"
   >
     <Table class="w-full">
-      <TableHeader class="sticky top-0 z-10 bg-background">
+      <TableHeader class="sticky top-0 z-10 bg-card">
         <TableRow>
           <TableHead
             v-for="(col, i) in props.columns"
@@ -64,11 +64,11 @@ const props = defineProps<Props>()
   </div>
 
   <!-- Mobile: cards (<md) -->
-  <div class="grid grid-cols-1 gap-4 md:hidden">
+  <div class="grid grid-cols-1 gap-3 md:hidden">
     <div
       v-for="(row, i) in props.rows"
       :key="i"
-      class="rounded-lg border bg-background p-4 shadow-sm"
+      class="rounded-xl border border-border/70 bg-card p-4 text-card-foreground shadow-sm"
     >
       <slot name="card" :row="row" :index="i">
         <div v-for="(col, j) in props.columns" :key="j" class="mb-1">

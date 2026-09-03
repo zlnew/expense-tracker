@@ -482,8 +482,8 @@ const rowActions = (t: Transaction) => [
                 class="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase"
                 :class="
                   t.type === 'income'
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    ? 'bg-income/15 text-income'
+                    : 'bg-expense/15 text-expense'
                 "
               >
                 {{ __(t.type) }}
@@ -495,8 +495,8 @@ const rowActions = (t: Transaction) => [
                   class="flex size-10 shrink-0 items-center justify-center rounded-full"
                   :class="
                     t.type === 'income'
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      ? 'bg-income/10 text-income'
+                      : 'bg-expense/10 text-expense'
                   "
                 >
                   <component
@@ -521,11 +521,9 @@ const rowActions = (t: Transaction) => [
               </div>
               <div class="shrink-0 text-right">
                 <p
-                  class="text-lg font-bold"
+                  class="text-lg font-bold tabular-nums"
                   :class="
-                    t.type === 'income'
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
+                    t.type === 'income' ? 'text-income' : 'text-foreground'
                   "
                 >
                   {{ t.type === 'income' ? '+' : '-'
