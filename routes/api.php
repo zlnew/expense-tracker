@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BudgetApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\FundApiController;
 use App\Http\Controllers\Api\ImpendingDrainsApiController;
+use App\Http\Controllers\Api\McpApiController;
 use App\Http\Controllers\Api\RecurringTransactionApiController;
 use App\Http\Controllers\Api\TransactionApiController;
 use App\Http\Controllers\Api\UpcomingFundApiController;
@@ -16,6 +17,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // middleware: it filters the route table by the token's own abilities.
     Route::get('contract', ApiContractController::class)
         ->name('api.contract');
+
+    // MCP endpoint — Model Context Protocol over JSON-RPC 2.0
+    Route::post('mcp', McpApiController::class)
+        ->name('api.mcp');
 
     // Transactions — GET is read, everything else is write. Per-method
     // abilities can't ride on a single apiResource (Sanctum's abilities
