@@ -22,6 +22,7 @@ class BalanceData extends Data
         public bool $is_primary = false,
         public int $reserved = 0,
         public int $real = 0,
+        public int $real_balance = 0,
         public ?UserData $user = null,
         #[DataCollectionOf(TransactionData::class)]
         public ?DataCollection $transactions = null,

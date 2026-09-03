@@ -25,8 +25,8 @@ class TransactionsSaveRequest extends FormRequest
     {
         return [
             'items.*.balance_id' => ['required', 'exists:balances,id'],
-            'items.*.budget_id' => ['required', 'exists:budgets,id'],
-            'items.*.budget_item_id' => ['required', 'exists:budget_items,id'],
+            'items.*.budget_id' => ['nullable', 'exists:budgets,id'],
+            'items.*.budget_item_id' => ['nullable', 'exists:budget_items,id'],
             'items.*.category_id' => ['required', 'exists:categories,id'],
             'items.*.type' => ['required', new Enum(CategoryType::class)],
             'items.*.date' => ['required', 'date'],

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable|null $updated_at
  * @property-read int|null $drift
  * @property-read bool $is_drift_flagged
+ * @property-read int $real_balance
  * @property-read Collection<int, Transaction> $transactions
  * @property-read int|null $transactions_count
  * @property-read User $user
@@ -61,9 +62,16 @@ class Balance extends Model
         ];
     }
 
-    protected $appends = ['drift', 'is_drift_flagged'];
+    protected $appends = ['drift', 'is_drift_flagged', 'real_balance'];
 
     public const DRIFT_TOLERANCE = 500;
+
+    public function getRealBalanceAttribute(): int
+    {
+        $reserved = GetBalanceInsight::reservedForBalanceId($this->id);
+
+        return (int) $this->final_amount - $reserved;
+    }
 
     public function getDriftAttribute(): ?int
     {
@@ -71,7 +79,7 @@ class Balance extends Model
             return null;
         }
 
-        return (int) $this->reconciled_amount - (int) $this->final_amount;
+        return (int) $this->final_amount - (int) $this->reconciled_amount;
     }
 
     public function getIsDriftFlaggedAttribute(): bool

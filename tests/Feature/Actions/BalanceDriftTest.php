@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 /**
  * US-4 balance-drift coverage (t_dd9cb24b FLAG-1).
  *
- * Drift model: reconciled_amount − final_amount, computed by the Balance
+ * Drift model: final_amount − reconciled_amount, computed by the Balance
  * accessors and surfaced through BalanceData (drift / is_drift_flagged are
  * appended attributes). A card is flagged only outside ±Rp 500 tolerance
  * (Balance::DRIFT_TOLERANCE). Reconciling happens over two authenticated
@@ -35,18 +35,19 @@ test('drift flag respects the ±500 tolerance boundary', function () {
 
     // |drift| == tolerance stays green, one rupiah past it goes red.
     $atTolerance = Balance::factory()->for($user)->create(['final_amount' => 100_000]);
-    $atTolerance->reconciled_amount = 100_500;
+    $atTolerance->reconciled_amount = 99_500;
     expect($atTolerance->drift)->toBe(500);
     expect($atTolerance->is_drift_flagged)->toBeFalse();
 
     $pastTolerance = Balance::factory()->for($user)->create(['final_amount' => 100_000]);
-    $pastTolerance->reconciled_amount = 99_499;
+    $pastTolerance->reconciled_amount = 100_501;
     expect($pastTolerance->drift)->toBe(-501);
     expect($pastTolerance->is_drift_flagged)->toBeTrue();
 
     // Sign doesn't matter — both directions of shrinkage/growth are drift.
     $positiveDrift = Balance::factory()->for($user)->create(['final_amount' => 200_000]);
-    $positiveDrift->reconciled_amount = 201_000;
+    $positiveDrift->reconciled_amount = 199_000;
+    expect($positiveDrift->drift)->toBe(1_000);
     expect($positiveDrift->is_drift_flagged)->toBeTrue();
 });
 
@@ -109,7 +110,7 @@ test('api reconcile stores the reconciliation and echoes the drift surface', fun
 
     // The response carries the full drift surface the UI renders from.
     expect($res->json('reconciled_amount'))->toBe(1_999_000);
-    expect($res->json('drift'))->toBe(-1_000);
+    expect($res->json('drift'))->toBe(1_000);
     expect($res->json('is_drift_flagged'))->toBeTrue();
 
     $balance->refresh();

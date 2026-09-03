@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Budget;
 use App\Models\BudgetItem;
+use App\Models\Category;
 
 /**
  * Resolve the budget link for a transaction being saved through the API,
@@ -61,11 +62,25 @@ class ResolveTransactionBudgetLink extends Action
             return ['budget_id' => null, 'budget_item_id' => null];
         }
 
-        $itemId = BudgetItem::query()
+        $category = Category::query()->find($this->categoryId);
+        if (! $category) {
+            return ['budget_id' => $budgetId, 'budget_item_id' => null];
+        }
+
+        $item = BudgetItem::query()
             ->where('budget_id', $budgetId)
             ->where('category_id', $this->categoryId)
-            ->value('id');
+            ->first();
 
-        return ['budget_id' => $budgetId, 'budget_item_id' => $itemId ?: null];
+        if (! $item) {
+            $item = BudgetItem::query()->create([
+                'budget_id' => $budgetId,
+                'category_id' => $category->id,
+                'type' => $category->type,
+                'planned_amount' => 0,
+            ]);
+        }
+
+        return ['budget_id' => $budgetId, 'budget_item_id' => $item->id];
     }
 }
