@@ -33,5 +33,6 @@ class TransactionData extends Data
         public ?BudgetItemData $budget_item,
         public ?CategoryData $category,
         public ?string $transfer_group_id = null,
+        public bool $is_transfer = false,
     ) {}
 }

@@ -45,7 +45,8 @@ class GetMonthlySpendingTrend extends Action
                 [$cutoffDay],
             )
             ->where('user_id', $this->user->id)
-            ->where('budget_id', $this->activeBudget->id);
+            ->where('budget_id', $this->activeBudget->id)
+            ->excludeInternalTransfers();
 
         // Plain DB builder: Transaction::query() would re-apply the SoftDeletes
         // scope against the outer FROM (the aliased subquery), producing

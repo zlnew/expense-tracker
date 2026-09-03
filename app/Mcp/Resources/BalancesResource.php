@@ -49,7 +49,8 @@ class BalancesResource implements ResourceInterface
                 'is_primary' => (bool) $b->is_primary,
                 'active_amount' => $insight['active'],
                 'reserved_amount' => $insight['reserved'],
-                'real_amount' => $insight['real'],
+                'real_amount' => $b->real_balance,
+                'real_balance' => $b->real_balance,
                 'reconciled_amount' => $b->reconciled_amount,
                 'drift' => $b->drift,
             ];
