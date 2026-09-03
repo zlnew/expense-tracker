@@ -37,6 +37,7 @@ budget_list,"Budget List","List Budget"
 budget_list_description,"Manage and monitor your budgets","Kelola dan pantau anggaran Anda"
 budget_progress,"Budget Progress","Progress Anggaran Pengeluaran"
 budget_progress_description,"Track how much of your budget has been used and how much remains.","Pantau seberapa banyak anggaran yang sudah digunakan dan yang masih tersisa."
+budget_status,"Budget Pacing","Status Anggaran"
 budget_update_description,"Update and adjust your monthly budget plans","Perbarui dan sesuaikan perencanaan anggaran bulanan Anda"
 budgets,Budgets,Anggaran
 cadence,Cadence,Kadens
@@ -89,6 +90,7 @@ deleting,Deleting...,Menghapus...
 description,Description,Deskripsi
 detail,Detail,Detail
 detail_data,":data Detail","Detail :data"
+details,Details,Detail
 diff,Diff,Diff
 discord_webhook_url,"Discord webhook URL","URL webhook Discord"
 discord_webhook_url_description,"Receive a Discord notification when a budget category reaches 80% or 100% of its planned amount.","Dapatkan notifikasi Discord saat kategori anggaran mencapai 80% atau 100% dari jumlah yang direncanakan."
@@ -138,6 +140,9 @@ inactive,Inactive,"Tidak Aktif"
 income,Income,Pemasukan
 incomes,Incomes,Pemasukan
 initial_amount,"Initial Amount","Saldo Awal"
+install,Install,Pasang
+install_app,"Install Expense Tracker","Pasang Aplikasi Pengeluaran"
+install_app_description,"Add to home screen for instant, offline access.","Tambahkan ke layar utama untuk akses instan dan offline."
 install_banner_action,Install,Pasang
 install_banner_description,"Add Expense Tracker to your home screen for quick access.","Tambahkan Expense Tracker ke layar utama untuk akses cepat."
 install_banner_dismiss,"Dismiss install banner","Tutup banner pemasangan"
@@ -153,6 +158,7 @@ july,July,Juli
 june,June,Juni
 last_set_aside,"Last set aside","Terakhir menyisihkan"
 last_updated_at,"Last Updated At","Terakhir Diperbarui"
+limit,Limit,Batas
 list,List,List
 loading,Loading,Memuat
 log_out,"Log Out",Keluar
@@ -181,6 +187,7 @@ no_breakdown_data_description,"Expenses from this budget cycle will appear here.
 no_data_found,"No :data found",":data tidak ditemukan"
 no_impending_drains,"No drains due in this window","No drains due in this window"
 no_impending_drains_description,"Funds and recurring inside the window will appear here.","Funds and recurring inside the window will appear here."
+no_transactions,"No transactions yet","Belum ada transaksi"
 no_trend_data,"No spending trend yet","Belum ada tren pengeluaran"
 no_trend_data_description,"Income and expenses from this budget cycle will appear here.","Pemasukan dan pengeluaran dari siklus anggaran ini akan muncul di sini."
 notes,Notes,Catatan
@@ -227,6 +234,7 @@ remaining,Remaining,Sisa
 remaining_budget,"Remaining Budget","Sisa Anggaran"
 remove_item,"Remove item","Hapus item"
 reserved,Reserved,Reserved
+reserved_in_funds,"Reserved in Funds","Dicadangkan di Dana"
 reset,Reset,"Atur Ulang"
 resume_recurring,"Resume Recurring","Lanjutkan Berulang"
 retry,Retry,"Coba Lagi"
@@ -260,6 +268,7 @@ sinking_funds,"Sinking Funds","Dana Cadangan"
 skip_to_content,"Skip to content","Langsung ke konten"
 something_went_wrong,"Something went wrong.","Terjadi kesalahan."
 source_balance,"Source balance","Source balance"
+spendable,Spendable,"Dapat Digunakan"
 spent,Used,Terpakai
 start_date,"Start Date","Tanggal Mulai"
 status,Status,Status
@@ -269,6 +278,7 @@ target_amount,"Target amount","Jumlah target"
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
 toggle_sidebar,"Toggle sidebar","Buka/tutup bilah samping"
+top_envelopes,"Top Envelopes","Amplop Utama"
 total,Total,Total
 total_balance,"Total Balance","Total Saldo"
 total_expense,"Total Expense","Total Pengeluaran"
