@@ -120,7 +120,7 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
                   >•</span
                 >
                 <span v-if="t.balance?.name" class="truncate">
-                  {{ t.balance.name }}
+                  via {{ t.balance.name }}
                 </span>
               </div>
             </div>
