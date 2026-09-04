@@ -66,6 +66,26 @@ test('oauth authorize user approval generates code and redirects to callback', f
         ->and($authCode->code_challenge)->toBe('sample-challenge');
 });
 
+test('oauth authorize user approval with inertia returns 409 location header', function () {
+    $this->actingAs($this->user);
+
+    $response = $this->withHeaders(['X-Inertia' => 'true'])
+        ->post('/oauth/authorize', [
+            'client_id' => $this->client->id,
+            'redirect_uri' => 'https://gemini.google.com/auth/callback',
+            'state' => 'xyz-state-123',
+            'action' => 'approve',
+            'code_challenge' => 'sample-challenge',
+            'code_challenge_method' => 'S256',
+        ]);
+
+    $response->assertStatus(409);
+    $location = $response->headers->get('X-Inertia-Location');
+    expect($location)->toContain('https://gemini.google.com/auth/callback')
+        ->and($location)->toContain('code=')
+        ->and($location)->toContain('state=xyz-state-123');
+});
+
 test('oauth authorize user denial redirects with access_denied error', function () {
     $this->actingAs($this->user);
 
@@ -77,6 +97,22 @@ test('oauth authorize user denial redirects with access_denied error', function 
     ]);
 
     $response->assertRedirect('https://gemini.google.com/auth/callback?error=access_denied&state=xyz-state-123');
+});
+
+test('oauth authorize user denial with inertia returns 409 location header', function () {
+    $this->actingAs($this->user);
+
+    $response = $this->withHeaders(['X-Inertia' => 'true'])
+        ->post('/oauth/authorize', [
+            'client_id' => $this->client->id,
+            'redirect_uri' => 'https://gemini.google.com/auth/callback',
+            'state' => 'xyz-state-123',
+            'action' => 'deny',
+        ]);
+
+    $response->assertStatus(409);
+    $location = $response->headers->get('X-Inertia-Location');
+    expect($location)->toBe('https://gemini.google.com/auth/callback?error=access_denied&state=xyz-state-123');
 });
 
 test('oauth token exchange with authorization_code and pkce S256 issues working tokens', function () {
