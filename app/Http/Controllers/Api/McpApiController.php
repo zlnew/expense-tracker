@@ -11,6 +11,15 @@ class McpApiController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
+        if ($request->isMethod('GET')) {
+            return response()->json([
+                'name' => 'expense-tracker-mcp',
+                'version' => '1.0.0',
+                'protocolVersion' => '2024-11-05',
+                'transport' => 'http',
+            ]);
+        }
+
         $payload = $request->json()->all();
 
         if (empty($payload) || ! is_array($payload)) {

@@ -5,6 +5,7 @@ import { onUnmounted, ref } from 'vue'
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController'
 import Heading from '@/components/Heading.vue'
 import InputError from '@/components/InputError.vue'
+import OAuthClientsManager from '@/components/OAuthClientsManager.vue'
 import PasswordInput from '@/components/PasswordInput.vue'
 import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue'
 import TwoFactorSetupModal from '@/components/TwoFactorSetupModal.vue'
@@ -171,5 +172,9 @@ onUnmounted(() => clearTwoFactorAuthData())
       :requiresConfirmation="requiresConfirmation"
       :twoFactorEnabled="twoFactorEnabled"
     />
+  </div>
+
+  <div class="mt-6 border-t border-border pt-6">
+    <OAuthClientsManager />
   </div>
 </template>
