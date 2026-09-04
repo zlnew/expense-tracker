@@ -78,7 +78,7 @@ test('mcp server lists all available tools with valid input schemas', function (
 
     $tools = $response['result']['tools'];
     expect($tools)->toBeArray()
-        ->and(count($tools))->toBe(13);
+        ->and(count($tools))->toBe(14);
 
     $toolNames = collect($tools)->pluck('name')->all();
 
@@ -92,6 +92,7 @@ test('mcp server lists all available tools with valid input schemas', function (
         ->toContain('pay_from_fund')
         ->toContain('create_fund_contribution')
         ->toContain('reconcile_balance')
+        ->toContain('sync_financial_integrity')
         ->toContain('list_categories')
         ->toContain('list_funds')
         ->toContain('list_recurring_transactions');
@@ -747,4 +748,55 @@ test('artisan mcp:serve command executes single request via --request option', f
 
     expect($output)->toContain('"jsonrpc":"2.0"')
         ->and($output)->toContain('expense-tracker-mcp');
+});
+
+test('mcp tool sync_financial_integrity audits balances, reports discrepancies, and can resync', function () {
+    $server = new McpServer($this->user);
+
+    // Create a transaction without updating balance final_amount
+    Transaction::factory()->create([
+        'user_id' => $this->user->id,
+        'balance_id' => $this->balance->id,
+        'category_id' => $this->category->id,
+        'type' => 'expense',
+        'amount' => 50_000,
+    ]);
+
+    // 1. Dry run
+    $responseDry = $server->handle([
+        'jsonrpc' => '2.0',
+        'id' => 99,
+        'method' => 'tools/call',
+        'params' => [
+            'name' => 'sync_financial_integrity',
+            'arguments' => [
+                'dry_run' => true,
+            ],
+        ],
+    ]);
+
+    expect($responseDry['result']['content'][0]['text'])->toContain('DRY-RUN')
+        ->and($responseDry['result']['content'][0]['text'])->toContain('DISCREPANCY');
+
+    // Balance should still be unchanged
+    expect($this->balance->fresh()->final_amount)->toBe(500_000);
+
+    // 2. Active run with sync
+    $responseActive = $server->handle([
+        'jsonrpc' => '2.0',
+        'id' => 100,
+        'method' => 'tools/call',
+        'params' => [
+            'name' => 'sync_financial_integrity',
+            'arguments' => [
+                'dry_run' => false,
+            ],
+        ],
+    ]);
+
+    expect($responseActive['result']['content'][0]['text'])->toContain('ACTIVE')
+        ->and($responseActive['result']['content'][0]['text'])->toContain('FIXED');
+
+    // Balance should now be resynced: 500,000 - 50,000 = 450,000
+    expect($this->balance->fresh()->final_amount)->toBe(450_000);
 });

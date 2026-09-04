@@ -36,21 +36,27 @@ class BalancesResource implements ResourceInterface
             ->orderBy('name')
             ->get();
 
+        $ids = $balances->pluck('id')->all();
+        $reservedById = GetBalanceInsight::reservedByBalanceId($ids);
+
         $rows = [];
         $totalReal = 0;
 
         foreach ($balances as $b) {
-            $insight = GetBalanceInsight::run($b);
-            $totalReal += $insight['real'];
+            $active = (int) $b->final_amount;
+            $reserved = (int) ($reservedById[$b->id] ?? 0);
+            $real = $active - $reserved;
+
+            $totalReal += $real;
 
             $rows[] = [
                 'id' => $b->id,
                 'name' => $b->name,
                 'is_primary' => (bool) $b->is_primary,
-                'active_amount' => $insight['active'],
-                'reserved_amount' => $insight['reserved'],
-                'real_amount' => $b->real_balance,
-                'real_balance' => $b->real_balance,
+                'active_amount' => $active,
+                'reserved_amount' => $reserved,
+                'real_amount' => $real,
+                'real_balance' => $real,
                 'reconciled_amount' => $b->reconciled_amount,
                 'drift' => $b->drift,
             ];

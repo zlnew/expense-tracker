@@ -104,4 +104,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function oauthClients(): HasMany
+    {
+        return $this->hasMany(OAuthClient::class);
+    }
+
+    public function sinkingFunds(): HasMany
+    {
+        return $this->hasMany(SinkingFund::class);
+    }
 }
