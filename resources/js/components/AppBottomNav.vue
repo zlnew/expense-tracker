@@ -8,7 +8,6 @@ import {
   Wallet,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
-import { Button } from '@/components/ui/button'
 import { useLang } from '@/composables/useLang'
 import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
@@ -50,6 +49,13 @@ const leftItems = computed(() => items.slice(0, 2))
 const rightItems = computed(() => items.slice(2))
 
 function openTransactionCreate() {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(15)
+    } catch {
+      // ignore
+    }
+  }
   window.dispatchEvent(new CustomEvent('open:transaction-create'))
 }
 </script>
@@ -58,7 +64,7 @@ function openTransactionCreate() {
   <nav
     data-testid="bottom-nav"
     :aria-label="__('main_navigation')"
-    class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] lg:hidden"
+    class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-[#1f222e] bg-[#0a0a0c]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] lg:hidden"
   >
     <div
       class="relative mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2"
@@ -68,30 +74,33 @@ function openTransactionCreate() {
         <Link
           :href="item.href"
           :aria-current="item.active() ? 'page' : undefined"
-          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-all focus-visible:outline-none"
           :class="
             item.active()
-              ? 'text-primary'
-              : 'text-sidebar-foreground/60 hover:text-sidebar-foreground'
+              ? 'text-emerald-400 font-semibold'
+              : 'text-zinc-500 hover:text-zinc-300'
           "
         >
           <component :is="item.icon" class="size-[22px]" />
-          <span class="text-[10px] font-medium">{{ item.title }}</span>
+          <span class="text-[10px] tracking-tight">{{ item.title }}</span>
+          <span
+            v-if="item.active()"
+            class="h-1 w-1 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
+          />
         </Link>
       </template>
 
       <!-- Center slot: quick-add FAB, raised above the bar -->
       <div class="flex items-center justify-center">
-        <Button
+        <button
+          type="button"
           data-testid="transaction-fab"
-          variant="default"
-          size="icon-lg"
           :aria-label="__('add_transaction')"
-          class="size-14 -translate-y-5 rounded-full shadow-lg ring-4 ring-background transition-transform active:scale-95"
+          class="flex size-14 -translate-y-5 items-center justify-center rounded-full bg-emerald-500 text-[#0a0a0c] shadow-[0_0_22px_rgba(16,185,129,0.5)] ring-4 ring-[#0a0a0c] transition-all active:scale-90 hover:scale-105 hover:bg-emerald-400"
           @click="openTransactionCreate"
         >
-          <Plus class="size-6" />
-        </Button>
+          <Plus class="size-6 stroke-[2.5]" />
+        </button>
       </div>
 
       <!-- Nav links (2 right) -->
@@ -99,15 +108,19 @@ function openTransactionCreate() {
         <Link
           :href="item.href"
           :aria-current="item.active() ? 'page' : undefined"
-          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-all focus-visible:outline-none"
           :class="
             item.active()
-              ? 'text-primary'
-              : 'text-sidebar-foreground/60 hover:text-sidebar-foreground'
+              ? 'text-emerald-400 font-semibold'
+              : 'text-zinc-500 hover:text-zinc-300'
           "
         >
           <component :is="item.icon" class="size-[22px]" />
-          <span class="text-[10px] font-medium">{{ item.title }}</span>
+          <span class="text-[10px] tracking-tight">{{ item.title }}</span>
+          <span
+            v-if="item.active()"
+            class="h-1 w-1 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
+          />
         </Link>
       </template>
     </div>

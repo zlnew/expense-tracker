@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import TransactionCreateDialog from '@/components/dialogs/TransactionCreateDialog.vue'
+import NumpadExpenseSheet from '@/components/NumpadExpenseSheet.vue'
 import type { Balance, Budget, Category } from '@/types'
 
-// Global quick-add dialog: mounted once in the app layout, opened by the
+// Global quick-add sheet: mounted once in the app layout, opened by the
 // mobile bottom-nav FAB (CustomEvent 'open:transaction-create') from ANY page.
 const page = usePage()
 const open = ref(false)
@@ -58,7 +58,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <TransactionCreateDialog
+  <NumpadExpenseSheet
     v-model:open="open"
     :balances="balances"
     :budgets="budgets"

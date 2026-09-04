@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { AlertTriangle, CalendarClock, Clock3 } from 'lucide-vue-next'
 import { ref, onMounted, watch, computed } from 'vue'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -108,58 +99,74 @@ watch(windowDays, fetchDrains)
 </script>
 
 <template>
-  <Card class="border-border/50 bg-card shadow-xs">
-    <CardHeader
-      class="flex flex-row items-start justify-between gap-3 space-y-0"
+  <div
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+  >
+    <!-- Header -->
+    <div
+      class="flex flex-row items-start justify-between gap-3 pb-4 border-b border-[#1f222e]/60 mb-4"
     >
       <div>
-        <CardTitle
-          class="flex items-center gap-2 text-base font-bold text-foreground"
+        <div
+          class="flex items-center gap-2 font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide"
         >
-          <CalendarClock class="size-4 text-muted-foreground" />
+          <span
+            class="inline-flex size-7 items-center justify-center rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-400"
+          >
+            <CalendarClock class="size-4" />
+          </span>
           {{ __('impending_drains') }}
-        </CardTitle>
-        <CardDescription class="mt-1 text-xs">
+        </div>
+        <p class="mt-1 font-mono text-[11px] text-zinc-500">
           {{ __('impending_drains_description', { days: String(windowDays) }) }}
           <span v-if="data" class="tabular-nums">
             · {{ formatDate(data.from) }} → {{ formatDate(data.until) }}</span
           >
-        </CardDescription>
+        </p>
       </div>
       <div class="flex items-center gap-1.5">
-        <Button
+        <button
           v-for="w in [30, 60, 90]"
           :key="w"
-          :variant="windowDays === w ? 'secondary' : 'ghost'"
-          size="sm"
-          class="h-7 px-2.5 text-xs"
+          type="button"
+          class="h-7 px-2.5 font-mono text-xs font-semibold rounded-lg border transition-all"
+          :class="
+            windowDays === w
+              ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300 shadow-xs'
+              : 'border-[#1f222e] bg-[#121217] text-zinc-500 hover:text-zinc-300'
+          "
           @click="windowDays = w"
         >
           {{ w }}d
-        </Button>
+        </button>
       </div>
-    </CardHeader>
-    <CardContent class="pt-2 pb-5">
-      <Skeleton v-if="loading" class="h-[140px] w-full" />
+    </div>
+
+    <!-- Content -->
+    <div>
+      <div
+        v-if="loading"
+        class="h-[140px] w-full animate-pulse rounded-xl bg-[#121217] border border-[#1f222e]"
+      />
       <div
         v-else-if="!data"
-        class="py-8 text-center text-sm text-muted-foreground"
+        class="py-8 text-center font-mono text-sm text-zinc-500"
       >
         {{ __('failed_to_load') }}
       </div>
       <template v-else>
         <!-- Totals + per-balance projections -->
-        <div class="mb-4 grid gap-3 sm:grid-cols-3">
-          <div class="rounded-lg border border-border/50 bg-muted/20 p-3">
+        <div class="mb-4 grid gap-2.5 sm:grid-cols-3">
+          <div class="rounded-xl border border-[#1f222e] bg-[#121217] p-3">
             <p
-              class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+              class="font-mono text-[10px] font-semibold tracking-wider text-zinc-500 uppercase"
             >
               {{ __('total_impending') }}
             </p>
-            <p class="mt-1 font-mono text-sm font-bold text-foreground">
+            <p class="mt-1 font-mono text-sm font-extrabold text-rose-400 tabular-nums">
               {{ formatAmount(data.total_impending_outflow) }}
             </p>
-            <p class="text-[11px] text-muted-foreground">
+            <p class="font-mono text-[11px] text-zinc-500">
               {{ __('fund_dues') }} {{ formatAmount(fundDuesTotal) }} ·
               {{ __('recurring') }} {{ formatAmount(recurringTotal) }}
             </p>
@@ -167,33 +174,33 @@ watch(windowDays, fetchDrains)
           <div
             v-for="p in data.per_balance"
             :key="p.balance_id"
-            class="rounded-lg border p-3"
+            class="rounded-xl border p-3"
             :class="
               p.would_go_negative
-                ? 'border-amber-200 bg-amber-50/60 dark:border-amber-900/40 dark:bg-amber-950/20'
-                : 'border-border/50 bg-muted/20'
+                ? 'border-rose-500/40 bg-rose-500/10'
+                : 'border-[#1f222e] bg-[#121217]'
             "
           >
             <p
-              class="truncate text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+              class="truncate font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase"
             >
               {{ p.balance_name }}
             </p>
             <p
-              class="mt-1 flex items-center gap-1 font-mono text-sm font-bold"
+              class="mt-1 flex items-center gap-1 font-mono text-sm font-bold tabular-nums"
               :class="
                 p.would_go_negative
-                  ? 'text-amber-700 dark:text-amber-400'
-                  : 'text-foreground'
+                  ? 'text-rose-400'
+                  : 'text-zinc-100'
               "
             >
               <AlertTriangle
                 v-if="p.would_go_negative"
-                class="size-3.5 shrink-0"
+                class="size-3.5 shrink-0 text-rose-400"
               />
               {{ __('free_after') }} {{ formatAmount(p.projected_free_after) }}
             </p>
-            <p class="text-[11px] text-muted-foreground">
+            <p class="font-mono text-[11px] text-zinc-500">
               Real {{ formatAmount(p.real) }} − {{ formatAmount(p.impending) }}
             </p>
           </div>
@@ -201,34 +208,34 @@ watch(windowDays, fetchDrains)
 
         <div
           v-if="data.items.length === 0"
-          class="flex flex-col items-center justify-center py-8 text-center text-muted-foreground"
+          class="flex flex-col items-center justify-center py-8 text-center text-zinc-500"
         >
-          <Clock3 class="mb-2 size-8 stroke-1 text-muted-foreground/30" />
-          <span class="text-sm font-medium">{{
+          <Clock3 class="mb-2 size-8 stroke-1 text-zinc-700" />
+          <span class="font-mono text-sm font-medium text-zinc-400">{{
             __('no_impending_drains')
           }}</span>
-          <span class="text-xs">{{
+          <span class="font-mono text-xs text-zinc-600">{{
             __('no_impending_drains_description')
           }}</span>
         </div>
-        <div v-else class="divide-y divide-border/40">
+        <div v-else class="divide-y divide-[#1f222e]/60">
           <div
             v-for="item in data.items"
             :key="`${item.kind}-${item.id}-${item.due_date}`"
-            class="flex items-center justify-between gap-3 px-2 py-3"
+            class="flex items-center justify-between gap-3 py-2.5 px-1"
           >
             <div class="min-w-0">
-              <p class="truncate text-sm font-semibold text-foreground">
+              <p class="truncate font-mono text-sm font-semibold text-zinc-200">
                 {{ item.label }}
               </p>
-              <p class="text-xs text-muted-foreground">
-                <span class="inline-flex items-center gap-1">
+              <p class="font-mono text-xs text-zinc-500">
+                <span class="inline-flex items-center gap-1.5">
                   <span
-                    class="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+                    class="inline-flex rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold"
                     :class="
                       item.kind === 'fund_due'
-                        ? 'bg-violet-50 text-violet-600 dark:bg-violet-950/30 dark:text-violet-400'
-                        : 'bg-sky-50 text-sky-600 dark:bg-sky-950/30 dark:text-sky-400'
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                        : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                     "
                     >{{
                       item.kind === 'fund_due'
@@ -241,12 +248,12 @@ watch(windowDays, fetchDrains)
               </p>
             </div>
             <span
-              class="shrink-0 font-mono text-sm font-bold text-foreground"
+              class="shrink-0 font-mono text-sm font-bold text-rose-400 tabular-nums"
               >{{ formatAmount(item.amount) }}</span
             >
           </div>
         </div>
       </template>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>

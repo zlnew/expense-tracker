@@ -5,7 +5,6 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import AppLogoIcon from '@/components/AppLogoIcon.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -120,16 +119,15 @@ onUnmounted(() => {
 
     <!-- Right actions: mask toggle + profile (mobile shows avatar here) -->
     <div class="ml-auto flex items-center gap-1.5">
-      <Button
-        variant="ghost"
-        size="icon"
-        class="h-10 w-10"
+      <button
+        type="button"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-zinc-400 transition-colors hover:border-[#1f222e] hover:bg-[#181820] hover:text-zinc-100"
         :aria-label="__('show_hide_balances')"
         :title="__('show_hide_balances')"
         @click="toggleMask"
       >
-        <component :is="masked ? EyeOff : Eye" class="size-[18px]" />
-      </Button>
+        <component :is="masked ? EyeOff : Eye" class="size-4" />
+      </button>
 
       <DropdownMenu v-if="user">
         <DropdownMenuTrigger as-child>

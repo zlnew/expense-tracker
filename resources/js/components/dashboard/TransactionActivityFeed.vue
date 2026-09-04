@@ -8,14 +8,6 @@ import {
   Receipt,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useMasking } from '@/composables/useMasking'
@@ -36,65 +28,69 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
 </script>
 
 <template>
-  <Card class="border-border/70 bg-card shadow-sm">
-    <CardHeader class="flex flex-row items-center justify-between pb-3">
-      <div class="space-y-1">
+  <div
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+  >
+    <!-- Header -->
+    <div
+      class="flex flex-row items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4"
+    >
+      <div class="space-y-0.5">
         <div class="flex items-center gap-2">
           <span
-            class="inline-flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary"
+            class="inline-flex size-7 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
           >
             <Receipt class="size-4" />
           </span>
-          <CardTitle class="text-base font-bold text-foreground">
+          <h2 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
             {{ __('recent_transactions') }}
-          </CardTitle>
+          </h2>
         </div>
-        <CardDescription class="text-xs">
+        <p class="font-mono text-[11px] text-zinc-500">
           {{ __('recent_transactions_description') }}
-        </CardDescription>
+        </p>
       </div>
 
       <Link :href="transactionIndex.url()">
-        <Button
-          variant="ghost"
-          size="sm"
-          class="h-8 gap-1 px-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+        <span
+          class="inline-flex items-center gap-1 font-mono text-xs text-zinc-400 hover:text-emerald-400 transition-colors"
         >
           {{ __('all_data', { data: __('transactions') }) }}
           <ChevronRight class="size-3.5" />
-        </Button>
+        </span>
       </Link>
-    </CardHeader>
+    </div>
 
-    <CardContent class="pt-1">
+    <!-- Content -->
+    <div>
       <div
         v-if="transactions.length === 0"
         class="flex flex-col items-center justify-center space-y-2 py-8 text-center"
       >
         <div
-          class="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground"
+          class="flex size-10 items-center justify-center rounded-full border border-[#1f222e] bg-[#121217] text-zinc-500"
         >
           <ArrowLeftRight class="size-5" />
         </div>
-        <p class="text-sm font-medium text-muted-foreground">
+        <p class="font-mono text-sm font-medium text-zinc-500">
           {{ __('no_transactions') }}
         </p>
       </div>
 
-      <div v-else class="divide-y divide-border/40">
+      <div v-else class="divide-y divide-[#1f222e]/50">
         <div
           v-for="t in transactions"
           :key="t.id"
-          class="group flex items-center justify-between rounded-xl px-2 py-3 transition-colors hover:bg-muted/30"
+          class="group flex items-center justify-between rounded-xl px-2.5 py-3 transition-colors hover:bg-[#121217]/70"
         >
           <!-- Left: Flow icon & Details -->
           <div class="flex min-w-0 items-center gap-3 pr-3">
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-xl"
+              class="flex size-9 shrink-0 items-center justify-center rounded-xl border transition-colors"
               :class="
                 t.type === 'income'
-                  ? 'bg-income/10 text-income'
-                  : 'bg-muted text-muted-foreground transition-colors group-hover:bg-expense/10 group-hover:text-expense'
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                  : 'border-[#1f222e] bg-[#121217] text-zinc-400 group-hover:border-rose-500/30 group-hover:bg-rose-500/10 group-hover:text-rose-400'
               "
             >
               <ArrowDownLeft v-if="t.type === 'income'" class="size-4" />
@@ -102,24 +98,24 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
             </div>
 
             <div class="min-w-0">
-              <p class="truncate text-sm font-semibold text-foreground">
+              <p class="truncate font-mono text-sm font-semibold text-zinc-100">
                 {{ t.description || t.category?.name || __('transaction') }}
               </p>
               <div
-                class="flex items-center gap-1.5 text-[11px] text-muted-foreground"
+                class="flex items-center gap-1.5 font-mono text-[11px] text-zinc-500"
               >
                 <span
                   v-if="t.category?.name"
-                  class="truncate font-medium text-foreground/80"
+                  class="truncate text-zinc-300"
                 >
                   {{ t.category.name }}
                 </span>
                 <span
                   v-if="t.category?.name && t.balance?.name"
-                  class="text-muted-foreground/40"
+                  class="text-zinc-600"
                   >•</span
                 >
-                <span v-if="t.balance?.name" class="truncate">
+                <span v-if="t.balance?.name" class="truncate text-zinc-400">
                   via {{ t.balance.name }}
                 </span>
               </div>
@@ -129,8 +125,8 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
           <!-- Right: Amount & Timestamp -->
           <div class="shrink-0 text-right">
             <p
-              class="text-sm font-bold tabular-nums"
-              :class="t.type === 'income' ? 'text-income' : 'text-foreground'"
+              class="font-mono text-sm font-bold tabular-nums"
+              :class="t.type === 'income' ? 'text-emerald-400' : 'text-zinc-100'"
             >
               {{
                 masked
@@ -138,12 +134,12 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
                   : (t.type === 'income' ? '+' : '-') + formatAmount(t.amount)
               }}
             </p>
-            <p class="text-[11px] text-muted-foreground">
+            <p class="font-mono text-[11px] text-zinc-500">
               {{ formatDate(t.date) }}
             </p>
           </div>
         </div>
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>

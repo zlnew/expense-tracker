@@ -20,16 +20,6 @@ import BalanceSaveDialog from '@/components/dialogs/BalanceSaveDialog.vue'
 import Heading from '@/components/Heading.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -141,10 +131,14 @@ const rowActions = (b: Balance) => [
           :description="__('balance_list_description')"
           class="mb-0"
         />
-        <Button @click="openCreateDialog">
-          <Plus class="mr-2 size-4" />
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+          @click="openCreateDialog"
+        >
+          <Plus class="size-4 stroke-[2.5]" />
           {{ __('add_data', { data: __('balance') }) }}
-        </Button>
+        </button>
       </div>
 
       <div class="flex flex-col items-center gap-4 lg:flex-row">
@@ -165,106 +159,115 @@ const rowActions = (b: Balance) => [
         :empty-description="__('balance_create_description')"
       >
         <template #empty>
-          <Button @click="openCreateDialog">
-            <Plus class="mr-2 size-4" />
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            @click="openCreateDialog"
+          >
+            <Plus class="size-4 stroke-[2.5]" />
             {{ __('add_data', { data: __('balance') }) }}
-          </Button>
+          </button>
         </template>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          <Card
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
+          <div
             v-for="b in balances.data"
             :key="b.id"
             :data-testid="`balance-card-${String(b.id)}`"
-            :class="[
-              'group relative overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-primary/5',
+            class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl transition-all hover:border-zinc-700"
+            :class="
               b.is_drift_flagged
-                ? 'border-destructive/60 ring-1 ring-destructive/30'
-                : '',
-            ]"
+                ? 'border-rose-500/60 ring-1 ring-rose-500/30'
+                : ''
+            "
           >
-            <div v-if="b.is_primary" class="absolute top-0 right-0 p-2">
-              <Badge
-                variant="secondary"
-                class="border-primary/20 bg-primary/10 text-primary"
+            <!-- Primary Account Neon Badge -->
+            <div v-if="b.is_primary" class="absolute top-4 right-4">
+              <span
+                class="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
               >
-                <CheckCircle2 class="mr-1 size-3" />
+                <CheckCircle2 class="size-3" />
                 {{ __('primary') }}
-              </Badge>
+              </span>
             </div>
 
-            <CardHeader>
-              <CardTitle class="flex items-center gap-2">
-                <Wallet class="size-5 text-primary" />
-                <Link
-                  :href="balanceShow.url({ balance: b })"
-                  class="truncate hover:underline"
+            <div>
+              <!-- Account Header -->
+              <div class="flex items-center gap-2.5 pr-20">
+                <span
+                  class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                 >
-                  {{ b.name }}
-                </Link>
-              </CardTitle>
-              <CardDescription class="line-clamp-2 min-h-[40px]">
-                {{ b.description ?? '-' }}
-              </CardDescription>
-            </CardHeader>
+                  <Wallet class="size-4" />
+                </span>
+                <div class="min-w-0">
+                  <Link
+                    :href="balanceShow.url({ balance: b })"
+                    class="truncate font-mono text-base font-bold text-zinc-100 hover:text-emerald-400 transition-colors"
+                  >
+                    {{ b.name }}
+                  </Link>
+                  <p class="truncate font-mono text-xs text-zinc-500">
+                    {{ b.description ?? '-' }}
+                  </p>
+                </div>
+              </div>
 
-            <CardContent>
-              <div class="space-y-4">
+              <!-- Main Amount Display -->
+              <div class="mt-5 space-y-3.5">
                 <div class="flex items-end justify-between">
-                  <span class="text-sm text-muted-foreground">{{
-                    __('active')
-                  }}</span>
-                  <span class="text-2xl font-bold tracking-tight">
+                  <span class="font-mono text-xs text-zinc-500 uppercase tracking-wider">
+                    {{ __('active') || 'Stored Active' }}
+                  </span>
+                  <span class="font-mono text-2xl font-extrabold text-zinc-100 tabular-nums">
                     {{ formatAmount(b.final_amount) }}
                   </span>
                 </div>
-                <div
-                  class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
-                >
-                  <span>{{ __('reserved') }}</span>
-                  <span>{{ formatAmount(b.reserved ?? 0) }}</span>
-                </div>
-                <div
-                  class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
-                >
-                  <span>{{ __('real_balance') }}</span>
-                  <span class="text-sm font-semibold text-foreground">
-                    {{ formatAmount(b.real ?? 0) }}
-                  </span>
-                </div>
-                <div
-                  class="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground"
-                >
-                  <span>{{ __('initial_amount') }}</span>
-                  <span>{{ formatAmount(b.initial_amount) }}</span>
+
+                <div class="space-y-2 border-t border-[#1f222e]/60 pt-3 text-xs">
+                  <div class="flex items-center justify-between font-mono">
+                    <span class="text-zinc-500">{{ __('real_balance') }}</span>
+                    <span class="font-bold text-emerald-400 tabular-nums">
+                      {{ formatAmount(b.real ?? 0) }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center justify-between font-mono">
+                    <span class="text-zinc-500">{{ __('reserved') }}</span>
+                    <span class="font-medium text-amber-400 tabular-nums">
+                      {{ formatAmount(b.reserved ?? 0) }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center justify-between font-mono text-zinc-500">
+                    <span>{{ __('initial_amount') }}</span>
+                    <span class="tabular-nums">{{ formatAmount(b.initial_amount) }}</span>
+                  </div>
                 </div>
 
-                <!-- Drift (reconciled) row — only when this balance has been reconciled. -->
+                <!-- Drift Reconciliation Strip -->
                 <div
                   v-if="b.reconciled_amount !== null && b.drift !== null"
                   :data-testid="`balance-drift-${String(b.id)}`"
-                  :class="[
-                    'flex items-center justify-between rounded-md border px-3 py-2 text-sm',
+                  class="flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-mono"
+                  :class="
                     b.is_drift_flagged
-                      ? 'border-destructive/40 bg-destructive/10 text-destructive'
-                      : 'border-border bg-muted/40 text-muted-foreground',
-                  ]"
+                      ? 'border-rose-500/40 bg-rose-500/10 text-rose-400'
+                      : 'border-[#1f222e] bg-[#121217] text-zinc-400'
+                  "
                 >
-                  <span class="inline-flex items-center gap-1.5 font-medium">
+                  <span class="inline-flex items-center gap-1.5 font-semibold">
                     <AlertTriangle
                       v-if="b.is_drift_flagged"
-                      class="size-4 shrink-0"
+                      class="size-3.5 shrink-0 text-rose-400"
                     />
-                    <Scale v-else class="size-4 shrink-0 opacity-60" />
+                    <Scale v-else class="size-3.5 shrink-0 opacity-60 text-emerald-400" />
                     {{
                       b.is_drift_flagged ? __('drift_flagged') : __('drift_ok')
                     }}
                   </span>
                   <span
-                    :class="[
-                      'font-mono font-semibold tabular-nums',
-                      b.is_drift_flagged ? 'text-destructive' : '',
-                    ]"
+                    class="font-bold tabular-nums"
+                    :class="b.is_drift_flagged ? 'text-rose-400' : 'text-zinc-200'"
                   >
                     {{ formatAmount(b.drift) }}
                   </span>
@@ -272,16 +275,17 @@ const rowActions = (b: Balance) => [
 
                 <p
                   v-if="b.reconciled_at"
-                  class="text-xs text-muted-foreground"
+                  class="font-mono text-[11px] text-zinc-500"
                   :data-testid="`balance-reconciled-at-${String(b.id)}`"
                 >
                   {{ __('reconciled_at') }}: {{ b.reconciled_at }}
                 </p>
               </div>
-            </CardContent>
+            </div>
 
-            <CardFooter
-              class="flex justify-between gap-2 border-t pt-4 transition-colors"
+            <!-- Footer Actions -->
+            <div
+              class="mt-5 flex items-center justify-between gap-2 border-t border-[#1f222e]/60 pt-4"
             >
               <RowActions
                 :actions="rowActions(b)"
@@ -289,17 +293,16 @@ const rowActions = (b: Balance) => [
                 align="left"
               />
 
-              <Button
+              <button
                 v-if="!b.is_primary"
-                variant="outline"
-                size="sm"
-                class="h-10 md:h-9"
+                type="button"
+                class="rounded-xl border border-[#1f222e] bg-[#121217] px-3 py-1.5 font-mono text-xs font-semibold text-zinc-300 hover:border-emerald-500/40 hover:text-emerald-400 transition-all"
                 @click="setPrimary(b)"
               >
                 {{ __('set_as_primary') }}
-              </Button>
-            </CardFooter>
-          </Card>
+              </button>
+            </div>
+          </div>
         </div>
       </DataListState>
 

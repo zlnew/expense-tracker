@@ -10,14 +10,6 @@ import {
 import { TrendingDown, LineChart, ChevronRight } from 'lucide-vue-next'
 import { computed } from 'vue'
 import ChartEmpty from '@/components/ChartEmpty.vue'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
 import {
   ChartContainer,
   ChartTooltip,
@@ -25,7 +17,6 @@ import {
 } from '@/components/ui/chart'
 import ChartTooltipContent from '@/components/ui/chart/ChartTooltipContent.vue'
 import { componentToString } from '@/components/ui/chart/utils'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useLang } from '@/composables/useLang'
 import { index as budgetIndex } from '@/routes/budgets'
 import type { MonthlySpendingTrend } from '@/types'
@@ -137,40 +128,46 @@ const tickFormatY = (tick: number): string => {
 </script>
 
 <template>
-  <Card class="border-border/70 bg-card shadow-sm">
-    <CardHeader class="flex flex-row items-center justify-between pb-3">
-      <div class="space-y-1">
+  <div
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+  >
+    <!-- Header -->
+    <div
+      class="flex flex-row items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4"
+    >
+      <div class="space-y-0.5">
         <div class="flex items-center gap-2">
           <span
-            class="inline-flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary"
+            class="inline-flex size-7 items-center justify-center rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400"
           >
             <LineChart class="size-4" />
           </span>
-          <CardTitle class="text-base font-bold text-foreground">
+          <h2 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
             {{ __('monthly_spending_trend') }}
-          </CardTitle>
+          </h2>
         </div>
-        <CardDescription class="text-xs">
+        <p class="font-mono text-[11px] text-zinc-500">
           {{ __('monthly_spending_trend_description') }}
-        </CardDescription>
+        </p>
       </div>
 
-      <div class="flex items-center gap-3 text-xs font-semibold">
-        <span class="flex items-center gap-1.5 text-income">
-          <span class="size-2 rounded-full bg-income" />
+      <div class="flex items-center gap-3 font-mono text-xs font-semibold">
+        <span class="flex items-center gap-1.5 text-emerald-400">
+          <span class="size-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
           {{ __('income') }}
         </span>
-        <span class="flex items-center gap-1.5 text-expense">
-          <span class="size-2 rounded-full bg-expense" />
+        <span class="flex items-center gap-1.5 text-rose-400">
+          <span class="size-2 rounded-full bg-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
           {{ __('expense') }}
         </span>
       </div>
-    </CardHeader>
+    </div>
 
-    <CardContent class="pt-1">
-      <Skeleton
+    <!-- Content -->
+    <div>
+      <div
         v-if="monthlySpendingTrend === undefined"
-        class="h-[200px] w-full rounded-xl sm:h-[260px]"
+        class="h-[200px] w-full animate-pulse rounded-xl bg-[#121217] border border-[#1f222e] sm:h-[260px]"
       />
 
       <ChartEmpty
@@ -184,10 +181,13 @@ const tickFormatY = (tick: number): string => {
         "
       >
         <Link v-if="!hasActiveBudget" :href="budgetIndex.url()">
-          <Button size="sm" class="mt-2 gap-1.5 text-xs font-semibold">
+          <button
+            type="button"
+            class="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-all"
+          >
             {{ __('create_budget') }}
             <ChevronRight class="size-3.5" />
-          </Button>
+          </button>
         </Link>
       </ChartEmpty>
 
@@ -232,7 +232,7 @@ const tickFormatY = (tick: number): string => {
                 :y="incomeY"
                 :color="INCOME_COLOR"
                 :size="(d: MonthlySpendingTrend) => (d.income > 0 ? 5 : 0)"
-                strokeColor="var(--card)"
+                strokeColor="#0a0a0c"
                 :strokeWidth="2"
               />
               <VisScatter
@@ -240,7 +240,7 @@ const tickFormatY = (tick: number): string => {
                 :y="expenseY"
                 :color="EXPENSE_COLOR"
                 :size="(d: MonthlySpendingTrend) => (d.expense > 0 ? 5 : 0)"
-                strokeColor="var(--card)"
+                strokeColor="#0a0a0c"
                 :strokeWidth="2"
               />
               <VisAxis type="x" :tickFormat="tickFormatX" :gridLine="false" />
@@ -256,6 +256,6 @@ const tickFormatY = (tick: number): string => {
           </ChartContainer>
         </div>
       </template>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>

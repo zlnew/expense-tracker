@@ -12,7 +12,6 @@ import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
-import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -102,10 +101,14 @@ const rowActions = (c: Data) => [
           :description="__('category_list_description')"
           class="mb-0"
         />
-        <Button @click="createDialogOpen = true">
-          <Plus class="mr-2 size-4" />
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+          @click="createDialogOpen = true"
+        >
+          <Plus class="size-4 stroke-[2.5]" />
           {{ __('add_data', { data: __('category') }) }}
-        </Button>
+        </button>
       </div>
 
       <div class="flex flex-col items-center gap-4 lg:flex-row">
@@ -119,12 +122,12 @@ const rowActions = (c: Data) => [
         <div class="flex w-full gap-2 sm:w-auto">
           <div class="w-full">
             <Select v-model="typeFilter">
-              <SelectTrigger class="w-full bg-background">
+              <SelectTrigger class="w-full border-[#1f222e] bg-[#0a0a0c] font-mono text-xs text-zinc-200">
                 <SelectValue
                   :placeholder="__('all_data', { data: __('types') })"
                 />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent class="border-[#1f222e] bg-[#121217] font-mono text-xs text-zinc-200">
                 <SelectGroup>
                   <SelectItem value="all">
                     {{ __('all_data', { data: __('types') }) }}
@@ -152,10 +155,14 @@ const rowActions = (c: Data) => [
         :empty-description="__('category_list_description')"
       >
         <template #empty>
-          <Button @click="createDialogOpen = true">
-            <Plus class="mr-2 size-4" />
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            @click="createDialogOpen = true"
+          >
+            <Plus class="size-4 stroke-[2.5]" />
             {{ __('add_data', { data: __('category') }) }}
-          </Button>
+          </button>
         </template>
 
         <ResponsiveTable
@@ -164,12 +171,12 @@ const rowActions = (c: Data) => [
             {
               header: __('type'),
               cell: (c) => __(c.type),
-              cellClass: 'w-[100px] text-muted-foreground',
+              cellClass: 'w-[100px] text-zinc-400',
             },
             {
               header: __('name'),
               cell: (c) => c.name,
-              cellClass: 'font-medium',
+              cellClass: 'font-medium text-zinc-100',
             },
             {
               header: __('actions'),
@@ -183,12 +190,17 @@ const rowActions = (c: Data) => [
           <template #card="{ row: c }">
             <div class="flex items-center justify-between">
               <div>
-                <p
-                  class="mb-1 text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
+                <span
+                  class="mb-1 inline-flex rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase"
+                  :class="
+                    c.type === 'income'
+                      ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                      : 'border-rose-500/30 bg-rose-500/15 text-rose-400'
+                  "
                 >
                   {{ __(c.type) }}
-                </p>
-                <h3 class="text-lg font-bold">{{ c.name }}</h3>
+                </span>
+                <h3 class="font-mono text-base font-bold text-zinc-100 mt-1">{{ c.name }}</h3>
               </div>
               <RowActions :actions="rowActions(c)" collapse-below="md" />
             </div>

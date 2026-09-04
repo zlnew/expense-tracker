@@ -11,7 +11,6 @@ import {
   ArrowDownRight,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
-import { Card, CardContent } from '@/components/ui/card'
 import { useLang } from '@/composables/useLang'
 import { useMasking } from '@/composables/useMasking'
 import { useNumber } from '@/composables/useNumber'
@@ -68,35 +67,37 @@ const reservedPercent = computed(() => {
 </script>
 
 <template>
-  <Card class="relative overflow-hidden border-border/70 bg-card shadow-sm">
-    <!-- Ambient subtle background glow for financial depth -->
+  <div
+    class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+  >
+    <!-- Terminal Ambient Glow -->
     <div
-      class="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-income/5 blur-3xl"
+      class="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-emerald-500/5 blur-3xl"
     />
     <div
-      class="pointer-events-none absolute -bottom-24 -left-24 size-64 rounded-full bg-primary/5 blur-3xl"
+      class="pointer-events-none absolute -bottom-24 -left-24 size-64 rounded-full bg-cyan-500/5 blur-3xl"
     />
 
-    <CardContent class="relative space-y-6 p-4 sm:p-6">
+    <div class="relative space-y-6">
       <div
         class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
       >
-        <!-- Left: Hero Real Balance -->
+        <!-- Left: Hero Real Spendable Balance -->
         <div class="space-y-2">
           <div class="flex items-center gap-2">
             <span
-              class="inline-flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary"
+              class="inline-flex size-7 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
             >
               <Wallet class="size-4" />
             </span>
             <span
-              class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+              class="font-mono text-xs font-semibold tracking-wider text-zinc-400 uppercase"
             >
               {{ __('real_balance') || 'Real Spendable Balance' }}
             </span>
             <span
               v-if="reservedBalance > 0"
-              class="inline-flex items-center gap-1 rounded-full bg-reserved/15 px-2 py-0.5 text-[10px] font-semibold text-reserved"
+              class="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-400"
             >
               <ShieldCheck class="size-3" />
               {{ formatAmount(reservedBalance) }}
@@ -104,57 +105,57 @@ const reservedPercent = computed(() => {
             </span>
           </div>
 
-          <!-- Hero Number Display -->
+          <!-- Hero Monospace Number -->
           <div class="flex items-baseline gap-1">
             <span
-              class="text-3xl font-extrabold tracking-tight text-foreground tabular-nums sm:text-4xl"
+              class="font-mono text-3xl font-extrabold tracking-tight text-emerald-400 tabular-nums sm:text-4xl drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               {{ masked ? '••••••••' : formatAmount(realBalance) }}
             </span>
           </div>
 
-          <p class="text-xs text-muted-foreground">
-            {{ __('active') || 'Total Balance' }}:
-            <span class="font-medium text-foreground">
+          <p class="font-mono text-xs text-zinc-500">
+            {{ __('active') || 'Total Active' }}:
+            <span class="font-semibold text-zinc-200">
               {{ masked ? '••••••' : formatAmount(ledgerBalance) }}
             </span>
             <span
               v-if="reservedBalance > 0"
-              class="mx-1 text-muted-foreground/60"
+              class="mx-1.5 text-zinc-600"
               >•</span
             >
             <Link
               v-if="reservedBalance > 0"
               :href="fundIndex()"
-              class="inline-flex items-center gap-0.5 text-xs font-medium text-reserved hover:underline"
+              class="inline-flex items-center gap-1 font-mono text-xs text-amber-400/90 hover:text-amber-300 hover:underline"
             >
-              <PiggyBank class="size-3" />
+              <PiggyBank class="size-3.5" />
               {{ __('sinking_funds') || 'Sinking Funds' }}
             </Link>
           </p>
         </div>
 
-        <!-- Right: Inflow / Outflow Flow Metrics -->
+        <!-- Right: Flow Metrics Pills -->
         <div
           class="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3 lg:justify-end"
         >
           <!-- Income Inflow Card -->
           <div
-            class="flex items-center gap-2.5 rounded-xl border border-border/50 bg-background/60 p-2.5 shadow-2xs sm:min-w-[140px] sm:p-3"
+            class="flex items-center gap-2.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
           >
             <div
-              class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-income/10 text-income sm:size-9"
+              class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 sm:size-9"
             >
               <TrendingUp class="size-4 sm:size-4.5" />
             </div>
             <div class="min-w-0">
               <p
-                class="truncate text-[10px] font-medium text-muted-foreground sm:text-[11px]"
+                class="truncate font-mono text-[10px] text-zinc-500 uppercase sm:text-[11px]"
               >
                 {{ __('current_month_incomes') || 'Income' }}
               </p>
               <p
-                class="truncate text-xs font-bold text-foreground tabular-nums sm:text-sm"
+                class="truncate font-mono text-xs font-bold text-zinc-100 tabular-nums sm:text-sm"
               >
                 {{ masked ? '••••' : formatAmount(monthlyIncome) }}
               </p>
@@ -163,21 +164,21 @@ const reservedPercent = computed(() => {
 
           <!-- Expense Outflow Card -->
           <div
-            class="flex items-center gap-2.5 rounded-xl border border-border/50 bg-background/60 p-2.5 shadow-2xs sm:min-w-[140px] sm:p-3"
+            class="flex items-center gap-2.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
           >
             <div
-              class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-expense/10 text-expense sm:size-9"
+              class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-400 sm:size-9"
             >
               <TrendingDown class="size-4 sm:size-4.5" />
             </div>
             <div class="min-w-0">
               <p
-                class="truncate text-[10px] font-medium text-muted-foreground sm:text-[11px]"
+                class="truncate font-mono text-[10px] text-zinc-500 uppercase sm:text-[11px]"
               >
                 {{ __('current_month_expenses') || 'Expense' }}
               </p>
               <p
-                class="truncate text-xs font-bold text-foreground tabular-nums sm:text-sm"
+                class="truncate font-mono text-xs font-bold text-zinc-100 tabular-nums sm:text-sm"
               >
                 {{ masked ? '••••' : formatAmount(monthlyExpense) }}
               </p>
@@ -186,11 +187,11 @@ const reservedPercent = computed(() => {
 
           <!-- Net Cash Flow Badge -->
           <div
-            class="col-span-2 flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold sm:col-span-1"
+            class="col-span-2 flex items-center justify-center gap-2 rounded-xl border px-3 py-2 font-mono text-xs font-semibold sm:col-span-1"
             :class="
               netCashFlow >= 0
-                ? 'border-income/30 bg-income/10 text-income'
-                : 'border-expense/30 bg-expense/10 text-expense'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                : 'border-rose-500/30 bg-rose-500/10 text-rose-400'
             "
           >
             <component
@@ -203,9 +204,10 @@ const reservedPercent = computed(() => {
             </span>
           </div>
 
+          <!-- Manage Balances Link -->
           <Link :href="balanceIndex.url()">
             <span
-              class="inline-flex size-9 items-center justify-center rounded-lg border border-border/60 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              class="inline-flex size-9 items-center justify-center rounded-lg border border-[#1f222e] bg-[#121217] text-zinc-400 transition-colors hover:border-emerald-500/40 hover:text-emerald-400"
               title="Manage Balances"
             >
               <ChevronRight class="size-4" />
@@ -217,31 +219,31 @@ const reservedPercent = computed(() => {
       <!-- Liquidity Proportion Bar (Real vs Sinking Fund Reserves) -->
       <div
         v-if="reservedBalance > 0 && ledgerBalance > 0"
-        class="mt-6 border-t border-border/40 pt-4"
+        class="border-t border-[#1f222e] pt-4"
       >
         <div
-          class="mb-1.5 flex items-center justify-between text-[11px] text-muted-foreground"
+          class="mb-1.5 flex items-center justify-between font-mono text-[11px] text-zinc-400"
         >
           <span class="flex items-center gap-1.5 font-medium">
-            <span class="size-2 rounded-full bg-income" />
+            <span class="size-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
             {{ __('spendable') || 'Free Cash' }}: {{ realPercent }}%
           </span>
           <span class="flex items-center gap-1.5 font-medium">
-            <span class="size-2 rounded-full bg-reserved" />
+            <span class="size-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
             {{ __('reserved_in_funds') || 'Reserved' }}: {{ reservedPercent }}%
           </span>
         </div>
-        <div class="flex h-2 w-full overflow-hidden rounded-full bg-muted/60">
+        <div class="flex h-2 w-full overflow-hidden rounded-full bg-zinc-800">
           <div
-            class="h-full bg-income transition-all duration-500 ease-out"
+            class="h-full bg-emerald-500 transition-all duration-500 ease-out"
             :style="{ width: `${realPercent}%` }"
           />
           <div
-            class="h-full bg-reserved transition-all duration-500 ease-out"
+            class="h-full bg-amber-500 transition-all duration-500 ease-out"
             :style="{ width: `${reservedPercent}%` }"
           />
         </div>
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>

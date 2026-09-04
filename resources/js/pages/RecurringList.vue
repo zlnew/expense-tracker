@@ -12,7 +12,6 @@ import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
 import TransactionTabs from '@/components/TransactionTabs.vue'
-import { Button } from '@/components/ui/button'
 import { useDate } from '@/composables/useDate'
 import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
@@ -118,10 +117,14 @@ const rowActions = (r: RecurringTransaction) => [
           :description="__('recurring_transactions_description')"
           class="mb-0"
         />
-        <Button @click="createDialogOpen = true">
-          <Plus class="mr-2 size-4" />
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+          @click="createDialogOpen = true"
+        >
+          <Plus class="size-4 stroke-[2.5]" />
           {{ __('add_data', { data: __('recurring_transaction') }) }}
-        </Button>
+        </button>
       </div>
 
       <div class="flex flex-col items-center gap-4 lg:flex-row">
@@ -148,10 +151,14 @@ const rowActions = (r: RecurringTransaction) => [
         :empty-description="__('recurring_transactions_description')"
       >
         <template #empty>
-          <Button @click="createDialogOpen = true">
-            <Plus class="mr-2 size-4" />
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            @click="createDialogOpen = true"
+          >
+            <Plus class="size-4 stroke-[2.5]" />
             {{ __('add_data', { data: __('recurring_transaction') }) }}
-          </Button>
+          </button>
         </template>
 
         <ResponsiveTable

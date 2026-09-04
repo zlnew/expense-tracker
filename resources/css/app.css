@@ -167,56 +167,62 @@
 .dark {
   color-scheme: dark;
 
-  /* Deep Obsidian Dark Mode */
-  --background: oklch(0.12 0.015 260);
+  /* Deep OLED Obsidian Dark Mode */
+  --background: oklch(0.10 0.015 260);
   --foreground: oklch(0.96 0.005 240);
-  --card: oklch(0.16 0.015 260);
+  --card: oklch(0.135 0.018 260);
   --card-foreground: oklch(0.96 0.005 240);
-  --popover: oklch(0.16 0.015 260);
+  --popover: oklch(0.17 0.020 260);
   --popover-foreground: oklch(0.96 0.005 240);
-  --primary: oklch(0.96 0.005 240);
-  --primary-foreground: oklch(0.14 0.015 260);
-  --secondary: oklch(0.22 0.015 260);
+  --primary: oklch(0.72 0.17 155);
+  --primary-foreground: oklch(0.10 0.015 260);
+  --secondary: oklch(0.18 0.018 260);
   --secondary-foreground: oklch(0.96 0.005 240);
-  --muted: oklch(0.2 0.015 260);
+  --muted: oklch(0.18 0.018 260);
   --muted-foreground: oklch(0.65 0.015 260);
-  --accent: oklch(0.22 0.015 260);
+  --accent: oklch(0.18 0.018 260);
   --accent-foreground: oklch(0.96 0.005 240);
-  --destructive: oklch(0.68 0.22 25);
+  --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.24 0.015 260);
-  --input: oklch(0.24 0.015 260);
-  --ring: oklch(0.65 0.03 260);
+  --border: oklch(0.24 0.020 260);
+  --input: oklch(0.24 0.020 260);
+  --ring: oklch(0.72 0.17 155);
+
+  /* Terminal Semantic Tokens */
+  --terminal-emerald: #10b981;
+  --terminal-rose: #f43f5e;
+  --terminal-amber: #f59e0b;
+  --terminal-cyan: #06b6d4;
 
   /* Charts in Dark */
-  --chart-1: oklch(0.72 0.17 155);
-  --chart-2: oklch(0.7 0.21 285);
-  --chart-3: oklch(0.78 0.16 75);
-  --chart-4: oklch(0.68 0.22 25);
-  --chart-5: oklch(0.65 0.18 215);
-  --chart-6: oklch(0.72 0.14 130);
-  --chart-7: oklch(0.74 0.13 206);
-  --chart-8: oklch(0.65 0.23 340);
+  --chart-1: #10b981;
+  --chart-2: #f59e0b;
+  --chart-3: #06b6d4;
+  --chart-4: #f43f5e;
+  --chart-5: #a855f7;
+  --chart-6: #3b82f6;
+  --chart-7: #ec4899;
+  --chart-8: #84cc16;
 
   /* Semantic Financial Accents in Dark */
-  --income: oklch(0.72 0.17 155);
-  --income-muted: oklch(0.72 0.17 155 / 22%);
-  --expense: oklch(0.68 0.22 25);
-  --expense-muted: oklch(0.68 0.22 25 / 22%);
-  --reserved: oklch(0.78 0.16 75);
-  --reserved-muted: oklch(0.78 0.16 75 / 22%);
-  --budget-pacing: oklch(0.7 0.21 285);
-  --budget-pacing-muted: oklch(0.7 0.21 285 / 22%);
+  --income: #10b981;
+  --income-muted: rgba(16, 185, 129, 0.18);
+  --expense: #f43f5e;
+  --expense-muted: rgba(244, 63, 94, 0.18);
+  --reserved: #f59e0b;
+  --reserved-muted: rgba(245, 158, 11, 0.18);
+  --budget-pacing: #06b6d4;
+  --budget-pacing-muted: rgba(6, 182, 212, 0.18);
 
-  --sidebar-background: oklch(0.14 0.015 260);
+  --sidebar-background: oklch(0.11 0.015 260);
   --sidebar-foreground: oklch(0.96 0.005 240);
-  --sidebar-primary: oklch(0.7 0.21 285);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.22 0.015 260);
+  --sidebar-primary: #10b981;
+  --sidebar-primary-foreground: oklch(0.10 0.015 260);
+  --sidebar-accent: oklch(0.18 0.018 260);
   --sidebar-accent-foreground: oklch(0.96 0.005 240);
-  --sidebar-border: oklch(0.24 0.015 260);
-  --sidebar-ring: oklch(0.65 0.03 260);
-  --sidebar: oklch(0.14 0.015 260);
+  --sidebar-border: oklch(0.24 0.020 260);
+  --sidebar-ring: #10b981;
+  --sidebar: oklch(0.11 0.015 260);
 }
 
 @media (min-width: 64rem) {
@@ -260,3 +266,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .font-mono-numbers {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .terminal-card {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.875rem;
+  }
+
+  .terminal-glow-emerald {
+    box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.35);
+  }
+
+  .terminal-glow-rose {
+    box-shadow: 0 0 25px -4px rgba(244, 63, 94, 0.35);
+  }
+
+  .terminal-glow-amber {
+    box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.35);
+  }
+
+  .terminal-glow-cyan {
+    box-shadow: 0 0 25px -4px rgba(6, 182, 212, 0.35);
+  }
+}
+

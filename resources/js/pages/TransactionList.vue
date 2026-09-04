@@ -191,13 +191,16 @@ const rowActions = (t: Transaction) => [
         />
         <!-- Visible 3-action grid: single / bulk / transfer (mobile + desktop) -->
         <div class="grid w-full grid-cols-3 gap-2 sm:w-auto">
-          <Button class="min-w-0 px-2" @click="openCreateDialog">
-            <Plus class="size-4 shrink-0" />
+          <Button
+            class="min-w-0 px-2.5 font-mono text-xs font-bold bg-emerald-500 text-[#0a0a0c] hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.35)]"
+            @click="openCreateDialog"
+          >
+            <Plus class="size-4 shrink-0 stroke-[2.5]" />
             <span class="min-w-0 truncate">{{ __('single_transaction') }}</span>
           </Button>
           <Button
             variant="outline"
-            class="min-w-0 px-2"
+            class="min-w-0 px-2.5 font-mono text-xs border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100"
             @click="openBulkCreateDialog"
           >
             <ListPlus class="size-4 shrink-0" />
@@ -207,7 +210,7 @@ const rowActions = (t: Transaction) => [
           </Button>
           <Button
             variant="outline"
-            class="min-w-0 px-2"
+            class="min-w-0 px-2.5 font-mono text-xs border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100"
             @click="openTransferDialog"
           >
             <ArrowRightLeft class="size-4 shrink-0" />
@@ -227,7 +230,7 @@ const rowActions = (t: Transaction) => [
           <Button
             variant="outline"
             size="icon"
-            class="h-10 w-10 shrink-0 lg:hidden"
+            class="h-10 w-10 shrink-0 border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100 relative lg:hidden"
             :aria-label="__('filter_transactions')"
             @click="filterSheetOpen = true"
           >
@@ -235,7 +238,7 @@ const rowActions = (t: Transaction) => [
             <Badge
               v-if="activeCount > 0"
               variant="secondary"
-              class="absolute -top-1 -right-1 size-4 p-0 text-[9px]"
+              class="absolute -top-1 -right-1 size-4 p-0 text-[9px] bg-emerald-500 text-[#0a0a0c] font-mono font-bold"
             >
               {{ activeCount }}
             </Badge>
@@ -243,7 +246,7 @@ const rowActions = (t: Transaction) => [
           <Button
             variant="outline"
             size="icon"
-            class="h-10 w-10 shrink-0"
+            class="h-10 w-10 shrink-0 border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100"
             :aria-label="__('export_transactions')"
             :title="__('export_transactions')"
             @click="exportCsv"
@@ -474,16 +477,16 @@ const rowActions = (t: Transaction) => [
           <template #card="{ row: t }">
             <div class="mb-3 flex items-center justify-between gap-2">
               <span
-                class="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
+                class="rounded-lg border border-[#1f222e] bg-[#121217] px-2.5 py-1 font-mono text-[11px] text-zinc-400"
               >
                 {{ formatDate(t.date) }}
               </span>
               <span
-                class="rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase"
+                class="rounded-lg px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase border"
                 :class="
                   t.type === 'income'
-                    ? 'bg-income/15 text-income'
-                    : 'bg-expense/15 text-expense'
+                    ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                    : 'border-rose-500/30 bg-rose-500/15 text-rose-400'
                 "
               >
                 {{ __(t.type) }}
@@ -492,11 +495,11 @@ const rowActions = (t: Transaction) => [
             <div class="flex items-start justify-between gap-3">
               <div class="flex min-w-0 items-start gap-3">
                 <div
-                  class="flex size-10 shrink-0 items-center justify-center rounded-full"
+                  class="flex size-10 shrink-0 items-center justify-center rounded-xl border"
                   :class="
                     t.type === 'income'
-                      ? 'bg-income/10 text-income'
-                      : 'bg-expense/10 text-expense'
+                      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                      : 'border-rose-500/30 bg-rose-500/10 text-rose-400'
                   "
                 >
                   <component
@@ -505,15 +508,15 @@ const rowActions = (t: Transaction) => [
                   />
                 </div>
                 <div class="min-w-0">
-                  <h3 class="truncate text-base font-bold">
+                  <h3 class="truncate font-mono text-base font-bold text-zinc-100">
                     {{ t.category?.name }}
                   </h3>
-                  <p class="truncate text-xs text-muted-foreground">
-                    {{ t.balance?.name }}
+                  <p class="truncate font-mono text-xs text-zinc-400">
+                    via {{ t.balance?.name }}
                   </p>
                   <p
                     v-if="t.description"
-                    class="mt-1 truncate text-sm text-muted-foreground"
+                    class="mt-1 truncate font-mono text-xs text-zinc-500"
                   >
                     {{ t.description }}
                   </p>
@@ -521,9 +524,9 @@ const rowActions = (t: Transaction) => [
               </div>
               <div class="shrink-0 text-right">
                 <p
-                  class="text-lg font-bold tabular-nums"
+                  class="font-mono text-lg font-extrabold tabular-nums"
                   :class="
-                    t.type === 'income' ? 'text-income' : 'text-foreground'
+                    t.type === 'income' ? 'text-emerald-400' : 'text-zinc-100'
                   "
                 >
                   {{ t.type === 'income' ? '+' : '-'

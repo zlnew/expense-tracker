@@ -13,9 +13,6 @@ import AppPagination from '@/components/AppPagination.vue'
 import DataListState from '@/components/DataListState.vue'
 import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -50,17 +47,13 @@ setLayoutProps({
   <AppContent>
     <div class="space-y-6 px-4 py-6 md:px-8">
       <div class="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          asChild
+        <Link
+          :href="balanceIndex.url()"
           :aria-label="__('back')"
-          class="h-10 w-10"
+          class="inline-flex size-10 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-white hover:bg-[#181b24] transition-colors active:scale-95"
         >
-          <Link :href="balanceIndex.url()">
-            <ArrowLeft class="size-4" />
-          </Link>
-        </Button>
+          <ArrowLeft class="size-4" />
+        </Link>
         <Heading
           :title="balance.name"
           :description="
@@ -70,68 +63,88 @@ setLayoutProps({
         />
       </div>
 
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
-          >
-            <CardTitle class="text-sm font-medium">{{
-              __('initial_amount')
-            }}</CardTitle>
-            <Wallet class="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div class="text-2xl font-bold">
-              {{ formatAmount(balance.initial_amount) }}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
-          >
-            <CardTitle class="text-sm font-medium">{{
-              __('final_amount')
-            }}</CardTitle>
-            <TrendingUp
-              v-if="balance.final_amount >= balance.initial_amount"
-              class="size-4 text-green-600 dark:text-green-400"
-            />
-            <TrendingDown
-              v-else
-              class="size-4 text-red-600 dark:text-red-400"
-            />
-          </CardHeader>
-          <CardContent>
-            <div class="text-2xl font-bold">
-              {{ formatAmount(balance.final_amount) }}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
-          >
-            <CardTitle class="text-sm font-medium">{{
-              __('status')
-            }}</CardTitle>
-            <Clock class="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Badge
-              v-if="balance.is_primary"
-              variant="secondary"
-              class="bg-primary/10 text-primary"
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <!-- Initial Amount Card -->
+        <div class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              {{ __('initial_amount') }}
+            </span>
+            <span class="flex size-8 items-center justify-center rounded-lg border border-[#1f222e] bg-[#12141a] text-zinc-400">
+              <Wallet class="size-4" />
+            </span>
+          </div>
+          <div class="mt-3 font-mono text-2xl font-bold text-zinc-200 tabular-nums">
+            {{ formatAmount(balance.initial_amount) }}
+          </div>
+        </div>
+
+        <!-- Final Amount Card -->
+        <div class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              {{ __('final_amount') }}
+            </span>
+            <span
+              :class="[
+                'flex size-8 items-center justify-center rounded-lg border',
+                balance.final_amount >= balance.initial_amount
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                  : 'border-rose-500/30 bg-rose-500/10 text-rose-400',
+              ]"
             >
+              <TrendingUp
+                v-if="balance.final_amount >= balance.initial_amount"
+                class="size-4"
+              />
+              <TrendingDown
+                v-else
+                class="size-4"
+              />
+            </span>
+          </div>
+          <div
+            :class="[
+              'mt-3 font-mono text-2xl font-bold tabular-nums',
+              balance.final_amount >= balance.initial_amount
+                ? 'text-emerald-400'
+                : 'text-rose-400',
+            ]"
+          >
+            {{ formatAmount(balance.final_amount) }}
+          </div>
+        </div>
+
+        <!-- Status Card -->
+        <div class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              {{ __('status') }}
+            </span>
+            <span class="flex size-8 items-center justify-center rounded-lg border border-[#1f222e] bg-[#12141a] text-zinc-400">
+              <Clock class="size-4" />
+            </span>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <span
+              v-if="balance.is_primary"
+              class="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-1 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+            >
+              <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
               {{ __('primary') }}
-            </Badge>
-            <Badge v-else variant="outline">{{ __('optional') }}</Badge>
-          </CardContent>
-        </Card>
+            </span>
+            <span
+              v-else
+              class="inline-flex items-center rounded-md border border-[#1f222e] bg-[#12141a] px-2.5 py-1 font-mono text-xs text-zinc-400"
+            >
+              {{ __('optional') }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold">{{ __('transactions') }}</h3>
+        <h3 class="font-mono text-sm font-semibold uppercase tracking-wider text-zinc-400">{{ __('transactions') }}</h3>
         <DataListState
           :is-empty="!transactions.data || transactions.data.length === 0"
           :rows="5"
@@ -143,7 +156,7 @@ setLayoutProps({
               {
                 header: __('date'),
                 cell: (t) => formatDate(t.date, 'DD MMM YYYY'),
-                cellClass: 'font-medium',
+                cellClass: 'font-mono text-xs font-medium text-zinc-400',
               },
               {
                 header: __('type'),
@@ -152,37 +165,47 @@ setLayoutProps({
               {
                 header: __('category'),
                 cell: (t) => t.category?.name || '-',
+                cellClass: 'font-mono text-xs text-zinc-300',
               },
               {
                 header: __('notes'),
                 cell: (t) => t.description || '-',
+                cellClass: 'font-mono text-xs text-zinc-500',
               },
               {
                 header: __('total'),
                 cell: (t) =>
                   `${t.type === 'income' ? '+' : '-'}${formatAmount(t.amount)}`,
-                cellClass: 'text-right font-medium',
+                cellClass: 'text-right font-mono text-sm font-bold tabular-nums',
               },
             ]"
             :rows="transactions.data ?? []"
           >
             <template #card="{ row: t }">
               <div class="mb-2 flex items-center justify-between">
-                <span class="text-sm text-muted-foreground">{{
+                <span class="font-mono text-xs text-zinc-500">{{
                   formatDate(t.date, 'DD MMM YYYY')
                 }}</span>
-                <Badge :variant="t.type === 'income' ? 'secondary' : 'outline'">
-                  {{ __(t.type) }}
-                </Badge>
-              </div>
-              <div class="flex items-center justify-between font-bold">
-                <span>{{ t.category?.name || '-' }}</span>
                 <span
-                  :class="
+                  :class="[
+                    'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider',
                     t.type === 'income'
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
-                  "
+                      ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                      : 'border border-rose-500/30 bg-rose-500/10 text-rose-400',
+                  ]"
+                >
+                  {{ __(t.type) }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-sm font-medium text-zinc-200">{{ t.category?.name || '-' }}</span>
+                <span
+                  :class="[
+                    'font-mono text-sm font-bold tabular-nums',
+                    t.type === 'income'
+                      ? 'text-emerald-400'
+                      : 'text-rose-400',
+                  ]"
                 >
                   {{ t.type === 'income' ? '+' : '-'
                   }}{{ formatAmount(t.amount) }}
@@ -190,23 +213,31 @@ setLayoutProps({
               </div>
               <div
                 v-if="t.description"
-                class="mt-2 text-sm text-muted-foreground"
+                class="mt-1.5 font-mono text-xs text-zinc-500 truncate"
               >
                 {{ t.description }}
               </div>
             </template>
             <template #cell-1="{ row: t }">
-              <Badge :variant="t.type === 'income' ? 'secondary' : 'outline'">
+              <span
+                :class="[
+                  'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider',
+                  t.type === 'income'
+                    ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                    : 'border border-rose-500/30 bg-rose-500/10 text-rose-400',
+                ]"
+              >
                 {{ __(t.type) }}
-              </Badge>
+              </span>
             </template>
             <template #cell-4="{ row: t }">
               <span
-                :class="
+                :class="[
+                  'font-mono font-bold tabular-nums',
                   t.type === 'income'
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
-                "
+                    ? 'text-emerald-400'
+                    : 'text-rose-400',
+                ]"
               >
                 {{ t.type === 'income' ? '+' : '-'
                 }}{{ formatAmount(t.amount) }}

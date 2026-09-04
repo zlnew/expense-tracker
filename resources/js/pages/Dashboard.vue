@@ -9,7 +9,6 @@ import CategorySpendPulse from '@/components/dashboard/CategorySpendPulse.vue'
 import ImpendingDrainsCard from '@/components/dashboard/ImpendingDrainsCard.vue'
 import SpendingTrendChart from '@/components/dashboard/SpendingTrendChart.vue'
 import TransactionActivityFeed from '@/components/dashboard/TransactionActivityFeed.vue'
-import { Button } from '@/components/ui/button'
 import { useInstallPrompt } from '@/composables/useInstallPrompt'
 import { useLang } from '@/composables/useLang'
 import type {
@@ -79,19 +78,19 @@ const hasActiveBudget = computed(
       <aside
         v-if="canInstall"
         aria-label="Install app"
-        class="flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-xs shadow-xs"
+        class="flex items-center justify-between gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-xs shadow-lg"
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"
+            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.4)]"
           >
             <Download class="size-4" />
           </div>
           <div>
-            <p class="font-bold text-foreground">
+            <p class="font-mono font-bold text-zinc-100">
               {{ __('install_app') || 'Install Expense Tracker' }}
             </p>
-            <p class="text-muted-foreground">
+            <p class="font-mono text-zinc-500 text-[11px]">
               {{
                 __('install_app_description') ||
                 'Add to home screen for instant, offline access.'
@@ -100,21 +99,20 @@ const hasActiveBudget = computed(
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <Button
-            size="sm"
-            class="h-8 text-xs font-semibold"
+          <button
+            type="button"
+            class="h-8 px-3 rounded-xl bg-emerald-500 text-[#0a0a0c] font-mono text-xs font-bold hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)]"
             @click="promptInstall"
           >
             {{ __('install') || 'Install' }}
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            class="size-8 text-muted-foreground hover:text-foreground"
+          </button>
+          <button
+            type="button"
+            class="size-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-200 transition-colors"
             @click="dismissInstall"
           >
             <X class="size-4" />
-          </Button>
+          </button>
         </div>
       </aside>
 

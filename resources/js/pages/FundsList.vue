@@ -10,15 +10,6 @@ import FundPayDialog from '@/components/dialogs/FundPayDialog.vue'
 import FundSetAsideDialog from '@/components/dialogs/FundSetAsideDialog.vue'
 import Heading from '@/components/Heading.vue'
 import RowActions from '@/components/RowActions.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
@@ -144,10 +135,14 @@ const daysUntilDue = (fund: SinkingFund) => {
           :description="__('fund_list_description')"
           class="mb-0"
         />
-        <Button @click="openCreate">
-          <Plus class="mr-2 size-4" />
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+          @click="openCreate"
+        >
+          <Plus class="size-4 stroke-[2.5]" />
           {{ __('add_data', { data: __('fund') }) }}
-        </Button>
+        </button>
       </div>
 
       <DataListState
@@ -158,76 +153,111 @@ const daysUntilDue = (fund: SinkingFund) => {
         :empty-description="__('fund_create_description')"
       >
         <template #empty>
-          <Button @click="openCreate">
-            <Plus class="mr-2 size-4" />
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            @click="openCreate"
+          >
+            <Plus class="size-4 stroke-[2.5]" />
             {{ __('add_data', { data: __('fund') }) }}
-          </Button>
+          </button>
         </template>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          <Card
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
+          <div
             v-for="fund in funds"
             :key="fund.id"
-            class="group relative overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-primary/5"
+            class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl transition-all hover:border-zinc-700"
           >
-            <CardHeader>
+            <div>
+              <!-- Header with Fund name & Status pill -->
               <div class="flex items-start justify-between gap-2">
-                <div>
-                  <CardTitle class="flex items-center gap-2">
-                    <PiggyBank class="size-5 text-primary" />
-                    {{ fund.name }}
-                  </CardTitle>
-                  <CardDescription class="mt-1 line-clamp-2 min-h-[20px]">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-400"
+                    >
+                      <PiggyBank class="size-4" />
+                    </span>
+                    <h3 class="truncate font-mono text-base font-bold text-zinc-100">
+                      {{ fund.name }}
+                    </h3>
+                  </div>
+                  <p class="mt-1 line-clamp-2 min-h-[18px] font-mono text-xs text-zinc-500">
                     {{ fund.notes ?? '-' }}
-                  </CardDescription>
+                  </p>
                 </div>
-                <Badge :variant="statusVariant(fund.status)">
-                  {{ __(fund.status) }}
-                </Badge>
-              </div>
-            </CardHeader>
-
-            <CardContent class="space-y-4">
-              <div v-if="fund.category" class="flex items-center gap-2">
-                <Badge variant="outline" class="text-muted-foreground">
-                  {{ fund.category.name }}
-                </Badge>
                 <span
-                  v-if="fund.next_due"
-                  class="text-xs text-muted-foreground"
+                  class="shrink-0 rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border"
+                  :class="
+                    fund.status === 'overfunded'
+                      ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                      : fund.status === 'due_soon'
+                        ? 'border-rose-500/30 bg-rose-500/15 text-rose-400'
+                        : fund.status === 'underfunded'
+                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-400'
+                          : 'border-purple-500/30 bg-purple-500/15 text-purple-400'
+                  "
                 >
-                  · {{ __('next_due') }}:
-                  {{ formatDate(fund.next_due, 'DD MMM YYYY') }}
+                  {{ __(fund.status) }}
                 </span>
               </div>
 
-              <div class="space-y-1.5">
-                <div class="flex items-center justify-between text-sm">
-                  <span class="text-muted-foreground">{{
-                    __('accumulated')
-                  }}</span>
-                  <span class="font-medium">
-                    {{ formatAmount(fund.accumulated) }}
-                    <span class="text-muted-foreground">
+              <!-- Category & Due Date Tag -->
+              <div
+                v-if="fund.category || fund.next_due"
+                class="mt-3 flex items-center gap-2 font-mono text-xs text-zinc-400"
+              >
+                <span
+                  v-if="fund.category"
+                  class="rounded-md border border-[#1f222e] bg-[#121217] px-2 py-0.5 text-[11px]"
+                >
+                  {{ fund.category.name }}
+                </span>
+                <span v-if="fund.next_due" class="text-[11px] text-zinc-500">
+                  {{ __('next_due') }}: {{ formatDate(fund.next_due, 'DD MMM YYYY') }}
+                </span>
+              </div>
+
+              <!-- Savings Progress Meter -->
+              <div class="mt-4 space-y-2">
+                <div class="flex items-baseline justify-between font-mono text-xs">
+                  <span class="text-zinc-500 uppercase tracking-wider text-[10px]">
+                    {{ __('accumulated') }}
+                  </span>
+                  <div class="text-right">
+                    <span class="text-sm font-bold text-zinc-100 tabular-nums">
+                      {{ formatAmount(fund.accumulated) }}
+                    </span>
+                    <span class="text-zinc-500 text-[11px] tabular-nums">
                       / {{ formatAmount(fund.target_amount) }}
                     </span>
-                  </span>
+                  </div>
                 </div>
-                <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
+
+                <!-- Hairline Progress Bar -->
+                <div class="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
                   <div
-                    class="h-full rounded-full transition-all"
-                    :class="progressColor(fund.status)"
+                    class="h-full rounded-full transition-all duration-500"
+                    :class="
+                      fund.status === 'overfunded'
+                        ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                        : fund.status === 'due_soon'
+                          ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                          : fund.status === 'underfunded'
+                            ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                            : 'bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]'
+                    "
                     :style="{ width: `${Math.min(100, fund.percent)}%` }"
                   />
                 </div>
+
                 <div
-                  class="flex items-center justify-between text-xs text-muted-foreground"
+                  class="flex items-center justify-between font-mono text-[11px] text-zinc-400"
                 >
-                  <span>{{ fund.percent }}%</span>
+                  <span class="font-bold text-zinc-200">{{ fund.percent }}%</span>
                   <span v-if="fund.contribution_amount">
-                    {{ formatAmount(fund.contribution_amount) }}/{{
-                      __('cycle')
-                    }}
+                    {{ formatAmount(fund.contribution_amount) }}/{{ __('cycle') }}
                   </span>
                   <span v-else>
                     {{
@@ -239,44 +269,52 @@ const daysUntilDue = (fund: SinkingFund) => {
                 </div>
               </div>
 
+              <!-- Countdown Banner -->
               <div
                 v-if="fund.next_due && daysUntilDue(fund) !== null"
-                class="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground"
+                class="mt-3 rounded-xl border border-[#1f222e] bg-[#121217] px-3 py-2 font-mono text-xs text-zinc-400"
               >
                 <template v-if="daysUntilDue(fund)! < 0">
-                  {{ __('due_in') }} {{ Math.abs(daysUntilDue(fund)!) }}
-                  {{ __('days_overdue') }}
+                  <span class="text-rose-400 font-bold">
+                    {{ __('due_in') }} {{ Math.abs(daysUntilDue(fund)!) }} {{ __('days_overdue') }}
+                  </span>
                 </template>
                 <template v-else>
-                  {{ __('due_in') }} {{ daysUntilDue(fund) }} {{ __('days') }}
+                  <span>
+                    {{ __('due_in') }} <strong class="text-zinc-200">{{ daysUntilDue(fund) }}</strong> {{ __('days') }}
+                  </span>
                 </template>
                 <template
                   v-if="
                     fund.status === 'underfunded' || fund.status === 'due_soon'
                   "
                 >
-                  · {{ fund.percent }}% {{ __('funded') }}
+                  <span class="text-zinc-500"> · {{ fund.percent }}% {{ __('funded') }}</span>
                 </template>
               </div>
+            </div>
 
-              <div class="flex items-center gap-2 pt-1">
-                <Button size="sm" class="flex-1" @click="openSetAside(fund)">
-                  {{ __('set_aside') }}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  class="flex-1"
-                  :disabled="fund.accumulated <= 0"
-                  @click="openPay(fund)"
-                >
-                  <Wallet class="mr-1 size-4" />
-                  {{ __('pay_from_fund') }}
-                </Button>
-                <RowActions :actions="rowActions(fund)" collapse-below="md" />
-              </div>
-            </CardContent>
-          </Card>
+            <!-- 1-Tap Action Footer -->
+            <div class="mt-5 flex items-center gap-2 border-t border-[#1f222e]/60 pt-4">
+              <button
+                type="button"
+                class="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/15 py-2 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                @click="openSetAside(fund)"
+              >
+                {{ __('set_aside') }}
+              </button>
+              <button
+                type="button"
+                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#121217] py-2 font-mono text-xs font-semibold text-zinc-300 hover:border-zinc-700 hover:text-zinc-100 transition-all disabled:opacity-40"
+                :disabled="fund.accumulated <= 0"
+                @click="openPay(fund)"
+              >
+                <Wallet class="size-3.5" />
+                {{ __('pay_from_fund') }}
+              </button>
+              <RowActions :actions="rowActions(fund)" collapse-below="md" />
+            </div>
+          </div>
         </div>
       </DataListState>
 
