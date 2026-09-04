@@ -147,8 +147,10 @@ class McpServer
 
     protected function handleInitialize(array $params): array
     {
+        $version = (string) ($params['protocolVersion'] ?? '2024-11-05');
+
         return [
-            'protocolVersion' => '2024-11-05',
+            'protocolVersion' => $version,
             'capabilities' => [
                 'tools' => new \stdClass,
                 'resources' => new \stdClass,
