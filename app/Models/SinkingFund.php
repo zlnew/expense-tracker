@@ -50,7 +50,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['name', 'target_amount', 'cadence', 'contribution_amount', 'category_id', 'from_balance_id', 'next_due', 'due_interval_months', 'anchor_day', 'notes'])]
+#[Fillable(['user_id', 'name', 'target_amount', 'cadence', 'contribution_amount', 'category_id', 'from_balance_id', 'next_due', 'due_interval_months', 'anchor_day', 'notes'])]
 class SinkingFund extends Model
 {
     use HasFactory, SoftDeletes;

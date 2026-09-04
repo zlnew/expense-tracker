@@ -34,16 +34,18 @@ class GetBalanceSummaryTool implements ToolInterface
             ->orderBy('name')
             ->get();
 
+        $ids = $balances->pluck('id')->all();
+        $reservedById = GetBalanceInsight::reservedByBalanceId($ids);
+
         $rows = [];
         $totalActive = 0;
         $totalReserved = 0;
         $totalReal = 0;
 
         foreach ($balances as $b) {
-            $insight = GetBalanceInsight::run($b);
-            $active = $insight['active'];
-            $reserved = $insight['reserved'];
-            $real = $insight['real'];
+            $active = (int) $b->final_amount;
+            $reserved = (int) ($reservedById[$b->id] ?? 0);
+            $real = $active - $reserved;
 
             $totalActive += $active;
             $totalReserved += $reserved;
@@ -57,9 +59,9 @@ class GetBalanceSummaryTool implements ToolInterface
                 'active_formatted' => 'Rp '.number_format($active, 0, ',', '.'),
                 'reserved' => $reserved,
                 'reserved_formatted' => 'Rp '.number_format($reserved, 0, ',', '.'),
-                'real' => $b->real_balance,
-                'real_balance' => $b->real_balance,
-                'real_formatted' => 'Rp '.number_format($b->real_balance, 0, ',', '.'),
+                'real' => $real,
+                'real_balance' => $real,
+                'real_formatted' => 'Rp '.number_format($real, 0, ',', '.'),
                 'reconciled_amount' => $b->reconciled_amount,
                 'drift' => $b->drift,
             ];

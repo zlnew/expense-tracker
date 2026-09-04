@@ -30,7 +30,16 @@ type CreatedToken = {
   plainTextToken: string
 }
 
-const tokens = ref<Token[]>([])
+const props = withDefaults(
+  defineProps<{
+    initialTokens?: Token[]
+  }>(),
+  {
+    initialTokens: () => [],
+  },
+)
+
+const tokens = ref<Token[]>(props.initialTokens.length > 0 ? [...props.initialTokens] : [])
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const showCreateDialog = ref(false)
@@ -191,7 +200,11 @@ function formatDate(dateStr: string | null): string {
   }
 }
 
-onMounted(fetchTokens)
+onMounted(() => {
+  if (tokens.value.length === 0) {
+    fetchTokens()
+  }
+})
 </script>
 
 <template>
