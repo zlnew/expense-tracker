@@ -15,7 +15,7 @@ const { __ } = useLang()
 withDefaults(defineProps<Props>(), {
   title: '',
   description: '',
-  icon: ArrowRightLeft,
+  icon: () => ArrowRightLeft,
 })
 </script>
 

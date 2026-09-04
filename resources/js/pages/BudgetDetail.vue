@@ -11,14 +11,6 @@ import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import DataListState from '@/components/DataListState.vue'
 import Heading from '@/components/Heading.vue'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import { useBudgetProgress } from '@/composables/useBudgetProgress'
 import { useDate } from '@/composables/useDate'
 import { useFilters } from '@/composables/useFilters'
@@ -357,26 +349,22 @@ const setActive = () => {
       <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
         <div class="flex items-center justify-center gap-2 lg:col-span-2">
           <CalendarDays class="mr-1 text-zinc-500 size-4" />
-          <Select v-model="month">
-            <SelectTrigger class="border-[#1f222e] bg-[#0a0a0c] font-mono text-xs text-zinc-200">
-              <SelectValue :placeholder="__('month')" />
-            </SelectTrigger>
-            <SelectContent class="border-[#1f222e] bg-[#121217] font-mono text-xs text-zinc-200">
-              <SelectItem v-for="m in months" :key="m.value" :value="m.value">
-                {{ m.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Select v-model="year">
-            <SelectTrigger class="border-[#1f222e] bg-[#0a0a0c] font-mono text-xs text-zinc-200">
-              <SelectValue :placeholder="__('year')" />
-            </SelectTrigger>
-            <SelectContent class="border-[#1f222e] bg-[#121217] font-mono text-xs text-zinc-200">
-              <SelectItem v-for="y in years" :key="y.value" :value="y.value">
-                {{ y.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <select
+            v-model="month"
+            class="rounded-xl border border-[#1f222e] bg-[#0a0a0c] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+          >
+            <option v-for="m in months" :key="m.value" :value="m.value" class="bg-[#12141a] text-zinc-200">
+              {{ m.label }}
+            </option>
+          </select>
+          <select
+            v-model="year"
+            class="rounded-xl border border-[#1f222e] bg-[#0a0a0c] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+          >
+            <option v-for="y in years" :key="y.value" :value="y.value" class="bg-[#12141a] text-zinc-200">
+              {{ y.label }}
+            </option>
+          </select>
         </div>
 
         <!-- Monthly Expenses Envelopes -->
