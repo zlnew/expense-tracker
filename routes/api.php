@@ -19,7 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->name('api.contract');
 
     // MCP endpoint — Model Context Protocol over JSON-RPC 2.0
-    Route::post('mcp', McpApiController::class)
+    Route::match(['get', 'post'], 'mcp', McpApiController::class)
         ->name('api.mcp');
 
     // Transactions — GET is read, everything else is write. Per-method

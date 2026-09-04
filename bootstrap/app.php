@@ -11,6 +11,7 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schedule;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -38,6 +39,11 @@ return Application::configure(basePath: dirname(__DIR__))
             TrustProxies::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'oauth/token',
+            'api/*',
+        ]);
+
         $middleware->throttleApi();
     })
     ->withSchedule(function (): void {
@@ -48,5 +54,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // API clients (and headless automation) must get JSON error bodies
         // even when they omit the Accept header.
-        $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
+        $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*') || $request->is('oauth/token'));
+
+        $exceptions->respond(function (Response $response, Throwable $e, Request $request) {
+            if ($response->getStatusCode() === 401 && $request->is('api/mcp')) {
+                $metadataUrl = url('/.well-known/oauth-protected-resource');
+                $response->headers->set('WWW-Authenticate', 'Bearer resource_metadata="'.$metadataUrl.'"');
+            }
+
+            return $response;
+        });
     })->create();
