@@ -1,12 +1,15 @@
 <?php
 
 use App\Actions\GetImpendingDrains;
+use App\Http\Controllers\Api\OAuthDiscoveryController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetTransactionsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FundController;
+use App\Http\Controllers\OAuth\OAuthAuthorizationController;
+use App\Http\Controllers\OAuth\OAuthTokenController;
 use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
@@ -58,6 +61,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('funds/{fund}/withdrawals', [FundController::class, 'storeWithdrawal'])->name('funds.withdrawals.store');
         Route::delete('fund-contributions/{contribution}', [FundController::class, 'destroyContribution'])->name('fund-contributions.destroy');
     });
+
+    // OAuth 2.0 Authorization Consent
+    Route::get('oauth/authorize', [OAuthAuthorizationController::class, 'authorize'])->name('oauth.authorize');
+    Route::post('oauth/authorize', [OAuthAuthorizationController::class, 'approve'])->name('oauth.approve');
 });
+
+// RFC 8414 & RFC 9728 Discovery Endpoints (Public)
+Route::get('.well-known/oauth-authorization-server', [OAuthDiscoveryController::class, 'authorizationServerMetadata'])
+    ->name('oauth.discovery.server');
+Route::get('.well-known/oauth-protected-resource', [OAuthDiscoveryController::class, 'protectedResourceMetadata'])
+    ->name('oauth.discovery.resource');
+
+// OAuth 2.0 Token Endpoint (Public, authenticated via client credentials)
+Route::post('oauth/token', [OAuthTokenController::class, 'token'])->name('oauth.token');
 
 require __DIR__.'/settings.php';
