@@ -41,6 +41,14 @@ class SecurityController extends Controller implements HasMiddleware
             $props['requiresConfirmation'] = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm');
         }
 
+        $props['tokens'] = $request->user()->tokens()
+            ->orderBy('id', 'desc')
+            ->get(['id', 'name', 'abilities', 'last_used_at', 'created_at', 'expires_at']);
+
+        $props['oauthClients'] = $request->user()->oauthClients()
+            ->latest()
+            ->get(['id', 'name', 'redirect_uri', 'created_at']);
+
         return Inertia::render('settings/Security', $props);
     }
 

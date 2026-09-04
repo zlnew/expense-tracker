@@ -108,7 +108,7 @@ test('gemini web browser unauthenticated request receives 401 with cors and www-
     expect($exposeHeaders)->toContain('WWW-Authenticate');
 });
 
-test('all 13 mcp tool definitions export valid json schema properties as object and never array', function () {
+test('all 14 mcp tool definitions export valid json schema properties as object and never array', function () {
     $server = new McpServer($this->user);
 
     $response = $server->handle([
@@ -118,7 +118,7 @@ test('all 13 mcp tool definitions export valid json schema properties as object 
     ]);
 
     $tools = $response['result']['tools'];
-    expect($tools)->toHaveCount(13);
+    expect($tools)->toHaveCount(14);
 
     foreach ($tools as $tool) {
         $name = $tool['name'];
@@ -178,7 +178,7 @@ test('mcp api controller handles json-rpc 2.0 batch requests', function () {
     // Tools list response
     expect($data[1]['jsonrpc'])->toBe('2.0')
         ->and($data[1]['id'])->toBe(102)
-        ->and($data[1]['result']['tools'])->toHaveCount(13);
+        ->and($data[1]['result']['tools'])->toHaveCount(14);
 });
 
 test('gemini public pkce token exchange succeeds without client secret', function () {

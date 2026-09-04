@@ -19,6 +19,7 @@ use App\Mcp\Tools\ListRecurringTransactionsTool;
 use App\Mcp\Tools\ListTransactionsTool;
 use App\Mcp\Tools\PayFromFundTool;
 use App\Mcp\Tools\ReconcileBalanceTool;
+use App\Mcp\Tools\SyncFinancialIntegrityTool;
 use App\Mcp\Tools\ToolInterface;
 use App\Mcp\Tools\TransferBalanceTool;
 use App\Models\User;
@@ -77,6 +78,7 @@ class McpServer
         $this->registerTool(new PayFromFundTool);
         $this->registerTool(new CreateFundContributionTool);
         $this->registerTool(new ReconcileBalanceTool);
+        $this->registerTool(new SyncFinancialIntegrityTool);
         $this->registerTool(new ListCategoriesTool);
         $this->registerTool(new ListFundsTool);
         $this->registerTool(new ListRecurringTransactionsTool);

@@ -68,6 +68,14 @@ class Balance extends Model
 
     public function getRealBalanceAttribute(): int
     {
+        if (array_key_exists('real_balance', $this->attributes)) {
+            return (int) $this->attributes['real_balance'];
+        }
+
+        if (array_key_exists('reserved', $this->attributes)) {
+            return (int) $this->final_amount - (int) $this->attributes['reserved'];
+        }
+
         $reserved = GetBalanceInsight::reservedForBalanceId($this->id);
 
         return (int) $this->final_amount - $reserved;

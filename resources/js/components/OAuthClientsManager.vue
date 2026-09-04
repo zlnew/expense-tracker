@@ -27,7 +27,16 @@ type CreatedCredentials = {
   secret: string
 }
 
-const clients = ref<Client[]>([])
+const props = withDefaults(
+  defineProps<{
+    initialClients?: Client[]
+  }>(),
+  {
+    initialClients: () => [],
+  },
+)
+
+const clients = ref<Client[]>(props.initialClients.length > 0 ? [...props.initialClients] : [])
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const showCreateDialog = ref(false)
@@ -146,7 +155,11 @@ function copyToClipboard(text: string, type: 'id' | 'secret') {
   }
 }
 
-onMounted(fetchClients)
+onMounted(() => {
+  if (clients.value.length === 0) {
+    fetchClients()
+  }
+})
 </script>
 
 <template>

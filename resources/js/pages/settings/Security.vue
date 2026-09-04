@@ -21,12 +21,16 @@ type Props = {
   canManageTwoFactor?: boolean
   requiresConfirmation?: boolean
   twoFactorEnabled?: boolean
+  tokens?: any[]
+  oauthClients?: any[]
 }
 
 withDefaults(defineProps<Props>(), {
   canManageTwoFactor: false,
   requiresConfirmation: false,
   twoFactorEnabled: false,
+  tokens: () => [],
+  oauthClients: () => [],
 })
 
 const { __ } = useLang()
@@ -176,10 +180,10 @@ onUnmounted(() => clearTwoFactorAuthData())
   </div>
 
   <div class="mt-6 border-t border-border pt-6">
-    <PersonalAccessTokensManager />
+    <PersonalAccessTokensManager :initial-tokens="tokens" />
   </div>
 
   <div class="mt-6 border-t border-border pt-6">
-    <OAuthClientsManager />
+    <OAuthClientsManager :initial-clients="oauthClients" />
   </div>
 </template>
