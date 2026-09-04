@@ -7,6 +7,7 @@ import Heading from '@/components/Heading.vue'
 import InputError from '@/components/InputError.vue'
 import OAuthClientsManager from '@/components/OAuthClientsManager.vue'
 import PasswordInput from '@/components/PasswordInput.vue'
+import PersonalAccessTokensManager from '@/components/PersonalAccessTokensManager.vue'
 import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue'
 import TwoFactorSetupModal from '@/components/TwoFactorSetupModal.vue'
 import { Button } from '@/components/ui/button'
@@ -172,6 +173,10 @@ onUnmounted(() => clearTwoFactorAuthData())
       :requiresConfirmation="requiresConfirmation"
       :twoFactorEnabled="twoFactorEnabled"
     />
+  </div>
+
+  <div class="mt-6 border-t border-border pt-6">
+    <PersonalAccessTokensManager />
   </div>
 
   <div class="mt-6 border-t border-border pt-6">
