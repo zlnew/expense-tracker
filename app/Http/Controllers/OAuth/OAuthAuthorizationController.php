@@ -5,18 +5,18 @@ namespace App\Http\Controllers\OAuth;
 use App\Http\Controllers\Controller;
 use App\Models\OAuthAuthCode;
 use App\Models\OAuthClient;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class OAuthAuthorizationController extends Controller
 {
     /**
      * Display the authorization consent screen.
      */
-    public function authorize(Request $request): Response|RedirectResponse
+    public function authorize(Request $request): Response|SymfonyResponse
     {
         $clientId = (string) $request->query('client_id');
         $redirectUri = (string) $request->query('redirect_uri');
@@ -39,7 +39,7 @@ class OAuthAuthorizationController extends Controller
         if ($responseType !== 'code') {
             $delimiter = str_contains($redirectUri, '?') ? '&' : '?';
 
-            return redirect()->away($redirectUri.$delimiter.http_build_query([
+            return Inertia::location($redirectUri.$delimiter.http_build_query([
                 'error' => 'unsupported_response_type',
                 'state' => $state,
             ]));
@@ -61,7 +61,7 @@ class OAuthAuthorizationController extends Controller
     /**
      * Process user's decision on the authorization request.
      */
-    public function approve(Request $request): RedirectResponse
+    public function approve(Request $request): SymfonyResponse
     {
         $request->validate([
             'client_id' => ['required', 'string'],
@@ -83,7 +83,7 @@ class OAuthAuthorizationController extends Controller
         $delimiter = str_contains($redirectUri, '?') ? '&' : '?';
 
         if ($action === 'deny') {
-            return redirect()->away($redirectUri.$delimiter.http_build_query([
+            return Inertia::location($redirectUri.$delimiter.http_build_query([
                 'error' => 'access_denied',
                 'state' => $state,
             ]));
@@ -107,6 +107,6 @@ class OAuthAuthorizationController extends Controller
             $params['state'] = $state;
         }
 
-        return redirect()->away($redirectUri.$delimiter.http_build_query($params));
+        return Inertia::location($redirectUri.$delimiter.http_build_query($params));
     }
 }

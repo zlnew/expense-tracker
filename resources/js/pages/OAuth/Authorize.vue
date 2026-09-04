@@ -2,6 +2,7 @@
 import { Head, useForm } from '@inertiajs/vue3'
 import { CheckCircle2, ShieldCheck } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 
 type Client = {
@@ -88,6 +89,13 @@ function submit(action: 'approve' | 'deny') {
         </div>
       </div>
 
+      <div
+        v-if="Object.keys(form.errors).length > 0"
+        class="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive"
+      >
+        <p v-for="(err, key) in form.errors" :key="key">{{ err }}</p>
+      </div>
+
       <div class="flex flex-col gap-2 sm:flex-row">
         <Button
           type="button"
@@ -95,6 +103,10 @@ function submit(action: 'approve' | 'deny') {
           :disabled="form.processing"
           @click="submit('approve')"
         >
+          <Spinner
+            v-if="form.processing && form.action === 'approve'"
+            class="mr-2 h-4 w-4"
+          />
           Authorize {{ client.name }}
         </Button>
         <Button
@@ -104,6 +116,10 @@ function submit(action: 'approve' | 'deny') {
           :disabled="form.processing"
           @click="submit('deny')"
         >
+          <Spinner
+            v-if="form.processing && form.action === 'deny'"
+            class="mr-2 h-4 w-4"
+          />
           Cancel
         </Button>
       </div>
