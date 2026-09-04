@@ -22,7 +22,7 @@ class ListFundsTool implements ToolInterface
     {
         return [
             'type' => 'object',
-            'properties' => [],
+            'properties' => (object) [],
         ];
     }
 

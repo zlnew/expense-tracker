@@ -27,23 +27,40 @@ class OAuthTokenController extends Controller
                 $decoded = base64_decode(substr($authHeader, 6));
                 if ($decoded && str_contains($decoded, ':')) {
                     [$clientId, $clientSecret] = explode(':', $decoded, 2);
+                    $clientId = urldecode($clientId);
+                    $clientSecret = urldecode($clientSecret);
                 }
             }
         }
 
-        if (! $clientId || ! $clientSecret) {
+        if (! $clientId) {
             return response()->json([
                 'error' => 'invalid_client',
-                'error_description' => 'Client credentials are required.',
+                'error_description' => 'Client ID is required.',
             ], 401);
         }
 
         $client = OAuthClient::find($clientId);
 
-        if (! $client || ! hash_equals($client->secret, (string) $clientSecret)) {
+        if (! $client) {
             return response()->json([
                 'error' => 'invalid_client',
-                'error_description' => 'Client authentication failed.',
+                'error_description' => 'Client not found.',
+            ], 401);
+        }
+
+        // Confidential client check (if secret supplied or no PKCE code_verifier provided)
+        if ($clientSecret !== null && $clientSecret !== '') {
+            if (! hash_equals($client->secret, (string) $clientSecret)) {
+                return response()->json([
+                    'error' => 'invalid_client',
+                    'error_description' => 'Client authentication failed.',
+                ], 401);
+            }
+        } elseif (! $request->input('code_verifier')) {
+            return response()->json([
+                'error' => 'invalid_client',
+                'error_description' => 'Client secret or PKCE code_verifier is required.',
             ], 401);
         }
 
@@ -101,13 +118,17 @@ class OAuthTokenController extends Controller
                 ], 400);
             }
 
-            if ($authCode->code_challenge_method === 'S256') {
+            $method = strtoupper((string) ($authCode->code_challenge_method ?: 'S256'));
+            if ($method === 'S256') {
                 $computedChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
                 if (! hash_equals($authCode->code_challenge, $computedChallenge)) {
-                    return response()->json([
-                        'error' => 'invalid_grant',
-                        'error_description' => 'PKCE verification failed.',
-                    ], 400);
+                    // Fallback to plain in case method was omitted and verifier matches directly
+                    if (! hash_equals($authCode->code_challenge, $codeVerifier)) {
+                        return response()->json([
+                            'error' => 'invalid_grant',
+                            'error_description' => 'PKCE verification failed.',
+                        ], 400);
+                    }
                 }
             } else {
                 if (! hash_equals($authCode->code_challenge, $codeVerifier)) {

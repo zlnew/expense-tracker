@@ -22,7 +22,7 @@ class GetBalanceSummaryTool implements ToolInterface
     {
         return [
             'type' => 'object',
-            'properties' => [],
+            'properties' => (object) [],
         ];
     }
 
