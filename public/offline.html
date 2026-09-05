@@ -1,61 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-        <meta name="color-scheme" content="light dark">
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f7">
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14131b">
-        <meta name="theme-color" content="#faf9f7">
-        <title>Offline — Expense Tracker</title>
+        <meta name="color-scheme" content="dark">
+        <meta name="theme-color" content="#050508">
+        <title>Offline — Expense Terminal</title>
         <style>
             :root {
-                color-scheme: light dark;
+                color-scheme: dark;
+            }
+            * {
+                box-sizing: border-box;
             }
             body {
-                font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
                 margin: 0;
                 min-height: 100dvh;
                 display: grid;
                 place-items: center;
-                background: light-dark(#faf9f7, #14131b);
-                color: light-dark(#18181b, #f4f4f5);
+                background-color: #050508;
+                color: #f4f4f5;
+                padding: 1.5rem;
             }
-            .card {
-                text-align: center;
-                padding: 2rem;
-                max-width: 24rem;
+            .terminal-box {
+                width: 100%;
+                max-width: 26rem;
+                background-color: #0a0a0c;
+                border: 1px solid #1f222e;
+                padding: 1.75rem 1.5rem;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
             }
-            h1 {
-                font-size: 1.25rem;
+            .terminal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #1f222e;
+                padding-bottom: 0.75rem;
+                margin-bottom: 1.25rem;
+                font-size: 0.75rem;
+                color: #71717a;
+            }
+            .status-dot {
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                background-color: #ef4444;
+                margin-right: 6px;
+            }
+            .title {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #34d399;
                 margin: 0 0 0.5rem;
+                letter-spacing: -0.02em;
             }
-            p {
-                font-size: 0.9rem;
-                line-height: 1.5;
-                color: light-dark(#525252, #a3a3a3);
+            .description {
+                font-size: 0.825rem;
+                line-height: 1.6;
+                color: #a1a1aa;
                 margin: 0 0 1.5rem;
             }
-            button {
-                font: inherit;
-                font-size: 0.9rem;
-                padding: 0.6rem 1.25rem;
-                border-radius: 0.5rem;
-                border: 1px solid light-dark(#e5e5e5, #262626);
-                background: light-dark(#ffffff, #171717);
-                color: inherit;
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                font-family: inherit;
+                font-size: 0.85rem;
+                font-weight: 600;
+                padding: 0.75rem 1rem;
+                background-color: #10b981;
+                color: #0a0a0c;
+                border: 1px solid #34d399;
                 cursor: pointer;
+                transition: background-color 0.15s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
             }
-            button:hover {
-                background: light-dark(#f5f5f5, #262626);
+            .btn:hover, .btn:active {
+                background-color: #34d399;
             }
         </style>
     </head>
     <body>
-        <div class="card">
-            <h1>You're offline</h1>
-            <p>Check your connection and try again — your data is safe and will sync when you're back.</p>
-            <button onclick="location.reload()">Try again</button>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span><span class="status-dot"></span>OFFLINE_MODE</span>
+                <span>SYS_ERR::NET_DISCONNECTED</span>
+            </div>
+            <h1 class="title">TERMINAL TERPUTUS</h1>
+            <p class="description">Koneksi jaringan tidak terdeteksi. Data transaksi Anda tetap aman di perangkat lokal dan akan tersinkronisasi segera setelah jaringan kembali terhubung.</p>
+            <button class="btn" onclick="location.reload()">[ ↺ ] Sambungkan Ulang</button>
         </div>
     </body>
 </html>

@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 
-        <meta name="color-scheme" content="light dark">
+        <meta name="color-scheme" content="dark light">
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f7">
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14131b">
-        <meta name="theme-color" content="#faf9f7">
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#050508">
+        <meta name="theme-color" content="#050508">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
@@ -25,7 +25,7 @@
 
                 document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 
-                const themeColor = isDark ? '#14131b' : '#faf9f7';
+                const themeColor = isDark ? '#050508' : '#faf9f7';
                 document.querySelectorAll('meta[name="theme-color"]').forEach(function(meta) {
                     meta.setAttribute('content', themeColor);
                 });
@@ -39,7 +39,7 @@
             }
 
             html.dark {
-                background-color: oklch(0.12 0.015 260);
+                background-color: #050508;
             }
         </style>
 
@@ -47,8 +47,9 @@
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <link rel="manifest" href="/build/manifest.webmanifest">
+        <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="apple-mobile-web-app-title" content="Expense Tracker">
 
         @fonts
