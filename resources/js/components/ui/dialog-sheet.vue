@@ -46,13 +46,13 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       :class="
         cn(
           'bg-background border fixed z-modal grid w-full gap-4 p-6 shadow-lg duration-200',
-          // < md: bottom sheet (thumb-reach)
-          'inset-x-0 bottom-0 top-auto max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl md:right-auto md:w-auto md:max-w-lg',
+          // < md: bottom sheet (thumb-reach) - sharp brutalist terminal style flush to bottom
+          'inset-x-0 bottom-0 top-auto max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-none md:right-auto md:w-auto md:max-w-lg',
           'md:left-[50%] md:-translate-x-1/2 md:max-w-lg',
-          'max-md:pt-4 max-md:pb-[calc(1.5rem+env(safe-area-inset-bottom))]',
+          'max-md:px-4 max-md:pt-4 max-md:pb-0',
           'max-md:data-[state=open]:animate-in max-md:data-[state=closed]:animate-out max-md:data-[state=closed]:fade-out-0 max-md:data-[state=open]:fade-in-0 max-md:data-[state=open]:slide-in-from-bottom max-md:data-[state=closed]:slide-out-to-bottom',
           // md+: centered modal (identical to DialogContent)
-          'md:top-[50%] md:left-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg',
+          'md:top-[50%] md:left-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-none',
           'md:data-[state=open]:animate-in md:data-[state=closed]:animate-out md:data-[state=closed]:fade-out-0 md:data-[state=open]:fade-in-0 md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95',
           props.class,
         )

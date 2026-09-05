@@ -36,10 +36,21 @@ createInertiaApp({
   setup({ el, App, props, plugin }) {
     const app = createApp({ render: () => h(App, props) })
 
-    const locale = props.initialPage.props.locale as 'id' | 'en' | undefined
+    const savedLocale =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('locale')
+        : null
+    const locale =
+      savedLocale === 'id' || savedLocale === 'en'
+        ? (savedLocale as 'id' | 'en')
+        : (props.initialPage.props.locale as 'id' | 'en' | undefined)
 
     if (locale) {
       i18n.global.locale.value = locale
+
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = locale
+      }
     }
 
     app.use(plugin)

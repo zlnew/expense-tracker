@@ -22,9 +22,13 @@ defineProps<{
       <div class="absolute inset-0 bg-zinc-900" />
       <Link
         :href="home()"
-        class="relative z-20 flex items-center text-lg font-medium"
+        class="relative z-20 flex items-center gap-2 font-mono text-base font-bold tracking-wider text-white uppercase"
       >
-        <AppLogoIcon class="mr-2 size-8 fill-current text-white" />
+        <div
+          class="flex aspect-square size-8 items-center justify-center border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+        >
+          <AppLogoIcon class="size-5 fill-current" />
+        </div>
         {{ name }}
       </Link>
     </div>
