@@ -14,12 +14,9 @@ import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import DataListState from '@/components/DataListState.vue'
 import BudgetDeleteDialog from '@/components/dialogs/BudgetDeleteDialog.vue'
-import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { useDate } from '@/composables/useDate'
 import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
@@ -132,21 +129,32 @@ const rowActions = (b: Budget) => {
   <Head :title="__('budgets')" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
+    <div class="page-container space-y-5">
+      <!-- Command Bar -->
       <div
-        class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <Heading
-          :title="__('budgets')"
-          :description="__('budget_list_description')"
-          class="mb-0"
-        />
-        <Button asChild>
-          <Link :href="budgetCreate.url()">
-            <Plus class="mr-2 size-4" />
-            {{ __('add_data', { data: __('budget') }) }}
+        <div class="flex items-center gap-2.5">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
+            {{ __('budgets') }}
+          </h1>
+          <span class="stat-chip font-semibold text-zinc-400">
+            {{ budgets.meta?.total ?? budgets.data.length }}
+            {{ __('periods') || 'periode' }}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <Link
+            :href="budgetCreate.url()"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 active:scale-95"
+          >
+            <Plus class="size-3.5 stroke-[2.5]" />
+            <span>{{ __('add_data', { data: __('budget') }) }}</span>
           </Link>
-        </Button>
+        </div>
       </div>
 
       <div class="flex flex-col items-center gap-4 lg:flex-row">
@@ -167,12 +175,13 @@ const rowActions = (b: Budget) => {
         :empty-description="__('budget_list_description')"
       >
         <template #empty>
-          <Button asChild>
-            <Link :href="budgetCreate.url()">
-              <Plus class="mr-2 size-4" />
-              {{ __('add_data', { data: __('budget') }) }}
-            </Link>
-          </Button>
+          <Link
+            :href="budgetCreate.url()"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
+          >
+            <Plus class="size-4 stroke-[2.5]" />
+            {{ __('add_data', { data: __('budget') }) }}
+          </Link>
         </template>
 
         <ResponsiveTable
@@ -207,42 +216,43 @@ const rowActions = (b: Budget) => {
         >
           <!-- Mobile card -->
           <template #card="{ row: b }">
-            <div class="mb-3 flex items-center justify-between border-b pb-3">
+            <div
+              class="mb-3 flex items-center justify-between border-b border-[#1f222e]/60 pb-3"
+            >
               <div class="flex items-center gap-2">
-                <span class="text-sm font-bold">{{
+                <span class="font-mono text-sm font-bold text-zinc-100">{{
                   formatDate(b.period_start, 'MMM YYYY')
                 }}</span>
-                <Badge
+                <span
                   v-if="b.is_active"
-                  variant="default"
-                  class="px-2.5 py-1 text-xs"
+                  class="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.2)]"
                 >
                   {{ __('active') }}
-                </Badge>
+                </span>
               </div>
               <RowActions :actions="rowActions(b)" collapse-below="md" />
             </div>
-            <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="grid grid-cols-2 gap-3 font-mono text-xs">
               <div>
-                <p class="text-xs text-muted-foreground">
+                <p class="text-[11px] text-zinc-500">
                   {{ __('period_start') }}
                 </p>
-                <p class="font-medium">
+                <p class="font-medium text-zinc-200">
                   {{ formatDate(b.period_start, 'DD MMM YYYY') }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-muted-foreground">
+                <p class="text-[11px] text-zinc-500">
                   {{ __('period_end') }}
                 </p>
-                <p class="font-medium">
+                <p class="font-medium text-zinc-200">
                   {{ formatDate(b.period_end, 'DD MMM YYYY') }}
                 </p>
               </div>
             </div>
             <p
               v-if="b.notes"
-              class="mt-3 line-clamp-2 text-sm text-muted-foreground italic"
+              class="mt-2.5 line-clamp-2 font-mono text-xs text-zinc-400 italic"
             >
               "{{ b.notes }}"
             </p>

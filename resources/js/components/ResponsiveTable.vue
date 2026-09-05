@@ -1,13 +1,5 @@
 <script setup lang="ts" generic="TRow">
 import type { HTMLAttributes } from 'vue'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 
 type Column = {
   /** i18n key or plain string for the desktop header. */
@@ -32,35 +24,43 @@ const props = defineProps<Props>()
 <template>
   <!-- Desktop: table (md+) -->
   <div
-    class="hidden overflow-x-clip rounded-xl border border-border/70 bg-card md:block"
+    class="hidden overflow-x-auto rounded-2xl border border-[#1f222e] bg-[#0a0a0c] shadow-xl md:block"
     :class="props.class"
   >
-    <Table class="w-full">
-      <TableHeader class="sticky top-0 z-10 bg-card">
-        <TableRow>
-          <TableHead
+    <table class="w-full border-collapse text-left">
+      <thead class="sticky top-0 z-10 border-b border-[#1f222e] bg-[#121217]">
+        <tr>
+          <th
             v-for="(col, i) in props.columns"
             :key="i"
+            class="px-4 py-3 font-mono text-[11px] font-semibold tracking-wider text-zinc-400 uppercase"
             :class="col.headerClass"
           >
             {{ col.header }}
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow v-for="(row, i) in props.rows" :key="i">
-          <TableCell
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="divide-y divide-[#1f222e]/60 font-mono text-xs text-zinc-200"
+      >
+        <tr
+          v-for="(row, i) in props.rows"
+          :key="i"
+          class="transition-colors hover:bg-[#121217]/60"
+        >
+          <td
             v-for="(col, j) in props.columns"
             :key="j"
+            class="px-4 py-3.5 align-middle"
             :class="col.cellClass"
           >
             <slot :name="`cell-${j}`" :row="row" :index="i">
               {{ col.cell(row, i) }}
             </slot>
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- Mobile: cards (<md) -->
@@ -68,10 +68,14 @@ const props = defineProps<Props>()
     <div
       v-for="(row, i) in props.rows"
       :key="i"
-      class="rounded-xl border border-border/70 bg-card p-4 text-card-foreground shadow-sm"
+      class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-4 text-zinc-100 shadow-lg"
     >
       <slot name="card" :row="row" :index="i">
-        <div v-for="(col, j) in props.columns" :key="j" class="mb-1">
+        <div
+          v-for="(col, j) in props.columns"
+          :key="j"
+          class="mb-1 font-mono text-xs"
+        >
           <slot :name="`cell-${j}`" :row="row" :index="i">
             {{ col.cell(row, i) }}
           </slot>

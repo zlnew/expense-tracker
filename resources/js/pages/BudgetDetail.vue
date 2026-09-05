@@ -2,6 +2,7 @@
 import { Head, Link, router, setLayoutProps, useHttp } from '@inertiajs/vue3'
 import {
   AlertTriangle,
+  ArrowLeft,
   CheckCircle2,
   CalendarDays,
   SquarePen,
@@ -10,18 +11,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import DataListState from '@/components/DataListState.vue'
-import Heading from '@/components/Heading.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import { useBudgetProgress } from '@/composables/useBudgetProgress'
 import { useDate } from '@/composables/useDate'
 import { useFilters } from '@/composables/useFilters'
@@ -43,12 +32,8 @@ const props = defineProps<{
 const { __ } = useLang()
 const { formatAmount } = useNumber()
 const { formatDate } = useDate()
-const {
-  getProgressPercent,
-  getProgressColor,
-  getProgressBgColor,
-  getProgressTextColor,
-} = useBudgetProgress()
+const { getProgressPercent, getProgressColor, getProgressTextColor } =
+  useBudgetProgress()
 
 setLayoutProps({
   breadcrumbs: [
@@ -312,87 +297,138 @@ const setActive = () => {
   <Head :title="__('detail_data', { data: __('budget') })" />
 
   <AppContent>
-    <div class="space-y-6 px-4 pt-6 pb-[var(--bottom-nav-height)] md:px-8">
-      <div class="flex items-start justify-between">
-        <Heading
-          :title="__('detail_data', { data: __('budget') })"
-          :description="__('budget_detail_description')"
-        />
-        <Badge v-if="budget.is_active">{{ __('active') }}</Badge>
+    <div class="page-container space-y-5">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <Link
+            :href="budgetIndex.url()"
+            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white active:scale-95"
+          >
+            <ArrowLeft class="size-4" />
+          </Link>
+          <div>
+            <h1
+              class="font-mono text-base font-bold tracking-tight text-zinc-100 uppercase"
+            >
+              {{ __('detail_data', { data: __('budget') }) }}
+            </h1>
+            <p class="font-mono text-[11px] text-zinc-500">
+              {{ formatDate(budget.period_start, 'DD MMM') }} -
+              {{ formatDate(budget.period_end, 'DD MMM YYYY') }}
+            </p>
+          </div>
+        </div>
+
+        <span
+          v-if="budget.is_active"
+          class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.25)]"
+        >
+          <CheckCircle2 class="size-3.5" />
+          {{ __('active') }}
+        </span>
       </div>
 
-      <div class="space-y-4">
-        <div class="flex flex-col gap-1">
-          <div class="text-sm font-semibold">{{ __('periods') }}</div>
-          <div class="text-lg">
-            {{ formatDate(budget.period_start, 'DD MMM YYYY') }} -
+      <!-- Budget Meta Grid -->
+      <div
+        class="grid grid-cols-2 gap-3 rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-4 font-mono text-xs sm:grid-cols-4"
+      >
+        <div class="space-y-1">
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('periods') }}
+          </div>
+          <div class="text-xs font-bold text-zinc-200">
+            {{ formatDate(budget.period_start, 'DD MMM') }} -
             {{ formatDate(budget.period_end, 'DD MMM YYYY') }}
           </div>
         </div>
 
-        <div class="flex flex-col gap-1">
-          <div class="text-sm font-semibold">{{ __('cutoff_day') }}</div>
-          <div class="text-lg">{{ budget.cutoff_day }}</div>
-        </div>
-
-        <div v-if="budget.carry_over" class="flex flex-col gap-1">
-          <div class="text-sm font-semibold">{{ __('carry_over') }}</div>
-          <div class="max-w-md text-muted-foreground">
-            {{ __('carry_over_description') }}
+        <div class="space-y-1">
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('cutoff_day') }}
+          </div>
+          <div class="text-xs font-bold text-zinc-200">
+            Tgl {{ budget.cutoff_day }}
           </div>
         </div>
 
-        <div class="flex flex-col gap-1">
-          <div class="text-sm font-semibold">{{ __('notes') }}</div>
-          <div class="max-w-md text-muted-foreground">
+        <div class="space-y-1">
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('carry_over') }}
+          </div>
+          <div
+            class="text-xs font-bold"
+            :class="budget.carry_over ? 'text-emerald-400' : 'text-zinc-400'"
+          >
+            {{ budget.carry_over ? 'Aktif' : 'Non-aktif' }}
+          </div>
+        </div>
+
+        <div class="col-span-2 space-y-1 sm:col-span-1">
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('notes') }}
+          </div>
+          <div class="line-clamp-2 text-xs text-zinc-300">
             {{ budget.notes ?? '-' }}
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <div class="text-sm font-semibold">{{ __('last_updated_at') }}</div>
-          <div>
-            {{
-              budget.updated_at
-                ? formatDate(budget.updated_at, 'DD MMM YYYY HH:mm')
-                : '-'
-            }}
           </div>
         </div>
       </div>
 
-      <Separator />
+      <!-- Cycle Selector -->
+      <div
+        class="flex items-center justify-between rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-3"
+      >
+        <div class="flex items-center gap-2 font-mono text-xs text-zinc-400">
+          <CalendarDays class="size-4 text-emerald-400" />
+          <span
+            class="text-[11px] font-semibold tracking-wider text-zinc-300 uppercase"
+            >{{ __('cycle') || 'Siklus' }}:</span
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <select
+            v-model="month"
+            class="cursor-pointer rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 transition-colors focus:border-emerald-500 focus:outline-none"
+          >
+            <option
+              v-for="m in months"
+              :key="m.value"
+              :value="m.value"
+              class="bg-[#12141a] text-zinc-200"
+            >
+              {{ m.label }}
+            </option>
+          </select>
+          <select
+            v-model="year"
+            class="cursor-pointer rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 transition-colors focus:border-emerald-500 focus:outline-none"
+          >
+            <option
+              v-for="y in years"
+              :key="y.value"
+              :value="y.value"
+              class="bg-[#12141a] text-zinc-200"
+            >
+              {{ y.label }}
+            </option>
+          </select>
+        </div>
+      </div>
 
       <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <div class="flex items-center justify-center gap-2 lg:col-span-2">
-          <CalendarDays class="mr-1 text-muted-foreground" />
-          <Select v-model="month">
-            <SelectTrigger>
-              <SelectValue :placeholder="__('month')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="m in months" :key="m.value" :value="m.value">
-                {{ m.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Select v-model="year">
-            <SelectTrigger>
-              <SelectValue :placeholder="__('year')" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="y in years" :key="y.value" :value="y.value">
-                {{ y.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{{ __('monthly_expenses') }}</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <!-- Monthly Expenses Envelopes -->
+        <div
+          class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
+        >
+          <div
+            class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+          >
+            <h3
+              class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+            >
+              {{ __('monthly_expenses') }}
+            </h3>
+          </div>
+          <div>
             <DataListState
               :loading="transactionsLoading"
               :error="transactionsError"
@@ -404,28 +440,27 @@ const setActive = () => {
               "
               :empty-title="__('no_data_found', { data: __('category') })"
             >
-              <!-- Budget progress style (mobile + desktop), matching Dashboard -->
               <div class="space-y-4">
                 <div
                   v-for="(exp, index) in expenseBudgetItems"
                   :key="index"
-                  class="-mx-2 space-y-1.5 rounded-lg px-2 py-2 transition-colors duration-200 hover:bg-muted/10"
+                  class="space-y-2 rounded-xl border border-transparent bg-[#121217]/50 p-3 transition-colors hover:border-[#1f222e]"
                 >
                   <div class="flex items-center justify-between text-sm">
                     <div class="flex min-w-0 items-center gap-1.5">
-                      <span class="truncate font-bold text-foreground">
+                      <span class="truncate font-mono font-bold text-zinc-100">
                         {{ exp.category?.name || __('unknown') }}
                       </span>
                       <span
                         v-if="exp.actual_amount > exp.planned_amount"
-                        class="inline-flex items-center gap-0.5 rounded-full bg-expense/15 px-1.5 py-0.5 text-[9px] font-semibold text-expense"
+                        class="inline-flex items-center gap-1 rounded-md border border-rose-500/30 bg-rose-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold text-rose-400"
                       >
                         <AlertTriangle class="size-2.5" />
                         {{ __('overspent') }}
                       </span>
                     </div>
                     <span
-                      class="text-xs font-semibold"
+                      class="font-mono text-xs font-bold tabular-nums"
                       :class="
                         getProgressTextColor(
                           exp.planned_amount,
@@ -444,13 +479,7 @@ const setActive = () => {
 
                   <!-- Progress Bar -->
                   <div
-                    class="h-2 w-full overflow-hidden rounded-full"
-                    :class="
-                      getProgressBgColor(
-                        exp.planned_amount,
-                        exp.actual_amount ?? 0,
-                      )
-                    "
+                    class="h-2 w-full overflow-hidden rounded-full bg-zinc-800"
                   >
                     <div
                       class="h-full rounded-full transition-all duration-500 ease-out"
@@ -463,12 +492,12 @@ const setActive = () => {
                       :style="{
                         width: `${getProgressPercent(exp.planned_amount, exp.actual_amount ?? 0)}%`,
                       }"
-                    ></div>
+                    />
                   </div>
 
                   <!-- Amounts detail -->
                   <div
-                    class="flex justify-between font-mono text-[11px] text-muted-foreground"
+                    class="flex justify-between font-mono text-[11px] text-zinc-400"
                   >
                     <span>
                       {{ formatAmount(exp.actual_amount ?? 0) }} /
@@ -477,8 +506,8 @@ const setActive = () => {
                     <span
                       :class="
                         exp.diff_amount < 0
-                          ? 'font-bold text-expense'
-                          : 'font-medium text-income'
+                          ? 'font-bold text-rose-400'
+                          : 'font-bold text-emerald-400'
                       "
                     >
                       {{
@@ -493,24 +522,26 @@ const setActive = () => {
                 <!-- Totals -->
                 <div
                   v-if="expenseBudgetItems.length > 0"
-                  class="flex flex-col gap-1 border-t pt-4 text-sm font-bold"
+                  class="flex flex-col gap-1 border-t border-[#1f222e]/60 pt-4 font-mono text-xs"
                 >
                   <div class="flex items-center justify-between">
-                    <span class="text-muted-foreground">{{ __('total') }}</span>
-                    <div class="flex flex-col items-end">
-                      <span>
+                    <span class="font-semibold text-zinc-400">{{
+                      __('total')
+                    }}</span>
+                    <div class="flex flex-col items-end space-y-0.5">
+                      <span class="text-zinc-300">
                         {{ __('planned') }}:
                         {{ formatAmount(plannedExpenseTotal) }}
                       </span>
-                      <span>
+                      <span class="font-bold text-rose-400">
                         {{ __('actual') }}:
                         {{ formatAmount(actualExpenseTotal) }}
                       </span>
                       <span
                         :class="
                           diffExpenseTotal < 0
-                            ? 'text-destructive'
-                            : 'text-muted-foreground'
+                            ? 'font-bold text-rose-400'
+                            : 'text-zinc-400'
                         "
                       >
                         {{ __('diff') }}: {{ formatAmount(diffExpenseTotal) }}
@@ -520,14 +551,23 @@ const setActive = () => {
                 </div>
               </div>
             </DataListState>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{{ __('monthly_incomes') }}</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <!-- Monthly Incomes Envelopes -->
+        <div
+          class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
+        >
+          <div
+            class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+          >
+            <h3
+              class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+            >
+              {{ __('monthly_incomes') }}
+            </h3>
+          </div>
+          <div>
             <DataListState
               :loading="transactionsLoading"
               :error="transactionsError"
@@ -539,29 +579,20 @@ const setActive = () => {
               "
               :empty-title="__('no_data_found', { data: __('category') })"
             >
-              <!-- Same progress-bar language as expenses — one render path
-                   at every breakpoint (kills the two-visual-languages
-                   problem: incomes used to be a plain list + desktop table). -->
               <div class="space-y-4">
                 <div
                   v-for="(inc, index) in incomeBudgetItems"
                   :key="index"
-                  class="-mx-2 space-y-1.5 rounded-lg px-2 py-2 transition-colors duration-200 hover:bg-muted/10"
+                  class="space-y-2 rounded-xl border border-transparent bg-[#121217]/50 p-3 transition-colors hover:border-[#1f222e]"
                 >
                   <div class="flex items-center justify-between text-sm">
                     <div class="flex min-w-0 items-center gap-1.5">
-                      <span class="truncate font-bold text-foreground">
+                      <span class="truncate font-mono font-bold text-zinc-100">
                         {{ inc.category?.name || __('unknown') }}
                       </span>
                     </div>
                     <span
-                      class="text-xs font-semibold"
-                      :class="
-                        getProgressTextColor(
-                          inc.planned_amount,
-                          inc.actual_amount ?? 0,
-                        )
-                      "
+                      class="font-mono text-xs font-bold text-emerald-400 tabular-nums"
                     >
                       {{
                         getProgressPercent(
@@ -574,13 +605,7 @@ const setActive = () => {
 
                   <!-- Progress Bar -->
                   <div
-                    class="h-2 w-full overflow-hidden rounded-full"
-                    :class="
-                      getProgressBgColor(
-                        inc.planned_amount,
-                        inc.actual_amount ?? 0,
-                      )
-                    "
+                    class="h-2 w-full overflow-hidden rounded-full bg-zinc-800"
                   >
                     <div
                       class="h-full rounded-full transition-all duration-500 ease-out"
@@ -593,12 +618,12 @@ const setActive = () => {
                       :style="{
                         width: `${getProgressPercent(inc.planned_amount, inc.actual_amount ?? 0)}%`,
                       }"
-                    ></div>
+                    />
                   </div>
 
                   <!-- Amounts detail -->
                   <div
-                    class="flex justify-between font-mono text-[11px] text-muted-foreground"
+                    class="flex justify-between font-mono text-[11px] text-zinc-400"
                   >
                     <span>
                       {{ formatAmount(inc.actual_amount ?? 0) }} /
@@ -607,8 +632,8 @@ const setActive = () => {
                     <span
                       :class="
                         inc.diff_amount < 0
-                          ? 'text-rose-500'
-                          : 'text-emerald-500'
+                          ? 'font-bold text-rose-400'
+                          : 'font-bold text-emerald-400'
                       "
                     >
                       {{
@@ -623,24 +648,26 @@ const setActive = () => {
                 <!-- Totals -->
                 <div
                   v-if="incomeBudgetItems.length > 0"
-                  class="flex flex-col gap-1 border-t pt-4 text-sm font-bold"
+                  class="flex flex-col gap-1 border-t border-[#1f222e]/60 pt-4 font-mono text-xs"
                 >
                   <div class="flex items-center justify-between">
-                    <span class="text-muted-foreground">{{ __('total') }}</span>
-                    <div class="flex flex-col items-end">
-                      <span>
+                    <span class="font-semibold text-zinc-400">{{
+                      __('total')
+                    }}</span>
+                    <div class="flex flex-col items-end space-y-0.5">
+                      <span class="text-zinc-300">
                         {{ __('planned') }}:
                         {{ formatAmount(plannedIncomeTotal) }}
                       </span>
-                      <span>
+                      <span class="font-bold text-emerald-400">
                         {{ __('actual') }}:
                         {{ formatAmount(actualIncomeTotal) }}
                       </span>
                       <span
                         :class="
                           diffIncomeTotal < 0
-                            ? 'text-destructive'
-                            : 'text-muted-foreground'
+                            ? 'font-bold text-rose-400'
+                            : 'text-zinc-400'
                         "
                       >
                         {{ __('diff') }}: {{ formatAmount(diffIncomeTotal) }}
@@ -650,31 +677,28 @@ const setActive = () => {
                 </div>
               </div>
             </DataListState>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   </AppContent>
 
-  <div
-    class="fixed right-4 bottom-[calc(var(--bottom-nav-height)+0.75rem)] z-fab flex gap-2 md:right-8 md:bottom-8"
-  >
-    <Button
+  <div class="fixed right-4 bottom-24 z-fab flex gap-2 md:right-8 md:bottom-8">
+    <button
       v-if="!budget.is_active"
       type="button"
-      size="lg"
-      variant="secondary"
-      class="rounded-full shadow-xl"
+      class="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-[#121217] px-4 py-3 font-mono text-xs font-bold text-emerald-400 shadow-xl transition-all hover:bg-emerald-500/10 active:scale-95"
       @click="setActive"
     >
-      <CheckCircle2 class="mr-2 size-4" />
+      <CheckCircle2 class="size-4" />
       <span>{{ __('set_as_active') }}</span>
-    </Button>
-    <Button type="submit" size="lg" class="rounded-full shadow-xl" asChild>
-      <Link :href="budgetEdit.url({ budget: budget })">
-        <SquarePen />
-        <span>{{ __('edit') }}</span>
-      </Link>
-    </Button>
+    </button>
+    <Link
+      :href="budgetEdit.url({ budget: budget })"
+      class="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
+    >
+      <SquarePen class="size-4" />
+      <span>{{ __('edit') }}</span>
+    </Link>
   </div>
 </template>

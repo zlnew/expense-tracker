@@ -5,18 +5,9 @@ import { VisSingleContainer, VisDonut } from '@unovis/vue'
 import { PieChart, TrendingDown, ChevronRight } from 'lucide-vue-next'
 import { computed } from 'vue'
 import ChartEmpty from '@/components/ChartEmpty.vue'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart'
 import ChartTooltipContent from '@/components/ui/chart/ChartTooltipContent.vue'
 import { componentToString } from '@/components/ui/chart/utils'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useLang } from '@/composables/useLang'
 import { useMasking } from '@/composables/useMasking'
 import { useNumber } from '@/composables/useNumber'
@@ -95,29 +86,37 @@ const donutTriggers = {
 </script>
 
 <template>
-  <Card class="border-border/70 bg-card shadow-sm">
-    <CardHeader class="flex flex-row items-center justify-between pb-3">
-      <div class="space-y-1">
+  <div
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
+  >
+    <!-- Card Header -->
+    <div
+      class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+    >
+      <div class="space-y-0.5">
         <div class="flex items-center gap-2">
           <span
-            class="inline-flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary"
+            class="inline-flex size-7 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-400"
           >
             <PieChart class="size-4" />
           </span>
-          <CardTitle class="text-base font-bold text-foreground">
+          <h2
+            class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('expense_breakdown') }}
-          </CardTitle>
+          </h2>
         </div>
-        <CardDescription class="text-xs">
+        <p class="font-mono text-[11px] text-zinc-500">
           {{ __('expense_breakdown_description') }}
-        </CardDescription>
+        </p>
       </div>
-    </CardHeader>
+    </div>
 
-    <CardContent class="pt-1">
-      <Skeleton
+    <!-- Content -->
+    <div>
+      <div
         v-if="expenseBreakdown === undefined"
-        class="h-[220px] w-full rounded-xl"
+        class="h-[220px] w-full animate-pulse rounded-xl border border-[#1f222e] bg-[#121217]"
       />
 
       <ChartEmpty
@@ -133,10 +132,13 @@ const donutTriggers = {
         "
       >
         <Link v-if="!hasActiveBudget" :href="budgetIndex.url()">
-          <Button size="sm" class="mt-2 gap-1.5 text-xs font-semibold">
+          <button
+            type="button"
+            class="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20"
+          >
             {{ __('create_budget') }}
             <ChevronRight class="size-3.5" />
-          </Button>
+          </button>
         </Link>
       </ChartEmpty>
 
@@ -164,45 +166,49 @@ const donutTriggers = {
             class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center"
           >
             <span
-              class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
+              class="font-mono text-[10px] font-semibold tracking-wider text-zinc-500 uppercase"
               >Total</span
             >
-            <span class="text-xs font-bold text-foreground tabular-nums">
+            <span
+              class="font-mono text-xs font-extrabold text-zinc-100 tabular-nums"
+            >
               {{ masked ? '••••' : formatAmount(totalExpense) }}
             </span>
           </div>
         </div>
 
         <!-- Ranked Category Chips / List -->
-        <div class="flex-1 space-y-2">
+        <div class="flex-1 space-y-1.5">
           <div
             v-for="(item, i) in breakdownItems"
             :key="item.category"
-            class="flex items-center justify-between rounded-lg px-2 py-1 text-xs transition-colors hover:bg-muted/40"
+            class="flex items-center justify-between rounded-xl border border-transparent bg-[#121217]/60 px-3 py-2 text-xs transition-colors hover:border-[#1f222e]"
           >
             <div class="flex items-center gap-2 truncate pr-2">
               <span
-                class="size-2.5 shrink-0 rounded-full"
+                class="size-2 shrink-0 rounded-full"
                 :style="{ backgroundColor: getCategoryColor(i) }"
               />
-              <span class="truncate font-medium text-foreground">
+              <span class="truncate font-medium text-zinc-200">
                 {{ item.category }}
               </span>
             </div>
 
-            <div class="flex shrink-0 items-center gap-2">
+            <div class="flex shrink-0 items-center gap-2.5">
               <span
-                class="text-[11px] font-semibold text-muted-foreground tabular-nums"
+                class="font-mono text-[11px] font-bold text-zinc-400 tabular-nums"
               >
                 {{ item.percentage }}%
               </span>
-              <span class="text-xs font-bold text-foreground tabular-nums">
+              <span
+                class="font-mono text-xs font-bold text-zinc-100 tabular-nums"
+              >
                 {{ masked ? '••••' : formatAmount(item.amount) }}
               </span>
             </div>
           </div>
         </div>
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>

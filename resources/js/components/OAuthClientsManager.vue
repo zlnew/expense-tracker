@@ -36,7 +36,9 @@ const props = withDefaults(
   },
 )
 
-const clients = ref<Client[]>(props.initialClients.length > 0 ? [...props.initialClients] : [])
+const clients = ref<Client[]>(
+  props.initialClients.length > 0 ? [...props.initialClients] : [],
+)
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const showCreateDialog = ref(false)
