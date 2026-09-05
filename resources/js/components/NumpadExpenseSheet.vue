@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/vue3'
 import { ChevronDown, Delete, Plus, X } from 'lucide-vue-next'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
+import { useLang } from '@/composables/useLang'
 import { store as storeTransaction } from '@/routes/transactions'
 import type { Balance, Budget, Category } from '@/types'
 
@@ -18,6 +19,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
+
+const { __ } = useLang()
 
 // State
 const type = ref<'expense' | 'income'>('expense')
@@ -154,19 +157,19 @@ function close() {
 
 function submit() {
   if (numericAmount.value <= 0) {
-    toast.error('Masukkan nominal pengeluaran.')
+    toast.error(__('enter_amount'))
 
     return
   }
 
   if (!selectedBalanceId.value) {
-    toast.error('Pilih akun rekening sumber.')
+    toast.error(__('select_account_prompt'))
 
     return
   }
 
   if (!selectedCategoryId.value) {
-    toast.error('Pilih kategori pengeluaran.')
+    toast.error(__('select_category_prompt'))
 
     return
   }
@@ -189,13 +192,16 @@ function submit() {
     onSuccess: () => {
       isSubmitting.value = false
       toast.success(
-        `Berhasil mencatat ${type.value === 'expense' ? 'pengeluaran' : 'pemasukan'} Rp ${formattedDisplay.value}!`,
+        __('transaction_recorded', {
+          type: __(type.value),
+          amount: formattedDisplay.value,
+        }),
       )
       close()
     },
     onError: () => {
       isSubmitting.value = false
-      toast.error('Gagal mencatat transaksi. Periksa kembali form.')
+      toast.error(__('transaction_failed'))
     },
   })
 }
@@ -264,20 +270,20 @@ onUnmounted(() => {
     >
       <div
         v-if="open"
-        class="safe-bottom fixed inset-x-0 bottom-0 z-50 flex max-h-[92vh] flex-col rounded-t-[28px] border-t border-[#1f222e] bg-[#0a0a0c] text-zinc-100 shadow-2xl"
+        class="safe-bottom fixed inset-x-0 bottom-0 z-50 flex max-h-[92vh] flex-col rounded-none border-t border-[#1f222e] bg-[#0a0a0c] text-zinc-100 shadow-2xl"
         @click.stop
       >
-        <!-- Drag pill handle -->
-        <div class="mx-auto mt-3 h-1.5 w-12 rounded-full bg-zinc-800" />
+        <!-- Telemetry top border strip -->
+        <div class="mx-auto mt-2 h-1 w-12 rounded-none bg-zinc-800" />
 
         <!-- Header Controls: Type Toggle & Close -->
         <div class="flex items-center justify-between px-6 pt-2 pb-1">
           <div
-            class="flex items-center gap-1 rounded-xl border border-[#1f222e] bg-[#121217] p-1"
+            class="flex items-center gap-1 rounded-none border border-[#1f222e] bg-[#121217] p-1"
           >
             <button
               type="button"
-              class="rounded-lg px-3 py-1 text-xs font-semibold tracking-wider transition-all"
+              class="rounded-none px-3 py-1 font-mono text-xs font-semibold tracking-wider uppercase transition-all"
               :class="
                 type === 'expense'
                   ? 'border border-rose-500/40 bg-rose-500/20 text-rose-400 shadow-sm'
@@ -285,11 +291,11 @@ onUnmounted(() => {
               "
               @click="type = 'expense'"
             >
-              EXPENSE
+              {{ __('expense') }}
             </button>
             <button
               type="button"
-              class="rounded-lg px-3 py-1 text-xs font-semibold tracking-wider transition-all"
+              class="rounded-none px-3 py-1 font-mono text-xs font-semibold tracking-wider uppercase transition-all"
               :class="
                 type === 'income'
                   ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-400 shadow-sm'
@@ -297,13 +303,13 @@ onUnmounted(() => {
               "
               @click="type = 'income'"
             >
-              INCOME
+              {{ __('income') }}
             </button>
           </div>
 
           <button
             type="button"
-            class="flex size-9 items-center justify-center rounded-full bg-zinc-900 text-zinc-400 transition-colors hover:text-zinc-100"
+            class="flex size-9 items-center justify-center rounded-none border border-[#1f222e] bg-zinc-900 text-zinc-400 transition-colors hover:text-zinc-100"
             @click="close"
           >
             <X class="size-5" />
@@ -316,7 +322,7 @@ onUnmounted(() => {
             class="mb-1 font-mono text-xs tracking-widest text-zinc-500 uppercase"
           >
             {{
-              type === 'expense' ? 'Nominal Pengeluaran' : 'Nominal Pemasukan'
+              type === 'expense' ? __('expense_amount') : __('income_amount')
             }}
           </span>
           <div class="flex items-baseline justify-center gap-2">
@@ -349,44 +355,44 @@ onUnmounted(() => {
             <button
               v-if="!showNoteInput && !description"
               type="button"
-              class="flex items-center gap-1.5 text-xs text-zinc-500 transition-colors hover:text-emerald-400"
+              class="flex items-center gap-1.5 font-mono text-xs text-zinc-500 transition-colors hover:text-emerald-400"
               @click="showNoteInput = true"
             >
               <Plus class="size-3.5" />
-              <span>Tambah catatan / keterangan</span>
+              <span>{{ __('add_note') }}</span>
             </button>
             <div
               v-else-if="!showNoteInput && description"
               class="flex items-center gap-2"
             >
               <span
-                class="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 font-mono text-xs text-emerald-400 italic"
+                class="rounded-none border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 font-mono text-xs text-emerald-400 italic"
               >
                 "{{ description }}"
               </span>
               <button
                 type="button"
-                class="text-xs text-zinc-500 hover:text-zinc-300"
+                class="font-mono text-xs text-zinc-500 hover:text-zinc-300"
                 @click="showNoteInput = true"
               >
-                Ubah
+                {{ __('edit') }}
               </button>
             </div>
             <div v-else class="flex w-full max-w-xs items-center gap-2">
               <input
                 v-model="description"
                 type="text"
-                placeholder="Catatan (misal: Makan siang Bu Imas)..."
-                class="w-full rounded-lg border border-[#1f222e] bg-[#121217] px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:border-emerald-500 focus:outline-none"
+                :placeholder="__('note_placeholder')"
+                class="w-full rounded-none border border-[#1f222e] bg-[#121217] px-3 py-1.5 font-mono text-xs text-zinc-100 placeholder-zinc-600 focus:border-emerald-500 focus:outline-none"
                 autofocus
                 @keydown.enter.prevent="showNoteInput = false"
               />
               <button
                 type="button"
-                class="rounded-lg bg-zinc-800 px-2.5 py-1.5 text-xs font-semibold text-zinc-300"
+                class="rounded-none border border-[#1f222e] bg-zinc-800 px-2.5 py-1.5 font-mono text-xs font-semibold text-zinc-300"
                 @click="showNoteInput = false"
               >
-                OK
+                {{ __('ok') || 'OK' }}
               </button>
             </div>
           </div>
@@ -401,7 +407,7 @@ onUnmounted(() => {
               v-for="cat in currentCategories"
               :key="cat.id"
               type="button"
-              class="flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium transition-all"
+              class="flex shrink-0 items-center gap-2 rounded-none px-3.5 py-2 font-mono text-xs font-medium transition-all"
               :class="
                 selectedCategoryId === cat.id
                   ? 'border border-emerald-500 bg-emerald-500/20 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
@@ -418,15 +424,17 @@ onUnmounted(() => {
         <div
           class="flex items-center justify-between border-b border-[#1f222e] bg-[#0a0a0c] px-6 py-2.5"
         >
-          <span class="font-mono text-xs text-zinc-500">Sumber Rekening:</span>
+          <span class="font-mono text-xs text-zinc-500"
+            >{{ __('source_account') }}:</span
+          >
           <div class="relative">
             <button
               type="button"
-              class="flex items-center gap-1.5 rounded-lg border border-[#1f222e] bg-[#121217] px-3 py-1.5 font-mono text-xs text-zinc-200 transition-colors hover:border-emerald-500/50"
+              class="flex items-center gap-1.5 rounded-none border border-[#1f222e] bg-[#121217] px-3 py-1.5 font-mono text-xs text-zinc-200 transition-colors hover:border-emerald-500/50"
               @click="showBalancePicker = !showBalancePicker"
             >
               <span class="font-semibold text-emerald-400">{{
-                activeBalance?.name || 'Pilih Rekening'
+                activeBalance?.name || __('select_account')
               }}</span>
               <span v-if="activeBalance" class="text-zinc-500">
                 (Rp
@@ -442,12 +450,12 @@ onUnmounted(() => {
             <!-- Inline Picker Dropdown -->
             <div
               v-if="showBalancePicker"
-              class="absolute right-0 bottom-full z-50 mb-2 w-56 rounded-xl border border-[#1f222e] bg-[#181820] p-1.5 shadow-2xl"
+              class="absolute right-0 bottom-full z-50 mb-2 w-56 rounded-none border border-[#1f222e] bg-[#181820] p-1.5 shadow-2xl"
             >
               <div
                 v-for="bal in balances"
                 :key="bal.id"
-                class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors"
+                class="flex cursor-pointer items-center justify-between rounded-none px-3 py-2 text-xs transition-colors"
                 :class="
                   selectedBalanceId === bal.id
                     ? 'bg-emerald-500/20 text-emerald-300'
@@ -455,7 +463,7 @@ onUnmounted(() => {
                 "
                 @click="selectBalance(bal.id)"
               >
-                <span class="font-medium">{{ bal.name }}</span>
+                <span class="font-mono font-medium">{{ bal.name }}</span>
                 <span class="font-mono text-[11px] text-zinc-400">
                   Rp
                   {{ new Intl.NumberFormat('id-ID').format(bal.final_amount) }}
@@ -484,7 +492,7 @@ onUnmounted(() => {
             ]"
             :key="k"
             type="button"
-            class="flex h-13 items-center justify-center rounded-xl border border-[#1f222e] bg-[#121217] font-mono text-xl font-semibold text-zinc-200 transition-all hover:border-zinc-700 active:scale-95 active:bg-zinc-800"
+            class="flex h-13 items-center justify-center rounded-none border border-[#1f222e] bg-[#121217] font-mono text-xl font-semibold text-zinc-200 transition-all hover:border-zinc-700 active:scale-95 active:bg-zinc-800"
             @click="pressKey(k)"
           >
             <Delete v-if="k === 'BACKSPACE'" class="size-6 text-zinc-400" />
@@ -502,7 +510,7 @@ onUnmounted(() => {
           <button
             type="button"
             :disabled="numericAmount <= 0 || isSubmitting"
-            class="flex h-14 w-full items-center justify-center gap-2 rounded-2xl font-mono text-sm font-bold tracking-wider uppercase transition-all disabled:opacity-40"
+            class="flex h-14 w-full items-center justify-center gap-2 rounded-none font-mono text-sm font-bold tracking-wider uppercase transition-all disabled:opacity-40"
             :class="
               type === 'expense'
                 ? 'bg-rose-500 text-[#0a0a0c] shadow-[0_0_25px_rgba(244,63,94,0.35)] active:scale-[0.98]'
@@ -511,10 +519,10 @@ onUnmounted(() => {
             @click="submit"
           >
             <span v-if="!isSubmitting">
-              Simpan {{ type === 'expense' ? 'Pengeluaran' : 'Pemasukan' }} (Rp
-              {{ formattedDisplay }})
+              {{ type === 'expense' ? __('save_expense') : __('save_income') }}
+              (Rp {{ formattedDisplay }})
             </span>
-            <span v-else class="animate-pulse">Menyimpan...</span>
+            <span v-else class="animate-pulse">{{ __('saving') }}</span>
           </button>
         </div>
       </div>

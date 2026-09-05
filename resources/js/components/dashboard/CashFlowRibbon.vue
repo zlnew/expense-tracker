@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 import {
   Wallet,
   TrendingUp,
@@ -11,7 +11,8 @@ import {
   Plus,
   ArrowRightLeft,
 } from 'lucide-vue-next'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import TransactionTransferDialog from '@/components/dialogs/TransactionTransferDialog.vue'
 import { useLang } from '@/composables/useLang'
 import { useMasking } from '@/composables/useMasking'
 import { useNumber } from '@/composables/useNumber'
@@ -22,6 +23,9 @@ import type { SummaryCards } from '@/types'
 const props = defineProps<{
   summaryCards: SummaryCards
 }>()
+
+const page = usePage()
+const transferDialogOpen = ref(false)
 
 const { __ } = useLang()
 const { formatAmount } = useNumber()
@@ -266,13 +270,14 @@ function triggerTransactionCreate() {
             <Plus class="size-3.5" />
             <span>{{ __('catat') }}</span>
           </button>
-          <Link
-            :href="balanceIndex.url()"
+          <button
+            type="button"
             class="flex items-center justify-center gap-1.5 rounded-none border border-border bg-secondary/50 px-1 py-2 font-mono text-xs font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
+            @click="transferDialogOpen = true"
           >
             <ArrowRightLeft class="size-3.5 text-muted-foreground" />
             <span>{{ __('pindah') }}</span>
-          </Link>
+          </button>
           <Link
             :href="balanceIndex.url()"
             class="flex items-center justify-center gap-1.5 rounded-none border border-border bg-secondary/50 px-1 py-2 font-mono text-xs font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
@@ -284,4 +289,9 @@ function triggerTransactionCreate() {
       </div>
     </div>
   </div>
+
+  <TransactionTransferDialog
+    v-model:open="transferDialogOpen"
+    :balances="(page.props.balances as any) ?? []"
+  />
 </template>

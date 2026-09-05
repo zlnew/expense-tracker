@@ -98,7 +98,29 @@ const hasTrendData = computed(() => {
   )
 })
 
-const trendData = computed(() => props.monthlySpendingTrend ?? [])
+// Stop the trend line at the last month with actual spending or income
+const lastActiveIndex = computed(() => {
+  const data = props.monthlySpendingTrend ?? []
+
+  for (let i = data.length - 1; i >= 0; i--) {
+    if (data[i].income > 0 || data[i].expense > 0) {
+      return i
+    }
+  }
+
+  return -1
+})
+
+const trendData = computed(() => {
+  const data = props.monthlySpendingTrend ?? []
+
+  if (data.length === 0 || lastActiveIndex.value === -1) {
+    return []
+  }
+
+  // Stock-style termination: don't connect to future empty months
+  return data.slice(0, lastActiveIndex.value + 1)
+})
 
 const x = (_d: MonthlySpendingTrend, i: number) => i
 const incomeY = (d: MonthlySpendingTrend) => d.income
@@ -221,30 +243,37 @@ const tickFormatY = (tick: number): string => {
                 :y="incomeY"
                 :color="INCOME_COLOR"
                 :lineWidth="2"
+                curveType="linear"
               />
               <VisLine
                 :x="x"
                 :y="expenseY"
                 :color="EXPENSE_COLOR"
                 :lineWidth="2"
+                curveType="linear"
               />
               <VisArea
                 :x="x"
                 :y="incomeY"
                 :color="INCOME_COLOR"
-                :opacity="0.08"
+                :opacity="0.1"
+                curveType="linear"
               />
               <VisArea
                 :x="x"
                 :y="expenseY"
                 :color="EXPENSE_COLOR"
-                :opacity="0.08"
+                :opacity="0.1"
+                curveType="linear"
               />
               <VisScatter
                 :x="x"
                 :y="incomeY"
                 :color="INCOME_COLOR"
-                :size="(d: MonthlySpendingTrend) => (d.income > 0 ? 5 : 0)"
+                :size="
+                  (d: MonthlySpendingTrend, i: number) =>
+                    i === trendData.length - 1 ? 6 : d.income > 0 ? 4 : 0
+                "
                 strokeColor="var(--card)"
                 :strokeWidth="2"
               />
@@ -252,7 +281,10 @@ const tickFormatY = (tick: number): string => {
                 :x="x"
                 :y="expenseY"
                 :color="EXPENSE_COLOR"
-                :size="(d: MonthlySpendingTrend) => (d.expense > 0 ? 5 : 0)"
+                :size="
+                  (d: MonthlySpendingTrend, i: number) =>
+                    i === trendData.length - 1 ? 6 : d.expense > 0 ? 4 : 0
+                "
                 strokeColor="var(--card)"
                 :strokeWidth="2"
               />

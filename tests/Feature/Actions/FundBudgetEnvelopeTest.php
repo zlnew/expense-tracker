@@ -506,3 +506,26 @@ test('E13 web endpoint: envelope extras in the response, frozen /api/transaction
         ->and($apiResponse->json())->not->toHaveKey('fund')
         ->and($apiResponse->json())->not->toHaveKey('transactions');
 });
+
+test('E14 transaction with null budget_item_id is resolved by category_id to its envelope', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $balance = Balance::factory()->for($user)->create(['initial_amount' => 5_000_000, 'final_amount' => 5_000_000]);
+    [$budget, $item, $category] = envelopeBudget($user, 1_000_000);
+
+    // Create an expense transaction without budget_item_id (e.g. from quick log or external import)
+    Transaction::forceCreate([
+        'user_id' => $user->id,
+        'balance_id' => $balance->id,
+        'budget_id' => $budget->id,
+        'budget_item_id' => null,
+        'category_id' => $category->id,
+        'type' => CategoryType::EXPENSE->value,
+        'amount' => 250_000,
+        'date' => CarbonImmutable::now()->toDateString(),
+        'description' => 'Quick unlinked expense',
+    ]);
+
+    expect(envelopeItemActual($user->id, $item->id))->toBe(250_000);
+});

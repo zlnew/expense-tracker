@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { Trash2 } from 'lucide-vue-next'
 import { computed, nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
@@ -41,7 +42,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
+  delete: [transaction: Transaction]
 }>()
+
+function onDeleteClick() {
+  if (props.transaction) {
+    emit('update:open', false)
+    emit('delete', props.transaction)
+  }
+}
 
 const { __ } = useLang()
 const { formatDate } = useDate()
@@ -328,19 +337,39 @@ const submit = () => {
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter
+          class="flex w-full flex-col-reverse items-center gap-2 pt-2 sm:flex-row sm:justify-between"
+        >
           <Button
+            v-if="transaction"
             type="button"
-            variant="outline"
-            @click="$emit('update:open', false)"
+            variant="destructive"
+            class="w-full rounded-none font-mono text-xs sm:w-auto"
+            @click="onDeleteClick"
             :disabled="form.processing"
           >
-            {{ __('cancel') }}
+            <Trash2 class="mr-1.5 size-3.5" />
+            {{ __('delete') }}
           </Button>
-          <Button type="submit" :disabled="form.processing">
-            <Spinner v-if="form.processing" class="mr-2" />
-            {{ form.processing ? __('updating') : __('update') }}
-          </Button>
+          <div class="flex w-full items-center justify-end gap-2 sm:w-auto">
+            <Button
+              type="button"
+              variant="outline"
+              class="rounded-none font-mono text-xs"
+              @click="$emit('update:open', false)"
+              :disabled="form.processing"
+            >
+              {{ __('cancel') }}
+            </Button>
+            <Button
+              type="submit"
+              class="rounded-none font-mono text-xs"
+              :disabled="form.processing"
+            >
+              <Spinner v-if="form.processing" class="mr-2" />
+              {{ form.processing ? __('updating') : __('update') }}
+            </Button>
+          </div>
         </DialogFooter>
       </form>
     </SheetDialogContent>
