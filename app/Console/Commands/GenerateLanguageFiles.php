@@ -181,35 +181,7 @@ class GenerateLanguageFiles extends Command
 
     private function normalizeTranslationPlaceholders(string $value): string
     {
-        return str_replace(
-            [
-                ':amount',
-                ':data',
-                ':date',
-                ':fund',
-                ':name',
-                ':student',
-                ':activity',
-                ':period',
-                ':total',
-                ':from',
-                ':to',
-            ],
-            [
-                '{amount}',
-                '{data}',
-                '{date}',
-                '{fund}',
-                '{name}',
-                '{student}',
-                '{activity}',
-                '{period}',
-                '{total}',
-                '{from}',
-                '{to}',
-            ],
-            $value
-        );
+        return (string) preg_replace('/(?<![a-zA-Z0-9_:]):([a-zA-Z_][a-zA-Z0-9_]*)/', '{$1}', $value);
     }
 
     /**

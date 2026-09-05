@@ -8,6 +8,7 @@ active_expense,"Active Expense","Pengeluaran Aktif"
 active_income,"Active Income","Pemasukan Aktif"
 actual,Actual,Aktual
 add_data,"Add :data","Tambah :data"
+add_note,"Add note / description","Tambah catatan / keterangan"
 add_transaction,"Add transaction","Tambah transaksi"
 all_data,"All :data","Semua :data"
 amount,Amount,Jumlah
@@ -88,6 +89,8 @@ delete_account_action_title,"Are you sure you want to delete your account?","Apa
 delete_account_description,"Delete your account and all of its resources","Hapus akun dan seluruh data yang ada"
 delete_account_title,"Delete Account","Hapus Akun"
 delete_data,"Delete :data","Hapus :data"
+delete_transaction,"Delete Transaction","Hapus Transaksi"
+delete_transaction_confirm,"Are you sure you want to delete this transaction?","Apakah Anda yakin ingin menghapus transaksi ini?"
 delete_will_cascade_fund_expense,"Deleting this withdrawal will also delete its linked expense. Add ?cascade=1 to confirm.","Menghapus penarikan ini juga akan menghapus pengeluaran terkait. Tambahkan ?cascade=1 untuk konfirmasi."
 delete_will_cascade_fund_withdrawal,"Deleting this transaction will also delete its linked fund withdrawal. Add ?cascade=1 to confirm.","Menghapus transaksi ini juga akan menghapus penarikan dana terkait. Tambahkan ?cascade=1 untuk konfirmasi."
 deleted_data,":data Deleted",":data Dihapus"
@@ -110,8 +113,10 @@ edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
 end_date,"End Date","Tanggal Selesai"
+enter_amount,"Please enter an amount.","Masukkan nominal transaksi."
 enter_terminal,"Enter Terminal","Masuk Terminal"
 expense,Expense,Pengeluaran
+expense_amount,"Expense Amount","Nominal Pengeluaran"
 expense_breakdown,"Expense Breakdown","Proporsi Pengeluaran"
 expense_breakdown_description,"Analyze which categories contribute the most to your expenses.","Analisis kategori yang paling banyak menyumbang pengeluaran Anda."
 expenses,Expenses,Pengeluaran
@@ -144,10 +149,11 @@ funds,Funds,Dana
 get_started,"Get Started","Mulai Sekarang"
 go_to_next_page,"Go to next page","Ke halaman berikutnya"
 go_to_previous_page,"Go to previous page","Ke halaman sebelumnya"
-impending_drains,"Impending drains","Impending drains"
-impending_drains_description,"Upcoming fund dues + recurring in the next :days days","Upcoming fund dues + recurring in the next :days days"
+impending_drains,"Impending Drains","Beban Mendatang"
+impending_drains_description,"Upcoming fund dues + recurring in the next :days days","Kewajiban pos dana & tagihan rutin dalam :days hari ke depan"
 inactive,Inactive,"Tidak Aktif"
 income,Income,Pemasukan
+income_amount,"Income Amount","Nominal Pemasukan"
 incomes,Incomes,Pemasukan
 initial_amount,"Initial Amount","Saldo Awal"
 install,Install,Pasang
@@ -224,12 +230,14 @@ no_impending_drains_description,"Funds and recurring inside the window will appe
 no_transactions,"No transactions yet","Belum ada transaksi"
 no_trend_data,"No spending trend yet","Belum ada tren pengeluaran"
 no_trend_data_description,"Income and expenses from this budget cycle will appear here.","Pemasukan dan pengeluaran dari siklus anggaran ini akan muncul di sini."
+note_placeholder,"Note (e.g. Lunch with team)...","Catatan (misal: Makan siang)..."
 notes,Notes,Catatan
 november,November,November
 october,October,Oktober
 of,of,dari
 offline,"You're offline","Anda sedang offline"
 offline_first,"Offline First","Offline Pertama"
+ok,OK,OK
 on_track,"On track","Sesuai rencana"
 optional,Optional,Opsional
 others,Others,Lainnya
@@ -254,7 +262,6 @@ profile_settings,"Profile Settings","Pengaturan Profil"
 profile_update_description,"Update your name and email address","Perbarui nama dan alamat email anda"
 profile_update_title,"Profile Information","Informasi Profil"
 quick_log,"Quick Log","Catat Cepat"
-real_balance,"Real Balance","Real Balance"
 real_balance,"Real Balance","Saldo Riil"
 received,Received,Diterima
 recent_transactions,"Recent Transactions","Transaksi Terakhir"
@@ -283,8 +290,11 @@ reset,Reset,"Atur Ulang"
 resume_recurring,"Resume Recurring","Lanjutkan Berulang"
 retry,Retry,"Coba Lagi"
 save,Save,Simpan
+save_expense,"Save Expense","Simpan Pengeluaran"
+save_income,"Save Income","Simpan Pemasukan"
 save_password,"Save Password","Simpan Kata Sandi"
 saved_data,":data Saved",":data Disimpan"
+saving,Saving...,Menyimpan...
 saving,Saving...,Menyimpan...
 search_balances_placeholder,"Search by name...","Cari berdasarkan nama..."
 search_budgets_placeholder,"Search by name or notes...","Cari berdasarkan nama atau catatan..."
@@ -294,6 +304,9 @@ search_transactions_placeholder,Search...,Cari...
 security,Security,Keamanan
 security_settings,"Security Settings","Pengaturan Keamanan"
 see_all,"See All","Lihat Semua"
+select_account,"Select Account","Pilih Rekening"
+select_account_prompt,"Please select a source account.","Pilih akun rekening sumber."
+select_category_prompt,"Please select a category.","Pilih kategori transaksi."
 select_data,"Select :data","Pilih :data"
 september,September,September
 set_as_active,"Set as Active","Jadikan Aktif"
@@ -311,6 +324,7 @@ single_transaction,"Single Transaction","Satu Transaksi"
 sinking_funds,"Sinking Funds","Dana Cadangan"
 skip_to_content,"Skip to content","Langsung ke konten"
 something_went_wrong,"Something went wrong.","Terjadi kesalahan."
+source_account,"Source Account","Sumber Rekening"
 source_balance,"Source balance","Source balance"
 spendable,Spendable,"Dapat Digunakan"
 spent,Used,Terpakai
@@ -336,7 +350,9 @@ transaction,Transaction,Transaksi
 transaction_bulk_create_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 transaction_create_description,"Create a new transaction record.","Buat catatan transaksi baru."
 transaction_delete_description,"Are you sure you want to delete this transaction?","Apakah Anda yakin ingin menghapus transaksi ini?"
+transaction_failed,"Failed to record transaction. Please check the form.","Gagal mencatat transaksi. Periksa kembali form."
 transaction_list_description,"View and manage your transaction history.","Lihat dan kelola riwayat transaksi Anda."
+transaction_recorded,"Successfully recorded :type Rp :amount!","Berhasil mencatat :type Rp :amount!"
 transaction_update_description,"Update the selected transaction details.","Perbarui detail transaksi yang dipilih."
 transactions,Transactions,Transaksi
 transfer,Transfer,Transfer

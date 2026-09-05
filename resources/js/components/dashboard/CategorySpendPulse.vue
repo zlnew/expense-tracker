@@ -25,6 +25,14 @@ const { masked } = useMasking()
 
 const BREAKDOWN_TOP = 6
 
+const formatPercent = (val: number) => {
+  if (val > 0 && val < 1) {
+    return '< 1%'
+  }
+
+  return `${Math.round(val)}%`
+}
+
 const breakdownItems = computed<ExpenseBreakdown[]>(() => {
   const data = props.expenseBreakdown ?? []
 
@@ -36,13 +44,15 @@ const breakdownItems = computed<ExpenseBreakdown[]>(() => {
   const rest = data.slice(BREAKDOWN_TOP)
   const restAmount = rest.reduce((sum, item) => sum + item.amount, 0)
   const total = data.reduce((sum, item) => sum + item.amount, 0)
+  const rawPercent = total > 0 ? (restAmount / total) * 100 : 0
+  const roundedPercent = Math.round(rawPercent * 10) / 10
 
   return [
     ...top,
     {
       category: __('others') || 'Others',
       amount: restAmount,
-      percentage: total > 0 ? Math.round((restAmount / total) * 100) : 0,
+      percentage: rawPercent > 0 && roundedPercent === 0 ? 0.1 : roundedPercent,
     },
   ]
 })
@@ -198,7 +208,7 @@ const donutTriggers = {
               <span
                 class="font-mono text-[11px] font-bold text-muted-foreground tabular-nums"
               >
-                {{ item.percentage }}%
+                {{ formatPercent(item.percentage) }}
               </span>
               <span
                 class="font-mono text-xs font-bold text-foreground tabular-nums"

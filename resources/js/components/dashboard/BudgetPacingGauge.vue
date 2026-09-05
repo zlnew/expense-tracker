@@ -59,6 +59,27 @@ const spentPercent = computed(() => {
 
 const isOverspent = computed(() => budgetRemaining.value < 0)
 
+// Sort envelopes by highest consumption/activity:
+// 1) actual_amount descending (where money was actually spent)
+// 2) secondary: planned_amount descending (biggest envelopes)
+const topEnvelopes = computed(() => {
+  if (!props.budgetProgress?.length) {
+    return []
+  }
+
+  return [...props.budgetProgress]
+    .sort((a, b) => {
+      const diffActual = (b.actual_amount ?? 0) - (a.actual_amount ?? 0)
+
+      if (diffActual !== 0) {
+        return diffActual
+      }
+
+      return (b.planned_amount ?? 0) - (a.planned_amount ?? 0)
+    })
+    .slice(0, 3)
+})
+
 // Calculate pacing based on the active budget's actual cycle range (or calendar fallback)
 const cycleElapsedPercent = computed(() => {
   if (props.summaryCards.cycle_start && props.summaryCards.cycle_end) {
@@ -275,7 +296,7 @@ const pacingStatus = computed(() => {
 
         <!-- Sub Envelopes Preview -->
         <div
-          v-if="budgetProgress?.length"
+          v-if="topEnvelopes.length"
           class="space-y-2.5 border-t border-border pt-3"
         >
           <div class="flex items-center justify-between">
@@ -287,7 +308,7 @@ const pacingStatus = computed(() => {
           </div>
           <div class="space-y-2">
             <div
-              v-for="item in budgetProgress.slice(0, 3)"
+              v-for="item in topEnvelopes"
               :key="item.category_id"
               class="space-y-1 text-xs"
             >

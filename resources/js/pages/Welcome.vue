@@ -129,21 +129,6 @@ const { __, currentLocale, setLocale } = useLang()
         />
 
         <div class="relative z-10 flex flex-col items-center">
-          <!-- Telemetry Header Badge -->
-          <div
-            class="mb-6 inline-flex flex-wrap items-center justify-center gap-2 border border-border bg-card/80 px-3 py-1 font-mono text-[11px] backdrop-blur"
-          >
-            <span class="font-bold text-emerald-600 dark:text-emerald-400">
-              {{ __('landing_badge') }}
-            </span>
-            <span class="text-border">/</span>
-            <span class="text-muted-foreground">{{
-              __('strict_reconciliation')
-            }}</span>
-            <span class="text-border">/</span>
-            <span class="text-muted-foreground">{{ __('offline_first') }}</span>
-          </div>
-
           <!-- Hero Headline -->
           <h1
             class="max-w-3xl font-mono text-3xl font-black tracking-tight text-foreground uppercase sm:text-5xl lg:text-6xl"
@@ -193,125 +178,6 @@ const { __, currentLocale, setLocale } = useLang()
                 {{ __('login') }}
               </Link>
             </Button>
-          </div>
-        </div>
-
-        <!-- Terminal Telemetry Showcase Preview -->
-        <div class="relative z-10 mx-auto mt-12 w-full max-w-4xl sm:mt-16">
-          <div class="border border-border bg-card shadow-2xl">
-            <!-- Console Header Bar -->
-            <div
-              class="flex items-center justify-between border-b border-border bg-secondary/50 px-4 py-2 font-mono text-[11px]"
-            >
-              <div class="flex items-center gap-2">
-                <span class="inline-block size-2 bg-emerald-500" />
-                <span class="font-bold text-foreground"
-                  >EXPENSE TERMINAL v2.5</span
-                >
-                <span class="text-muted-foreground"
-                  >// PORT :8000 (DUAL-THEME ENGINE)</span
-                >
-              </div>
-              <span
-                class="hidden font-semibold text-emerald-600 sm:inline dark:text-emerald-400"
-                >{{ __('landing_preview_status') }}</span
-              >
-            </div>
-
-            <!-- Console Content Mockup -->
-            <div class="p-4 sm:p-6">
-              <!-- HUD Grid -->
-              <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <!-- Gauge 1 -->
-                <div
-                  class="border border-border bg-background/50 p-3.5 text-left"
-                >
-                  <div
-                    class="font-mono text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
-                  >
-                    {{ __('landing_real_spendable') }}
-                  </div>
-                  <div
-                    class="mt-1 font-mono text-lg font-bold text-emerald-600 sm:text-xl dark:text-emerald-400"
-                  >
-                    Rp 14.850.000
-                  </div>
-                  <div
-                    class="mt-1 font-mono text-[9px] text-muted-foreground uppercase"
-                  >
-                    LEDGER - SINKING FUNDS
-                  </div>
-                </div>
-
-                <!-- Gauge 2 -->
-                <div
-                  class="border border-border bg-background/50 p-3.5 text-left"
-                >
-                  <div
-                    class="font-mono text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
-                  >
-                    {{ __('landing_sinking_funds') }}
-                  </div>
-                  <div
-                    class="mt-1 font-mono text-lg font-bold text-blue-600 sm:text-xl dark:text-blue-400"
-                  >
-                    Rp 8.500.000
-                  </div>
-                  <div
-                    class="mt-1 font-mono text-[9px] text-muted-foreground uppercase"
-                  >
-                    4 ACTIVE ENVELOPES
-                  </div>
-                </div>
-
-                <!-- Gauge 3 -->
-                <div
-                  class="border border-border bg-background/50 p-3.5 text-left"
-                >
-                  <div
-                    class="font-mono text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
-                  >
-                    {{ __('strict_reconciliation') }}
-                  </div>
-                  <div
-                    class="mt-1 font-mono text-lg font-bold text-foreground sm:text-xl"
-                  >
-                    0.00% {{ __('landing_drift_status') }}
-                  </div>
-                  <div
-                    class="mt-1 font-mono text-[9px] font-semibold text-emerald-600 uppercase dark:text-emerald-400"
-                  >
-                    ✓ {{ __('reconciled') }}
-                  </div>
-                </div>
-              </div>
-
-              <!-- Console Ticker Log -->
-              <div
-                class="mt-4 border border-border bg-background/80 p-3 text-left font-mono text-[11px] text-muted-foreground"
-              >
-                <div
-                  class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400"
-                >
-                  <span class="font-bold">></span>
-                  <span>SYS.AUDIT: 0 drift detected across 3 accounts.</span>
-                </div>
-                <div class="mt-1 flex items-center gap-2">
-                  <span class="font-bold">></span>
-                  <span
-                    >PACING: 42% monthly allowance consumed (64% cycle
-                    remaining).</span
-                  >
-                </div>
-                <div class="mt-1 flex items-center gap-2">
-                  <span class="font-bold">></span>
-                  <span
-                    >PWA SYNC: Service worker active. Android installation
-                    ready.</span
-                  >
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -406,23 +272,6 @@ const { __, currentLocale, setLocale } = useLang()
             <p class="mt-2 text-xs leading-relaxed text-muted-foreground">
               {{ __('landing_feature_4_desc') }}
             </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Protocol Telemetry Bar -->
-      <section class="border-y border-border bg-secondary/30 py-4">
-        <div
-          class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-4 font-mono text-[11px] text-muted-foreground sm:px-6"
-        >
-          <div class="flex items-center gap-2">
-            <span class="size-1.5 bg-emerald-500" />
-            <span>{{ __('landing_terminal_sub') }}</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <span>ZERO FLOATING ROUNDING</span>
-            <span>&bull;</span>
-            <span>STRICT ACID TRANSACTIONS</span>
           </div>
         </div>
       </section>
