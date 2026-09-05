@@ -38,19 +38,19 @@ const HIDE_CLASSES = {
 } as const
 
 const FLEX_CLASSES = {
-  sm: 'sm:flex',
-  md: 'md:flex',
-  lg: 'lg:flex',
-  xl: 'xl:flex',
-  '2xl': '2xl:flex',
+  sm: 'hidden sm:flex',
+  md: 'hidden md:flex',
+  lg: 'hidden lg:flex',
+  xl: 'hidden xl:flex',
+  '2xl': 'hidden 2xl:flex',
 } as const
 
 const { __ } = useLang()
 
 function triggerClasses(align: 'left' | 'right') {
   return align === 'right'
-    ? 'flex items-center justify-end gap-2'
-    : 'flex items-center gap-2'
+    ? 'items-center justify-end gap-2'
+    : 'items-center gap-2'
 }
 </script>
 

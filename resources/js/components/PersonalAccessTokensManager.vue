@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, Copy, Key, Plus, Shield, Trash2 } from 'lucide-vue-next'
+import { Check, Copy, Key, Plus, Trash2 } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 import Heading from '@/components/Heading.vue'
 import { Button } from '@/components/ui/button'
@@ -39,7 +39,9 @@ const props = withDefaults(
   },
 )
 
-const tokens = ref<Token[]>(props.initialTokens.length > 0 ? [...props.initialTokens] : [])
+const tokens = ref<Token[]>(
+  props.initialTokens.length > 0 ? [...props.initialTokens] : [],
+)
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const showCreateDialog = ref(false)
@@ -90,6 +92,7 @@ async function fetchTokens() {
 async function createToken() {
   if (!form.value.name.trim()) {
     errorMessage.value = 'Please provide a name for this token.'
+
     return
   }
 
@@ -102,10 +105,13 @@ async function createToken() {
 
   if (!form.value.fullAccess) {
     if (form.value.abilities.length === 0) {
-      errorMessage.value = 'Please select at least one permission or choose Full Access.'
+      errorMessage.value =
+        'Please select at least one permission or choose Full Access.'
       isSubmitting.value = false
+
       return
     }
+
     payload.abilities = form.value.abilities
   } else {
     payload.abilities = ['*']
@@ -124,7 +130,9 @@ async function createToken() {
 
     if (!res.ok) {
       const data = await res.json()
-      errorMessage.value = data.message || 'Failed to create personal access token.'
+      errorMessage.value =
+        data.message || 'Failed to create personal access token.'
+
       return
     }
 
@@ -146,7 +154,11 @@ async function createToken() {
 }
 
 async function deleteToken(id: number) {
-  if (!confirm('Are you sure you want to revoke this personal access token? Any client or script using it will immediately lose access.')) {
+  if (
+    !confirm(
+      'Are you sure you want to revoke this personal access token? Any client or script using it will immediately lose access.',
+    )
+  ) {
     return
   }
 
@@ -169,6 +181,7 @@ async function deleteToken(id: number) {
 
 function toggleAbility(id: string) {
   const idx = form.value.abilities.indexOf(id)
+
   if (idx === -1) {
     form.value.abilities.push(id)
   } else {
@@ -178,6 +191,7 @@ function toggleAbility(id: string) {
 
 function getCsrfToken(): string {
   const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/)
+
   return match ? decodeURIComponent(match[1]) : ''
 }
 
@@ -188,7 +202,10 @@ function copyToClipboard(text: string) {
 }
 
 function formatDate(dateStr: string | null): string {
-  if (!dateStr) return 'Never'
+  if (!dateStr) {
+    return 'Never'
+  }
+
   try {
     return new Date(dateStr).toLocaleDateString(undefined, {
       year: 'numeric',
@@ -209,7 +226,9 @@ onMounted(() => {
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
       <Heading
         variant="small"
         title="Personal Access Tokens"
@@ -241,7 +260,8 @@ onMounted(() => {
         </Button>
       </div>
       <p class="text-xs text-muted-foreground">
-        Make sure to copy your personal access token now. You won't be able to see it again!
+        Make sure to copy your personal access token now. You won't be able to
+        see it again!
       </p>
       <div>
         <div class="flex items-center gap-2">
@@ -289,10 +309,15 @@ onMounted(() => {
               {{ t.abilities.length }} permissions
             </span>
           </div>
-          <div class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+          <div
+            class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground"
+          >
             <span>Created: {{ formatDate(t.created_at) }}</span>
             <span>•</span>
-            <span>Last used: {{ t.last_used_at ? formatDate(t.last_used_at) : 'Never' }}</span>
+            <span
+              >Last used:
+              {{ t.last_used_at ? formatDate(t.last_used_at) : 'Never' }}</span
+            >
           </div>
         </div>
         <div class="flex items-center gap-2 self-end sm:self-auto">
@@ -312,7 +337,8 @@ onMounted(() => {
       v-else-if="!isLoading"
       class="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground"
     >
-      No personal access tokens generated yet. Click "Generate Token" to create an API token for Antigravity or automation scripts.
+      No personal access tokens generated yet. Click "Generate Token" to create
+      an API token for Antigravity or automation scripts.
     </div>
 
     <!-- Create Dialog -->
@@ -321,7 +347,8 @@ onMounted(() => {
         <DialogHeader>
           <DialogTitle>Generate Personal Access Token</DialogTitle>
           <DialogDescription>
-            Create an API token to authenticate scripts, CLI agents, or local MCP clients with your account.
+            Create an API token to authenticate scripts, CLI agents, or local
+            MCP clients with your account.
           </DialogDescription>
         </DialogHeader>
 
@@ -350,12 +377,18 @@ onMounted(() => {
                 :checked="form.fullAccess"
                 @update:checked="(val: boolean) => (form.fullAccess = val)"
               />
-              <Label for="fullAccess" class="cursor-pointer text-xs font-normal">
+              <Label
+                for="fullAccess"
+                class="cursor-pointer text-xs font-normal"
+              >
                 Full Access (allow all current and future API/MCP actions)
               </Label>
             </div>
 
-            <div v-if="!form.fullAccess" class="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2">
+            <div
+              v-if="!form.fullAccess"
+              class="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2"
+            >
               <div
                 v-for="ability in availableAbilities"
                 :key="ability.id"
@@ -366,7 +399,10 @@ onMounted(() => {
                   :checked="form.abilities.includes(ability.id)"
                   @update:checked="() => toggleAbility(ability.id)"
                 />
-                <Label :for="ability.id" class="cursor-pointer text-xs font-normal">
+                <Label
+                  :for="ability.id"
+                  class="cursor-pointer text-xs font-normal"
+                >
                   {{ ability.label }}
                 </Label>
               </div>

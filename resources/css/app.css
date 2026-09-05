@@ -16,9 +16,15 @@
     Instrument Sans, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius: 0px;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -74,7 +80,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --radius-xl: calc(var(--radius) + 4px);
 
   --z-index-sticky: 20;
   --z-index-header: 30;
@@ -151,7 +156,7 @@
   --budget-pacing: oklch(0.65 0.21 285);
   --budget-pacing-muted: oklch(0.65 0.21 285 / 16%);
 
-  --radius: 0.75rem;
+  --radius: 0px;
   --bottom-nav-height: calc(4.25rem + env(safe-area-inset-bottom, 0px));
   --sidebar-background: oklch(0.985 0.005 240);
   --sidebar-foreground: oklch(0.18 0.015 260);
@@ -167,56 +172,62 @@
 .dark {
   color-scheme: dark;
 
-  /* Deep Obsidian Dark Mode */
-  --background: oklch(0.12 0.015 260);
+  /* Deep OLED Obsidian Dark Mode */
+  --background: oklch(0.1 0.015 260);
   --foreground: oklch(0.96 0.005 240);
-  --card: oklch(0.16 0.015 260);
+  --card: oklch(0.135 0.018 260);
   --card-foreground: oklch(0.96 0.005 240);
-  --popover: oklch(0.16 0.015 260);
+  --popover: oklch(0.17 0.02 260);
   --popover-foreground: oklch(0.96 0.005 240);
-  --primary: oklch(0.96 0.005 240);
-  --primary-foreground: oklch(0.14 0.015 260);
-  --secondary: oklch(0.22 0.015 260);
+  --primary: oklch(0.72 0.17 155);
+  --primary-foreground: oklch(0.1 0.015 260);
+  --secondary: oklch(0.18 0.018 260);
   --secondary-foreground: oklch(0.96 0.005 240);
-  --muted: oklch(0.2 0.015 260);
+  --muted: oklch(0.18 0.018 260);
   --muted-foreground: oklch(0.65 0.015 260);
-  --accent: oklch(0.22 0.015 260);
+  --accent: oklch(0.18 0.018 260);
   --accent-foreground: oklch(0.96 0.005 240);
-  --destructive: oklch(0.68 0.22 25);
+  --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.24 0.015 260);
-  --input: oklch(0.24 0.015 260);
-  --ring: oklch(0.65 0.03 260);
+  --border: oklch(0.24 0.02 260);
+  --input: oklch(0.24 0.02 260);
+  --ring: oklch(0.72 0.17 155);
+
+  /* Terminal Semantic Tokens */
+  --terminal-emerald: #10b981;
+  --terminal-rose: #f43f5e;
+  --terminal-amber: #f59e0b;
+  --terminal-cyan: #06b6d4;
 
   /* Charts in Dark */
-  --chart-1: oklch(0.72 0.17 155);
-  --chart-2: oklch(0.7 0.21 285);
-  --chart-3: oklch(0.78 0.16 75);
-  --chart-4: oklch(0.68 0.22 25);
-  --chart-5: oklch(0.65 0.18 215);
-  --chart-6: oklch(0.72 0.14 130);
-  --chart-7: oklch(0.74 0.13 206);
-  --chart-8: oklch(0.65 0.23 340);
+  --chart-1: #10b981;
+  --chart-2: #f59e0b;
+  --chart-3: #06b6d4;
+  --chart-4: #f43f5e;
+  --chart-5: #a855f7;
+  --chart-6: #3b82f6;
+  --chart-7: #ec4899;
+  --chart-8: #84cc16;
 
   /* Semantic Financial Accents in Dark */
-  --income: oklch(0.72 0.17 155);
-  --income-muted: oklch(0.72 0.17 155 / 22%);
-  --expense: oklch(0.68 0.22 25);
-  --expense-muted: oklch(0.68 0.22 25 / 22%);
-  --reserved: oklch(0.78 0.16 75);
-  --reserved-muted: oklch(0.78 0.16 75 / 22%);
-  --budget-pacing: oklch(0.7 0.21 285);
-  --budget-pacing-muted: oklch(0.7 0.21 285 / 22%);
+  --income: #10b981;
+  --income-muted: rgba(16, 185, 129, 0.18);
+  --expense: #f43f5e;
+  --expense-muted: rgba(244, 63, 94, 0.18);
+  --reserved: #f59e0b;
+  --reserved-muted: rgba(245, 158, 11, 0.18);
+  --budget-pacing: #06b6d4;
+  --budget-pacing-muted: rgba(6, 182, 212, 0.18);
 
-  --sidebar-background: oklch(0.14 0.015 260);
+  --sidebar-background: oklch(0.11 0.015 260);
   --sidebar-foreground: oklch(0.96 0.005 240);
-  --sidebar-primary: oklch(0.7 0.21 285);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.22 0.015 260);
+  --sidebar-primary: #10b981;
+  --sidebar-primary-foreground: oklch(0.1 0.015 260);
+  --sidebar-accent: oklch(0.18 0.018 260);
   --sidebar-accent-foreground: oklch(0.96 0.005 240);
-  --sidebar-border: oklch(0.24 0.015 260);
-  --sidebar-ring: oklch(0.65 0.03 260);
-  --sidebar: oklch(0.14 0.015 260);
+  --sidebar-border: oklch(0.24 0.02 260);
+  --sidebar-ring: #10b981;
+  --sidebar: oklch(0.11 0.015 260);
 }
 
 @media (min-width: 64rem) {
@@ -258,5 +269,88 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .font-mono-numbers {
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .terminal-card {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0px;
+  }
+
+  .terminal-glow-emerald {
+    box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.35);
+  }
+
+  .terminal-glow-rose {
+    box-shadow: 0 0 25px -4px rgba(244, 63, 94, 0.35);
+  }
+
+  .terminal-glow-amber {
+    box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.35);
+  }
+
+  .terminal-glow-cyan {
+    box-shadow: 0 0 25px -4px rgba(6, 182, 212, 0.35);
+  }
+
+  .page-container {
+    width: 100%;
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 7rem;
+  }
+
+  @media (min-width: 768px) {
+    .page-container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      padding-top: 1.5rem;
+      padding-bottom: 3rem;
+    }
+  }
+
+  .card-terminal {
+    background-color: #0a0a0c;
+    border: 1px solid #1f222e;
+    border-radius: 0px;
+    padding: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  }
+
+  @media (min-width: 640px) {
+    .card-terminal {
+      padding: 1.25rem;
+    }
+  }
+
+  .stat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 0px;
+    border: 1px solid #1f222e;
+    background-color: #12141a;
+    padding: 0.25rem 0.625rem;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+  }
+
+  /* Enforce sharp 90-degree brutalist financial terminal geometry */
+  [class*='rounded'] {
+    border-radius: 0px !important;
   }
 }

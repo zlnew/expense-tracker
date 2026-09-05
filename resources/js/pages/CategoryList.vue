@@ -8,19 +8,9 @@ import DataListState from '@/components/DataListState.vue'
 import CategoryCreateDialog from '@/components/dialogs/CategoryCreateDialog.vue'
 import CategoryDeleteDialog from '@/components/dialogs/CategoryDeleteDialog.vue'
 import CategoryUpdateDialog from '@/components/dialogs/CategoryUpdateDialog.vue'
-import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { useFilters } from '@/composables/useFilters'
 import { useLang } from '@/composables/useLang'
 import { index as categoriesIndex } from '@/routes/categories'
@@ -93,53 +83,70 @@ const rowActions = (c: Data) => [
   <Head :title="__('categories')" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
+    <div class="page-container space-y-5">
+      <!-- Command Bar -->
       <div
-        class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <Heading
-          :title="__('categories')"
-          :description="__('category_list_description')"
-          class="mb-0"
-        />
-        <Button @click="createDialogOpen = true">
-          <Plus class="mr-2 size-4" />
-          {{ __('add_data', { data: __('category') }) }}
-        </Button>
+        <div class="flex items-center gap-2.5">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
+            {{ __('categories') }}
+          </h1>
+          <span class="stat-chip font-semibold text-zinc-400">
+            {{ categories.meta?.total ?? categories.data.length }} pos
+          </span>
+        </div>
+
+        <button
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
+          @click="createDialogOpen = true"
+        >
+          <Plus class="size-3.5 stroke-[2.5]" />
+          <span>{{ __('add_data', { data: __('category') }) }}</span>
+        </button>
       </div>
 
-      <div class="flex flex-col items-center gap-4 lg:flex-row">
-        <div class="flex w-full items-center gap-2 lg:max-w-md">
+      <!-- Filters: Search + Segmented Pills -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="w-full sm:max-w-xs">
           <SearchInput
             v-model="search"
             :placeholder="__('search_categories_placeholder')"
           />
         </div>
 
-        <div class="flex w-full gap-2 sm:w-auto">
-          <div class="w-full">
-            <Select v-model="typeFilter">
-              <SelectTrigger class="w-full bg-background">
-                <SelectValue
-                  :placeholder="__('all_data', { data: __('types') })"
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="all">
-                    {{ __('all_data', { data: __('types') }) }}
-                  </SelectItem>
-                  <SelectItem
-                    v-for="value in types"
-                    :key="value"
-                    :value="value"
-                  >
-                    {{ __(value) }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+        <div
+          class="flex scrollbar-none items-center gap-1.5 overflow-x-auto pb-1 font-mono text-xs"
+        >
+          <button
+            type="button"
+            class="rounded-xl px-3 py-1.5 font-medium transition-all"
+            :class="
+              typeFilter === 'all'
+                ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400'
+                : 'border border-[#1f222e] bg-[#121217] text-zinc-400 hover:text-zinc-200'
+            "
+            @click="typeFilter = 'all'"
+          >
+            {{ __('all_data', { data: __('types') }) }}
+          </button>
+          <button
+            v-for="value in types"
+            :key="value"
+            type="button"
+            class="rounded-xl px-3 py-1.5 font-medium capitalize transition-all"
+            :class="
+              typeFilter === value
+                ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400'
+                : 'border border-[#1f222e] bg-[#121217] text-zinc-400 hover:text-zinc-200'
+            "
+            @click="typeFilter = value"
+          >
+            {{ __(value) }}
+          </button>
         </div>
       </div>
 
@@ -152,24 +159,32 @@ const rowActions = (c: Data) => [
         :empty-description="__('category_list_description')"
       >
         <template #empty>
-          <Button @click="createDialogOpen = true">
-            <Plus class="mr-2 size-4" />
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
+            @click="createDialogOpen = true"
+          >
+            <Plus class="size-4 stroke-[2.5]" />
             {{ __('add_data', { data: __('category') }) }}
-          </Button>
+          </button>
         </template>
 
         <ResponsiveTable
           :columns="[
-            { header: '#', cell: (row, i) => i + 1, cellClass: 'w-[60px]' },
+            {
+              header: '#',
+              cell: (row, i) => i + 1,
+              cellClass: 'w-[60px] font-mono text-zinc-500',
+            },
             {
               header: __('type'),
               cell: (c) => __(c.type),
-              cellClass: 'w-[100px] text-muted-foreground',
+              cellClass: 'w-[120px]',
             },
             {
               header: __('name'),
               cell: (c) => c.name,
-              cellClass: 'font-medium',
+              cellClass: 'font-medium font-mono text-zinc-100',
             },
             {
               header: __('actions'),
@@ -181,20 +196,57 @@ const rowActions = (c: Data) => [
         >
           <!-- Mobile card -->
           <template #card="{ row: c }">
-            <div class="flex items-center justify-between">
-              <div>
-                <p
-                  class="mb-1 text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex min-w-0 flex-1 items-center gap-3">
+                <div
+                  class="flex size-10 shrink-0 items-center justify-center rounded-xl border"
+                  :class="
+                    c.type === 'income'
+                      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                      : 'border-rose-500/20 bg-rose-500/10 text-rose-400'
+                  "
                 >
-                  {{ __(c.type) }}
-                </p>
-                <h3 class="text-lg font-bold">{{ c.name }}</h3>
+                  <Tags class="size-4" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="font-mono text-sm font-bold text-zinc-100">
+                      {{ c.name }}
+                    </h3>
+                    <span
+                      class="inline-flex shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase"
+                      :class="
+                        c.type === 'income'
+                          ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                          : 'border-rose-500/30 bg-rose-500/15 text-rose-400'
+                      "
+                    >
+                      {{ __(c.type) }}
+                    </span>
+                  </div>
+                  <span class="font-mono text-[11px] text-zinc-500"
+                    >ID Pos #{{ c.id }}</span
+                  >
+                </div>
               </div>
               <RowActions :actions="rowActions(c)" collapse-below="md" />
             </div>
           </template>
 
           <!-- Desktop cells -->
+          <template #cell-1="{ row: c }">
+            <span
+              class="inline-flex rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase"
+              :class="
+                c.type === 'income'
+                  ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                  : 'border-rose-500/30 bg-rose-500/15 text-rose-400'
+              "
+            >
+              {{ __(c.type) }}
+            </span>
+          </template>
+
           <template #cell-3="{ row: c }">
             <div class="flex items-center justify-end gap-2">
               <RowActions :actions="rowActions(c)" collapse-below="md" />

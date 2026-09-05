@@ -15,15 +15,63 @@ defineProps<Props>()
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 40 42"
+    viewBox="0 0 32 32"
+    fill="none"
     :class="className"
     v-bind="$attrs"
   >
+    <!-- Isometric Vault Outer Hexagon (Sharp 90/60deg chamfers) -->
     <path
-      fill="currentColor"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-      d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633ZM38 18.301l-5.6 3.11v-6.157l5.6-3.11V18.3Zm-1.06-7.856-5.54 3.078-5.54-3.079 5.54-3.078 5.54 3.079ZM24.8 18.3v-6.157l5.6 3.111v6.158L24.8 18.3Zm-1 1.732 5.54 3.078-13.14 7.302-5.54-3.078 13.14-7.3v-.002Zm-16.2 7.89 7.6 4.222V38.3L2 30.966V7.92l5.6 3.111v16.892ZM8.6 9.3 3.06 6.222 8.6 3.143l5.54 3.08L8.6 9.3Zm21.8 15.51-13.2 7.334V38.3l13.2-7.334v-6.156ZM9.6 11.034l5.6-3.11v14.6l-5.6 3.11v-14.6Z"
+      d="M16 2.5L28.5 9.5V22.5L16 29.5L3.5 22.5V9.5L16 2.5Z"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linejoin="miter"
+      class="opacity-40"
     />
+    <!-- Isometric Vault Inner Chamber -->
+    <path
+      d="M16 7L24.5 11.8V20.2L16 25L7.5 20.2V11.8L16 7Z"
+      stroke="currentColor"
+      stroke-width="1.25"
+      stroke-linejoin="miter"
+      class="opacity-60"
+    />
+    <!-- Isometric Core Axis & Combination Dial -->
+    <circle
+      cx="16"
+      cy="16"
+      r="3.5"
+      stroke="currentColor"
+      stroke-width="1.5"
+      class="opacity-80"
+    />
+    <circle cx="16" cy="16" r="1.25" fill="currentColor" />
+    <!-- Safe Hinge Blocks -->
+    <rect
+      x="2"
+      y="11"
+      width="2"
+      height="3"
+      fill="currentColor"
+      class="opacity-60"
+    />
+    <rect
+      x="2"
+      y="18"
+      width="2"
+      height="3"
+      fill="currentColor"
+      class="opacity-60"
+    />
+    <!-- Dynamic Breakthrough Trend Arrow (Banana Concept B) -->
+    <path
+      d="M4.5 22L12 15.5L17 19.5L27 6"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="square"
+      stroke-linejoin="miter"
+    />
+    <!-- Arrowhead Head Point -->
+    <polygon points="28.5,4 28,10.5 22,6.5" fill="currentColor" />
   </svg>
 </template>
