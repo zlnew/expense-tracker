@@ -73,7 +73,7 @@ const hasActiveBudget = computed(
   <Head :title="__('dashboard')" />
 
   <AppContent>
-    <div class="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+    <div class="page-container space-y-5">
       <!-- PWA Install Banner -->
       <aside
         v-if="canInstall"

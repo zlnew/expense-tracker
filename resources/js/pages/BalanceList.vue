@@ -104,11 +104,15 @@ const rowActions = (b: Balance) => [
     icon: SquarePen,
     onClick: () => openEditDialog(b),
   },
-  {
-    label: __('reconcile_balance'),
-    icon: Scale,
-    onClick: () => openReconcileDialog(b),
-  },
+  ...(b.is_primary
+    ? []
+    : [
+        {
+          label: __('set_as_primary'),
+          icon: CheckCircle2,
+          onClick: () => setPrimary(b),
+        },
+      ]),
   {
     label: __('delete_data', { data: __('balance') }),
     icon: Trash2,
@@ -122,27 +126,32 @@ const rowActions = (b: Balance) => [
   <Head :title="__('balances')" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
-      <div
-        class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
-      >
-        <Heading
-          :title="__('balances')"
-          :description="__('balance_list_description')"
-          class="mb-0"
-        />
-        <button
-          type="button"
-          class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
-          @click="openCreateDialog"
-        >
-          <Plus class="size-4 stroke-[2.5]" />
-          {{ __('add_data', { data: __('balance') }) }}
-        </button>
+    <div class="page-container space-y-5">
+      <!-- Command Bar -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-2.5">
+          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+            {{ __('balances') }}
+          </h1>
+          <span class="stat-chip text-zinc-400 font-semibold">
+            {{ balances.meta?.total ?? balances.data.length }} {{ __('balances').toLowerCase() }}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] active:scale-95"
+            @click="openCreateDialog"
+          >
+            <Plus class="size-3.5 stroke-[2.5]" />
+            <span>{{ __('add_data', { data: __('balance') }) }}</span>
+          </button>
+        </div>
       </div>
 
-      <div class="flex flex-col items-center gap-4 lg:flex-row">
-        <div class="flex w-full items-center gap-2 lg:max-w-md">
+      <div class="flex w-full items-center gap-2">
+        <div class="w-full">
           <SearchInput
             v-model="search"
             :placeholder="__('search_balances_placeholder')"
@@ -287,20 +296,20 @@ const rowActions = (b: Balance) => [
             <div
               class="mt-5 flex items-center justify-between gap-2 border-t border-[#1f222e]/60 pt-4"
             >
+              <button
+                type="button"
+                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 py-2 px-3 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 transition-all active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                @click="openReconcileDialog(b)"
+              >
+                <Scale class="size-3.5" />
+                <span>{{ __('reconcile_balance') }}</span>
+              </button>
+
               <RowActions
                 :actions="rowActions(b)"
                 collapse-below="md"
-                align="left"
+                align="right"
               />
-
-              <button
-                v-if="!b.is_primary"
-                type="button"
-                class="rounded-xl border border-[#1f222e] bg-[#121217] px-3 py-1.5 font-mono text-xs font-semibold text-zinc-300 hover:border-emerald-500/40 hover:text-emerald-400 transition-all"
-                @click="setPrimary(b)"
-              >
-                {{ __('set_as_primary') }}
-              </button>
             </div>
           </div>
         </div>

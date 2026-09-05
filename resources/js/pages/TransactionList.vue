@@ -128,6 +128,58 @@ const currentCategory = computed(() =>
   props.categories.find((c) => c.id.toString() === categoryFilter.value),
 )
 
+const groupedTransactions = computed(() => {
+  const list = props.transactions.data ?? []
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayStr = yesterday.toISOString().slice(0, 10)
+
+  const groupMap = new Map<string, Transaction[]>()
+
+  list.forEach((t) => {
+    const rawDate = t.date ? t.date.slice(0, 10) : 'unknown'
+    if (!groupMap.has(rawDate)) {
+      groupMap.set(rawDate, [])
+    }
+    groupMap.get(rawDate)!.push(t)
+  })
+
+  const result: Array<{
+    dateKey: string
+    dateLabel: string
+    items: Transaction[]
+    totalIncome: number
+    totalExpense: number
+  }> = []
+
+  groupMap.forEach((items, rawDate) => {
+    let label = formatDate(rawDate, 'DD MMMM YYYY')
+    if (rawDate === todayStr) {
+      label = 'Hari Ini'
+    } else if (rawDate === yesterdayStr) {
+      label = 'Kemarin'
+    }
+
+    let inc = 0
+    let exp = 0
+    items.forEach((item) => {
+      if (item.type === 'income') inc += item.amount
+      else exp += item.amount
+    })
+
+    result.push({
+      dateKey: rawDate,
+      dateLabel: label,
+      items,
+      totalIncome: inc,
+      totalExpense: exp,
+    })
+  })
+
+  return result
+})
+
 // Download the current filter view as CSV (full download, not Inertia visit).
 const exportCsv = () => {
   const url = new URL(transactionExport.url(), window.location.origin)
@@ -180,42 +232,51 @@ const rowActions = (t: Transaction) => [
   <Head :title="__('transactions')" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
-      <div
-        class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
-      >
-        <Heading
-          :title="__('transactions')"
-          :description="__('transaction_list_description')"
-          class="mb-0"
-        />
-        <!-- Visible 3-action grid: single / bulk / transfer (mobile + desktop) -->
-        <div class="grid w-full grid-cols-3 gap-2 sm:w-auto">
-          <Button
-            class="min-w-0 px-2.5 font-mono text-xs font-bold bg-emerald-500 text-[#0a0a0c] hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.35)]"
+    <div class="page-container space-y-5">
+      <!-- Command Bar -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-2.5">
+          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+            {{ __('transactions') }}
+          </h1>
+          <span class="stat-chip text-zinc-400 font-semibold">
+            {{ transactions.meta?.total ?? transactions.data.length }} total
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] active:scale-95"
             @click="openCreateDialog"
           >
-            <Plus class="size-4 shrink-0 stroke-[2.5]" />
-            <span class="min-w-0 truncate">{{ __('single_transaction') }}</span>
-          </Button>
-          <Button
-            variant="outline"
-            class="min-w-0 px-2.5 font-mono text-xs border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100"
-            @click="openBulkCreateDialog"
-          >
-            <ListPlus class="size-4 shrink-0" />
-            <span class="min-w-0 truncate">{{
-              __('multiple_transactions')
-            }}</span>
-          </Button>
-          <Button
-            variant="outline"
-            class="min-w-0 px-2.5 font-mono text-xs border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100"
+            <Plus class="size-3.5 stroke-[2.5]" />
+            <span>Catat Cepat</span>
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-2 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
             @click="openTransferDialog"
           >
-            <ArrowRightLeft class="size-4 shrink-0" />
-            <span class="min-w-0 truncate">{{ __('transfer') }}</span>
-          </Button>
+            <ArrowRightLeft class="size-3.5 text-zinc-400" />
+            <span class="hidden sm:inline">Pindah Saldo</span>
+          </button>
+          <button
+            type="button"
+            class="size-9 inline-flex items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+            title="Catat Banyak"
+            @click="openBulkCreateDialog"
+          >
+            <ListPlus class="size-4" />
+          </button>
+          <button
+            type="button"
+            class="size-9 inline-flex items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+            title="Export CSV"
+            @click="exportCsv"
+          >
+            <Download class="size-4" />
+          </button>
         </div>
       </div>
 
@@ -445,129 +506,123 @@ const rowActions = (t: Transaction) => [
           </Button>
         </template>
 
-        <!-- ResponsiveTable: mobile cards + desktop table -->
-        <ResponsiveTable
-          :columns="[
-            { header: '#', cell: (row, i) => i + 1, cellClass: 'w-[60px]' },
-            {
-              header: __('date'),
-              cell: (t) => formatDate(t.date),
-              cellClass: 'w-[120px] font-medium',
-            },
-            { header: __('category'), cell: (t) => t.category?.name ?? '-' },
-            { header: __('balance'), cell: (t) => t.balance?.name ?? '-' },
-            { header: __('description'), cell: (t) => t.description || '-' },
-            {
-              header: __('amount'),
-              cell: (t) =>
-                t.type === 'income'
-                  ? '+' + formatAmount(t.amount)
-                  : '-' + formatAmount(t.amount),
-              cellClass: 'text-right font-medium',
-            },
-            {
-              header: __('actions'),
-              cell: () => '',
-              cellClass: 'w-[100px] text-right',
-            },
-          ]"
-          :rows="transactions.data"
-        >
-          <!-- Mobile card -->
-          <template #card="{ row: t }">
-            <div class="mb-3 flex items-center justify-between gap-2">
-              <span
-                class="rounded-lg border border-[#1f222e] bg-[#121217] px-2.5 py-1 font-mono text-[11px] text-zinc-400"
-              >
-                {{ formatDate(t.date) }}
+        <!-- Mobile Date Grouped Ledger Stream (block md:hidden) -->
+        <div class="space-y-4 md:hidden">
+          <div
+            v-for="group in groupedTransactions"
+            :key="group.dateKey"
+            class="space-y-1.5"
+          >
+            <!-- Date Group Header -->
+            <div class="flex items-center justify-between px-1 font-mono text-xs">
+              <span class="font-bold text-zinc-400 uppercase tracking-wider text-[11px]">
+                {{ group.dateLabel }}
               </span>
+              <div class="flex items-center gap-2 text-[11px] tabular-nums">
+                <span v-if="group.totalIncome > 0" class="text-emerald-400 font-bold">
+                  +{{ formatAmount(group.totalIncome) }}
+                </span>
+                <span v-if="group.totalExpense > 0" class="text-rose-400 font-bold">
+                  -{{ formatAmount(group.totalExpense) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Day Cards Stack -->
+            <div class="overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] divide-y divide-[#1f222e]/60 shadow-lg">
+              <div
+                v-for="t in group.items"
+                :key="t.id"
+                class="flex items-center justify-between p-3.5 hover:bg-[#12141a]/60 active:bg-[#181b24] transition-colors cursor-pointer"
+                @click="openUpdateDialog(t)"
+              >
+                <div class="flex items-center gap-3 min-w-0 pr-3">
+                  <div
+                    class="flex size-9 shrink-0 items-center justify-center rounded-xl border"
+                    :class="
+                      t.type === 'income'
+                        ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                        : 'border-rose-500/30 bg-rose-500/10 text-rose-400'
+                    "
+                  >
+                    <component
+                      :is="t.type === 'income' ? TrendingUp : TrendingDown"
+                      class="size-4"
+                    />
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="truncate font-mono text-xs font-bold text-zinc-100">
+                      {{ t.category?.name || __('unknown') }}
+                    </h3>
+                    <p class="truncate font-mono text-[11px] text-zinc-500 mt-0.5">
+                      <span class="text-zinc-400">{{ t.balance?.name }}</span>
+                      <span v-if="t.description" class="text-zinc-600"> • </span>
+                      <span v-if="t.description" class="truncate text-zinc-400">{{ t.description }}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="shrink-0 text-right">
+                  <p
+                    class="font-mono text-xs font-bold tabular-nums"
+                    :class="t.type === 'income' ? 'text-emerald-400' : 'text-zinc-200'"
+                  >
+                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                  </p>
+                  <p class="font-mono text-[10px] text-zinc-500 mt-0.5">
+                    {{ formatDate(t.date, 'HH:mm') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Table (hidden md:block) -->
+        <div class="hidden md:block">
+          <ResponsiveTable
+            :columns="[
+              { header: '#', cell: (row, i) => i + 1, cellClass: 'w-[60px]' },
+              {
+                header: __('date'),
+                cell: (t) => formatDate(t.date),
+                cellClass: 'w-[120px] font-medium font-mono text-xs text-zinc-400',
+              },
+              { header: __('category'), cell: (t) => t.category?.name ?? '-', cellClass: 'font-mono text-xs text-zinc-200' },
+              { header: __('balance'), cell: (t) => t.balance?.name ?? '-', cellClass: 'font-mono text-xs text-zinc-400' },
+              { header: __('description'), cell: (t) => t.description || '-', cellClass: 'font-mono text-xs text-zinc-500' },
+              {
+                header: __('amount'),
+                cell: (t) =>
+                  (t.type === 'income' ? '+' : '-') + formatAmount(t.amount),
+                cellClass: 'text-right font-mono text-xs font-bold tabular-nums',
+              },
+              {
+                header: __('actions'),
+                cell: () => '',
+                cellClass: 'w-[100px] text-right',
+              },
+            ]"
+            :rows="transactions.data"
+          >
+            <template #cell-5="{ row: t }">
               <span
-                class="rounded-lg px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase border"
                 :class="
                   t.type === 'income'
-                    ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
-                    : 'border-rose-500/30 bg-rose-500/15 text-rose-400'
+                    ? 'text-emerald-400 font-mono font-bold'
+                    : 'text-zinc-200 font-mono font-bold'
                 "
               >
-                {{ __(t.type) }}
+                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
               </span>
-            </div>
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex min-w-0 items-start gap-3">
-                <div
-                  class="flex size-10 shrink-0 items-center justify-center rounded-xl border"
-                  :class="
-                    t.type === 'income'
-                      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-                      : 'border-rose-500/30 bg-rose-500/10 text-rose-400'
-                  "
-                >
-                  <component
-                    :is="t.type === 'income' ? TrendingUp : TrendingDown"
-                    class="size-5"
-                  />
-                </div>
-                <div class="min-w-0">
-                  <h3 class="truncate font-mono text-base font-bold text-zinc-100">
-                    {{ t.category?.name }}
-                  </h3>
-                  <p class="truncate font-mono text-xs text-zinc-400">
-                    via {{ t.balance?.name }}
-                  </p>
-                  <p
-                    v-if="t.description"
-                    class="mt-1 truncate font-mono text-xs text-zinc-500"
-                  >
-                    {{ t.description }}
-                  </p>
-                </div>
+            </template>
+            <template #cell-6="{ row: t }">
+              <div class="flex items-center justify-end gap-2">
+                <RowActions :actions="rowActions(t)" collapse-below="md" />
               </div>
-              <div class="shrink-0 text-right">
-                <p
-                  class="font-mono text-lg font-extrabold tabular-nums"
-                  :class="
-                    t.type === 'income' ? 'text-emerald-400' : 'text-zinc-100'
-                  "
-                >
-                  {{ t.type === 'income' ? '+' : '-'
-                  }}{{ formatAmount(t.amount) }}
-                </p>
-                <div class="mt-2 flex items-center justify-end gap-1">
-                  <RowActions :actions="rowActions(t)" collapse-below="md" />
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <!-- Desktop cells -->
-          <template #cell-2="{ row: t }">
-            <div class="flex items-center gap-2">
-              <span class="text-muted-foreground">{{ __(t.type) }}</span>
-              <span class="font-medium">{{ t.category?.name }}</span>
-            </div>
-          </template>
-          <template #cell-4="{ row: t }">
-            <div class="max-w-md truncate wrap-anywhere">
-              {{ t.description || '-' }}
-            </div>
-          </template>
-          <template #cell-5="{ row: t }">
-            <span
-              :class="
-                t.type === 'income'
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              "
-            >
-              {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
-            </span>
-          </template>
-          <template #cell-6="{ row: t }">
-            <div class="flex items-center justify-end gap-2">
-              <RowActions :actions="rowActions(t)" collapse-below="md" />
-            </div>
-          </template>
-        </ResponsiveTable>
+            </template>
+          </ResponsiveTable>
+        </div>
       </DataListState>
 
       <AppPagination

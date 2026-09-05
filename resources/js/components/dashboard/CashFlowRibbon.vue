@@ -9,6 +9,8 @@ import {
   PiggyBank,
   ArrowUpRight,
   ArrowDownRight,
+  Plus,
+  ArrowRightLeft,
 } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { useLang } from '@/composables/useLang'
@@ -64,6 +66,12 @@ const reservedPercent = computed(() => {
 
   return Math.max(0, Math.min(100, 100 - realPercent.value))
 })
+
+function triggerTransactionCreate() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('open:transaction-create'))
+  }
+}
 </script>
 
 <template>
@@ -242,6 +250,34 @@ const reservedPercent = computed(() => {
             class="h-full bg-amber-500 transition-all duration-500 ease-out"
             :style="{ width: `${reservedPercent}%` }"
           />
+        </div>
+      </div>
+
+      <!-- Quick Action Dock -->
+      <div class="border-t border-[#1f222e]/60 pt-4">
+        <div class="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            class="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/15 py-2 px-1 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-all active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+            @click="triggerTransactionCreate"
+          >
+            <Plus class="size-3.5" />
+            <span class="truncate">Catat Cepat</span>
+          </button>
+          <Link
+            :href="balanceIndex.url()"
+            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] py-2 px-1 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+          >
+            <ArrowRightLeft class="size-3.5 text-zinc-400" />
+            <span class="truncate">Pindah Saldo</span>
+          </Link>
+          <Link
+            :href="balanceIndex.url()"
+            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] py-2 px-1 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+          >
+            <ShieldCheck class="size-3.5 text-zinc-400" />
+            <span class="truncate">Rekonsiliasi</span>
+          </Link>
         </div>
       </div>
     </div>

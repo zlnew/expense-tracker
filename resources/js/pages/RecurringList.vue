@@ -7,7 +7,6 @@ import AppPagination from '@/components/AppPagination.vue'
 import DataListState from '@/components/DataListState.vue'
 import RecurringTransactionDeleteDialog from '@/components/dialogs/RecurringTransactionDeleteDialog.vue'
 import RecurringTransactionFormDialog from '@/components/dialogs/RecurringTransactionFormDialog.vue'
-import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
@@ -108,36 +107,40 @@ const rowActions = (r: RecurringTransaction) => [
   <Head :title="__('recurring_transactions')" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
-      <div
-        class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
-      >
-        <Heading
-          :title="__('recurring_transactions')"
-          :description="__('recurring_transactions_description')"
-          class="mb-0"
-        />
+    <div class="page-container space-y-5">
+      <!-- Command Bar -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-2.5">
+          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+            Tagihan & Langganan
+          </h1>
+          <span class="stat-chip text-zinc-400 font-semibold">
+            {{ recurrings.meta?.total ?? recurrings.data.length }} jadwal
+          </span>
+        </div>
+
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
           @click="createDialogOpen = true"
         >
-          <Plus class="size-4 stroke-[2.5]" />
-          {{ __('add_data', { data: __('recurring_transaction') }) }}
+          <Plus class="size-3.5 stroke-[2.5]" />
+          <span>{{ __('add_data', { data: __('recurring_transaction') }) }}</span>
         </button>
       </div>
 
-      <div class="flex flex-col items-center gap-4 lg:flex-row">
-        <div class="flex w-full items-center gap-2 lg:max-w-md">
+      <!-- Filters: Search & Tabs -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="w-full sm:max-w-xs">
           <SearchInput
             v-model="search"
             :placeholder="__('search_recurring_placeholder')"
           />
         </div>
 
-        <!-- Segmented [ Transactions | Recurring ] — visible at every
-             breakpoint, mirroring the transactions page. -->
-        <TransactionTabs viewMode="recurring" />
+        <div class="w-full sm:w-auto sm:min-w-[260px]">
+          <TransactionTabs viewMode="recurring" />
+        </div>
       </div>
 
       <DataListState
@@ -166,115 +169,136 @@ const rowActions = (r: RecurringTransaction) => [
             {
               header: __('description'),
               cell: (r) => r.description || '—',
-              cellClass: 'font-medium',
+              cellClass: 'font-mono text-zinc-100 font-semibold',
             },
             {
               header: __('type'),
               cell: (r) => __(r.type),
-              cellClass: 'capitalize',
+              cellClass: 'w-[110px]',
             },
             {
               header: __('frequency'),
               cell: (r) => __(r.frequency),
-              cellClass: 'capitalize',
+              cellClass: 'capitalize font-mono text-xs text-zinc-300',
             },
             {
               header: __('amount'),
               cell: (r) => formatAmount(r.amount),
-              cellClass: 'text-right',
+              cellClass: 'text-right font-mono font-bold',
             },
             {
               header: __('category'),
               cell: (r) => r.category?.name || '—',
+              cellClass: 'font-mono text-xs text-zinc-400',
             },
             {
               header: __('next_run_date'),
               cell: (r) => formatDate(r.next_run_date, 'DD MMM YYYY'),
+              cellClass: 'font-mono text-xs text-zinc-400',
             },
             {
               header: __('status'),
               cell: (r) => (r.is_active ? __('active') : __('inactive')),
-              cellClass: 'w-[110px]',
+              cellClass: 'w-[120px]',
             },
             {
               header: __('actions'),
               cell: () => '',
-              cellClass: 'w-[110px] text-right',
+              cellClass: 'w-[100px] text-right',
             },
           ]"
           :rows="recurrings.data"
         >
           <!-- Mobile card -->
           <template #card="{ row: r }">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <p
-                  class="mb-1 text-[10px] font-bold tracking-wider uppercase"
-                  :class="
-                    r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
-                  "
-                >
-                  {{ __(r.type) }} · {{ __(r.frequency) }}
-                </p>
-                <h3 class="text-lg font-bold">{{ r.description || '—' }}</h3>
-                <p class="text-sm text-muted-foreground">
-                  {{ formatAmount(r.amount) }}
-                  <span class="mx-1">·</span>
-                  {{ r.category?.name || '—' }}
-                </p>
-              </div>
-              <div class="flex items-center gap-1">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div 
+                    class="size-10 rounded-xl flex items-center justify-center shrink-0 border"
+                    :class="r.type === 'income' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'"
+                  >
+                    <Repeat class="size-4" />
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="font-mono text-sm font-bold text-zinc-100 truncate">{{ r.description || '—' }}</h3>
+                    <p class="text-xs font-mono text-zinc-400 truncate">
+                      {{ r.category?.name || 'Tanpa Kategori' }}
+                    </p>
+                  </div>
+                </div>
                 <RowActions :actions="rowActions(r)" collapse-below="md" />
               </div>
-            </div>
-            <div
-              class="mt-3 flex items-center justify-between text-sm text-muted-foreground"
-            >
-              <span>
-                {{ __('next_run_date') }}:
-                {{ formatDate(r.next_run_date, 'DD MMM YYYY') }}
-              </span>
-              <!-- Real toggle on mobile too — not a static badge -->
-              <button
-                type="button"
-                class="touch-target rounded-full border px-2.5 py-1 text-xs font-medium transition-colors"
-                :class="
-                  r.is_active
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                    : 'border-muted bg-muted/40 text-muted-foreground hover:bg-muted'
-                "
-                :aria-pressed="r.is_active"
-                @click="toggleActive(r)"
-              >
-                {{ r.is_active ? __('active') : __('inactive') }}
-              </button>
+
+              <div class="flex items-baseline justify-between pt-1 border-t border-[#1f222e]">
+                <span
+                  class="font-mono text-base font-bold"
+                  :class="r.type === 'income' ? 'text-emerald-400' : 'text-rose-400'"
+                >
+                  {{ r.type === 'income' ? '+' : '-' }}{{ formatAmount(r.amount) }}
+                </span>
+                <span class="inline-flex rounded px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border border-[#1f222e] bg-[#121217] text-zinc-300">
+                  {{ __(r.frequency) }}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between pt-1 text-xs font-mono text-zinc-400">
+                <span class="text-[11px] text-zinc-500">
+                  Jadwal: {{ formatDate(r.next_run_date, 'DD MMM YYYY') }}
+                </span>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-mono text-xs font-semibold transition-all active:scale-95"
+                  :class="
+                    r.is_active
+                      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                      : 'border-[#1f222e] bg-[#0d0d12] text-zinc-500 hover:text-zinc-300'
+                  "
+                  :aria-pressed="r.is_active"
+                  @click="toggleActive(r)"
+                >
+                  <span class="size-1.5 rounded-full" :class="r.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'"></span>
+                  <span>{{ r.is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                </button>
+              </div>
             </div>
           </template>
 
           <!-- Desktop cells -->
           <template #cell-1="{ row: r }">
             <span
-              class="capitalize"
+              class="inline-flex rounded px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border"
               :class="
-                r.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
+                r.type === 'income'
+                  ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                  : 'border-rose-500/30 bg-rose-500/15 text-rose-400'
               "
             >
               {{ __(r.type) }}
             </span>
           </template>
+          <template #cell-3="{ row: r }">
+            <span
+              class="font-mono text-sm font-bold"
+              :class="r.type === 'income' ? 'text-emerald-400' : 'text-rose-400'"
+            >
+              {{ r.type === 'income' ? '+' : '-' }}{{ formatAmount(r.amount) }}
+            </span>
+          </template>
           <template #cell-6="{ row: r }">
             <button
               type="button"
-              class="touch-target rounded-full border px-2.5 py-1 text-xs font-medium transition-colors"
+              class="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-mono text-xs font-semibold transition-all active:scale-95"
               :class="
                 r.is_active
-                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                  : 'border-muted bg-muted/40 text-muted-foreground hover:bg-muted'
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                  : 'border-[#1f222e] bg-[#0d0d12] text-zinc-500 hover:text-zinc-300'
               "
               :aria-pressed="r.is_active"
               @click="toggleActive(r)"
             >
-              {{ r.is_active ? __('active') : __('inactive') }}
+              <span class="size-1.5 rounded-full" :class="r.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'"></span>
+              <span>{{ r.is_active ? 'Aktif' : 'Nonaktif' }}</span>
             </button>
           </template>
           <template #cell-7="{ row: r }">

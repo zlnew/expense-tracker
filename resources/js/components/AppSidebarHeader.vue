@@ -91,11 +91,9 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="sticky top-0 z-header flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 bg-background/90 px-4 backdrop-blur transition-[width,height,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sm:px-6"
+    class="sticky top-0 z-header flex h-14 shrink-0 items-center gap-2 border-b border-[#1f222e]/60 bg-[#0a0a0c]/85 px-4 backdrop-blur-md transition-[transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] sm:px-6"
     :class="hidden ? '-translate-y-full' : 'translate-y-0'"
   >
-    <!-- Mobile/tablet (<lg): hamburger opens the drawer -->
-    <SidebarTrigger class="lg:hidden" />
     <!-- Desktop: sidebar trigger + breadcrumbs -->
     <SidebarTrigger class="-ml-1 hidden lg:flex" />
     <div class="hidden min-w-0 lg:flex lg:items-center lg:gap-2">
@@ -104,29 +102,32 @@ onUnmounted(() => {
         :breadcrumbs="breadcrumbs"
       />
       <template v-else>
-        <AppLogoIcon class="size-5 shrink-0 fill-current text-primary" />
-        <span class="truncate text-sm font-semibold">{{
+        <AppLogoIcon class="size-5 shrink-0 fill-current text-emerald-400" />
+        <span class="truncate text-sm font-semibold font-mono text-zinc-200">{{
           page.props.name
         }}</span>
       </template>
     </div>
 
-    <!-- Mobile/tablet: logo + current page title -->
-    <div class="flex min-w-0 items-center gap-2 lg:hidden">
-      <AppLogoIcon class="size-6 shrink-0 fill-current text-primary" />
-      <span class="truncate text-sm font-semibold">{{ pageTitle }}</span>
+    <!-- Mobile/tablet: logo + current page title in terminal format -->
+    <div class="flex min-w-0 items-center gap-2.5 lg:hidden">
+      <AppLogoIcon class="size-6 shrink-0 fill-current text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+      <div class="flex flex-col min-w-0">
+        <span class="truncate font-mono text-xs font-bold text-zinc-100 tracking-tight">{{ pageTitle }}</span>
+        <span class="text-[9px] font-mono text-emerald-500/80 font-semibold tracking-wider uppercase">Expense Terminal</span>
+      </div>
     </div>
 
     <!-- Right actions: mask toggle + profile (mobile shows avatar here) -->
-    <div class="ml-auto flex items-center gap-1.5">
+    <div class="ml-auto flex items-center gap-2">
       <button
         type="button"
-        class="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-zinc-400 transition-colors hover:border-[#1f222e] hover:bg-[#181820] hover:text-zinc-100"
+        class="flex h-8 w-8 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-100 active:scale-95"
         :aria-label="__('show_hide_balances')"
         :title="__('show_hide_balances')"
         @click="toggleMask"
       >
-        <component :is="masked ? EyeOff : Eye" class="size-4" />
+        <component :is="masked ? EyeOff : Eye" class="size-3.5" />
       </button>
 
       <DropdownMenu v-if="user">

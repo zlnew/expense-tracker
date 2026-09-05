@@ -126,23 +126,28 @@ const daysUntilDue = (fund: SinkingFund) => {
   <Head :title="__('sinking_funds')" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
-      <div
-        class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
-      >
-        <Heading
-          :title="__('sinking_funds')"
-          :description="__('fund_list_description')"
-          class="mb-0"
-        />
-        <button
-          type="button"
-          class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
-          @click="openCreate"
-        >
-          <Plus class="size-4 stroke-[2.5]" />
-          {{ __('add_data', { data: __('fund') }) }}
-        </button>
+    <div class="page-container space-y-5">
+      <!-- Command Bar -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-2.5">
+          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+            {{ __('sinking_funds') }}
+          </h1>
+          <span class="stat-chip text-zinc-400 font-semibold">
+            {{ funds.length }} pos dana
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] active:scale-95"
+            @click="openCreate"
+          >
+            <Plus class="size-3.5 stroke-[2.5]" />
+            <span>{{ __('add_data', { data: __('fund') }) }}</span>
+          </button>
+        </div>
       </div>
 
       <DataListState
@@ -170,7 +175,7 @@ const daysUntilDue = (fund: SinkingFund) => {
             class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl transition-all hover:border-zinc-700"
           >
             <div>
-              <!-- Header with Fund name & Status pill -->
+              <!-- Header with Fund name & Status pill & Actions -->
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0">
                   <div class="flex items-center gap-2">
@@ -187,20 +192,23 @@ const daysUntilDue = (fund: SinkingFund) => {
                     {{ fund.notes ?? '-' }}
                   </p>
                 </div>
-                <span
-                  class="shrink-0 rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border"
-                  :class="
-                    fund.status === 'overfunded'
-                      ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
-                      : fund.status === 'due_soon'
-                        ? 'border-rose-500/30 bg-rose-500/15 text-rose-400'
-                        : fund.status === 'underfunded'
-                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-400'
-                          : 'border-purple-500/30 bg-purple-500/15 text-purple-400'
-                  "
-                >
-                  {{ __(fund.status) }}
-                </span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <span
+                    class="rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border"
+                    :class="
+                      fund.status === 'overfunded'
+                        ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                        : fund.status === 'due_soon'
+                          ? 'border-rose-500/30 bg-rose-500/15 text-rose-400'
+                          : fund.status === 'underfunded'
+                            ? 'border-amber-500/30 bg-amber-500/15 text-amber-400'
+                            : 'border-purple-500/30 bg-purple-500/15 text-purple-400'
+                    "
+                  >
+                    {{ __(fund.status) }}
+                  </span>
+                  <RowActions :actions="rowActions(fund)" collapse-below="md" align="right" />
+                </div>
               </div>
 
               <!-- Category & Due Date Tag -->
@@ -294,25 +302,24 @@ const daysUntilDue = (fund: SinkingFund) => {
               </div>
             </div>
 
-            <!-- 1-Tap Action Footer -->
-            <div class="mt-5 flex items-center gap-2 border-t border-[#1f222e]/60 pt-4">
+            <!-- 2-Action Footer -->
+            <div class="mt-5 flex items-center gap-2.5 border-t border-[#1f222e]/60 pt-4">
               <button
                 type="button"
-                class="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/15 py-2 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                class="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/15 py-2 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)] active:scale-95"
                 @click="openSetAside(fund)"
               >
-                {{ __('set_aside') }}
+                + {{ __('set_aside') }}
               </button>
               <button
                 type="button"
-                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#121217] py-2 font-mono text-xs font-semibold text-zinc-300 hover:border-zinc-700 hover:text-zinc-100 transition-all disabled:opacity-40"
+                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#121217] py-2 font-mono text-xs font-semibold text-zinc-300 hover:border-zinc-700 hover:text-zinc-100 transition-all disabled:opacity-40 active:scale-95"
                 :disabled="fund.accumulated <= 0"
                 @click="openPay(fund)"
               >
                 <Wallet class="size-3.5" />
                 {{ __('pay_from_fund') }}
               </button>
-              <RowActions :actions="rowActions(fund)" collapse-below="md" />
             </div>
           </div>
         </div>

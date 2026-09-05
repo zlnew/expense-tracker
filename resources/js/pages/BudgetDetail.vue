@@ -2,6 +2,7 @@
 import { Head, Link, router, setLayoutProps, useHttp } from '@inertiajs/vue3'
 import {
   AlertTriangle,
+  ArrowLeft,
   CheckCircle2,
   CalendarDays,
   SquarePen,
@@ -301,12 +302,25 @@ const setActive = () => {
   <Head :title="__('detail_data', { data: __('budget') })" />
 
   <AppContent>
-    <div class="space-y-6 px-4 pt-6 pb-[var(--bottom-nav-height)] md:px-8">
-      <div class="flex items-start justify-between">
-        <Heading
-          :title="__('detail_data', { data: __('budget') })"
-          :description="__('budget_detail_description')"
-        />
+    <div class="page-container space-y-5">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <Link
+            :href="budgetIndex.url()"
+            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors active:scale-95"
+          >
+            <ArrowLeft class="size-4" />
+          </Link>
+          <div>
+            <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-tight">
+              {{ __('detail_data', { data: __('budget') }) }}
+            </h1>
+            <p class="font-mono text-[11px] text-zinc-500">
+              {{ formatDate(budget.period_start, 'DD MMM') }} - {{ formatDate(budget.period_end, 'DD MMM YYYY') }}
+            </p>
+          </div>
+        </div>
+
         <span
           v-if="budget.is_active"
           class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.25)]"
@@ -346,12 +360,16 @@ const setActive = () => {
         </div>
       </div>
 
-      <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <div class="flex items-center justify-center gap-2 lg:col-span-2">
-          <CalendarDays class="mr-1 text-zinc-500 size-4" />
+      <!-- Cycle Selector -->
+      <div class="flex items-center justify-between rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-3">
+        <div class="flex items-center gap-2 font-mono text-xs text-zinc-400">
+          <CalendarDays class="size-4 text-emerald-400" />
+          <span class="text-zinc-300 font-semibold uppercase tracking-wider text-[11px]">{{ __('cycle') || 'Siklus' }}:</span>
+        </div>
+        <div class="flex items-center gap-2">
           <select
             v-model="month"
-            class="rounded-xl border border-[#1f222e] bg-[#0a0a0c] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            class="rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
           >
             <option v-for="m in months" :key="m.value" :value="m.value" class="bg-[#12141a] text-zinc-200">
               {{ m.label }}
@@ -359,13 +377,16 @@ const setActive = () => {
           </select>
           <select
             v-model="year"
-            class="rounded-xl border border-[#1f222e] bg-[#0a0a0c] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            class="rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
           >
             <option v-for="y in years" :key="y.value" :value="y.value" class="bg-[#12141a] text-zinc-200">
               {{ y.label }}
             </option>
           </select>
         </div>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
 
         <!-- Monthly Expenses Envelopes -->
         <div class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl">
@@ -616,7 +637,7 @@ const setActive = () => {
   </AppContent>
 
   <div
-    class="fixed right-4 bottom-[calc(var(--bottom-nav-height)+0.75rem)] z-fab flex gap-2 md:right-8 md:bottom-8"
+    class="fixed right-4 bottom-24 z-fab flex gap-2 md:right-8 md:bottom-8"
   >
     <button
       v-if="!budget.is_active"

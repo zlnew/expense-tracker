@@ -45,22 +45,23 @@ setLayoutProps({
   <Head :title="balance.name" />
 
   <AppContent>
-    <div class="space-y-6 px-4 py-6 md:px-8">
-      <div class="flex items-center gap-4">
+    <div class="page-container space-y-5">
+      <div class="flex items-center gap-3">
         <Link
           :href="balanceIndex.url()"
           :aria-label="__('back')"
-          class="inline-flex size-10 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-white hover:bg-[#181b24] transition-colors active:scale-95"
+          class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors active:scale-95"
         >
           <ArrowLeft class="size-4" />
         </Link>
-        <Heading
-          :title="balance.name"
-          :description="
-            balance.description || __('detail_data', { data: __('balance') })
-          "
-          class="mb-0"
-        />
+        <div class="min-w-0">
+          <h1 class="truncate font-mono text-base font-bold text-zinc-100 uppercase tracking-tight">
+            {{ balance.name }}
+          </h1>
+          <p class="truncate font-mono text-[11px] text-zinc-500">
+            {{ balance.description || __('detail_data', { data: __('balance') }) }}
+          </p>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
