@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 
         <meta name="color-scheme" content="dark light">
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f7">
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f5f8">
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#050508">
         <meta name="theme-color" content="#050508">
 
@@ -25,7 +25,7 @@
 
                 document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 
-                const themeColor = isDark ? '#050508' : '#faf9f7';
+                const themeColor = isDark ? '#050508' : '#f4f5f8';
                 document.querySelectorAll('meta[name="theme-color"]').forEach(function(meta) {
                     meta.setAttribute('content', themeColor);
                 });
@@ -35,7 +35,7 @@
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
-                background-color: oklch(0.985 0.005 240);
+                background-color: #f4f5f8;
             }
 
             html.dark {

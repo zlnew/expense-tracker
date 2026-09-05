@@ -22,15 +22,15 @@ function visit(viewMode: 'transactions' | 'recurring') {
 
 <template>
   <div
-    class="grid w-full grid-cols-2 gap-1 rounded-xl border border-[#1f222e] bg-[#0d0d12] p-1 font-mono text-xs"
+    class="grid w-full grid-cols-2 gap-1 rounded-none border border-border bg-card p-1 font-mono text-xs shadow-xs"
   >
     <button
       type="button"
-      class="touch-target rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
+      class="cursor-pointer rounded-none px-3 py-1.5 text-center text-xs font-semibold transition-all"
       :class="
         viewMode === 'transactions'
-          ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400 shadow-sm'
-          : 'text-zinc-400 hover:text-zinc-200'
+          ? 'border border-emerald-500/40 bg-secondary font-bold text-emerald-500 shadow-xs dark:text-emerald-400'
+          : 'border border-transparent text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
       "
       :aria-pressed="viewMode === 'transactions'"
       @click="visit('transactions')"
@@ -39,11 +39,11 @@ function visit(viewMode: 'transactions' | 'recurring') {
     </button>
     <button
       type="button"
-      class="touch-target rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
+      class="cursor-pointer rounded-none px-3 py-1.5 text-center text-xs font-semibold transition-all"
       :class="
         viewMode === 'recurring'
-          ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400 shadow-sm'
-          : 'text-zinc-400 hover:text-zinc-200'
+          ? 'border border-emerald-500/40 bg-secondary font-bold text-emerald-500 shadow-xs dark:text-emerald-400'
+          : 'border border-transparent text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
       "
       :aria-pressed="viewMode === 'recurring'"
       @click="visit('recurring')"

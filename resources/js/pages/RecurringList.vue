@@ -114,18 +114,18 @@ const rowActions = (r: RecurringTransaction) => [
       >
         <div class="flex items-center gap-2.5">
           <h1
-            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+            class="font-mono text-base font-bold tracking-wide text-foreground uppercase"
           >
-            Tagihan & Langganan
+            {{ __('recurring_transactions') }}
           </h1>
-          <span class="stat-chip font-semibold text-zinc-400">
-            {{ recurrings.meta?.total ?? recurrings.data.length }} jadwal
+          <span class="stat-chip font-semibold text-muted-foreground">
+            {{ recurrings.meta?.total ?? recurrings.data.length }} total
           </span>
         </div>
 
         <button
           type="button"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
+          class="inline-flex h-9 items-center justify-center gap-1.5 rounded-none border border-emerald-400 bg-emerald-500 px-3.5 font-mono text-xs font-bold text-black shadow-xs transition-all hover:bg-emerald-400 active:scale-95 dark:border-emerald-400 dark:bg-emerald-500 dark:text-[#0a0a0c]"
           @click="createDialogOpen = true"
         >
           <Plus class="size-3.5 stroke-[2.5]" />
@@ -139,14 +139,14 @@ const rowActions = (r: RecurringTransaction) => [
       <div
         class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <div class="w-full sm:max-w-xs">
+        <div class="w-full sm:max-w-md">
           <SearchInput
             v-model="search"
             :placeholder="__('search_recurring_placeholder')"
           />
         </div>
 
-        <div class="w-full sm:w-auto sm:min-w-[260px]">
+        <div class="w-full sm:w-auto sm:min-w-[280px]">
           <TransactionTabs viewMode="recurring" />
         </div>
       </div>
@@ -164,7 +164,7 @@ const rowActions = (r: RecurringTransaction) => [
         <template #empty>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
+            class="inline-flex h-9 items-center justify-center gap-2 rounded-none border border-emerald-400 bg-emerald-500 px-4 font-mono text-xs font-bold text-black shadow-xs transition-all hover:bg-emerald-400 active:scale-95 dark:border-emerald-400 dark:bg-emerald-500 dark:text-[#0a0a0c]"
             @click="createDialogOpen = true"
           >
             <Plus class="size-4 stroke-[2.5]" />

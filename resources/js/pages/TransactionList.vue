@@ -256,32 +256,33 @@ const rowActions = (t: Transaction) => [
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 active:scale-95"
+            class="inline-flex h-9 items-center justify-center gap-1.5 rounded-none border border-emerald-400 bg-emerald-500 px-3 font-mono text-xs font-bold text-black shadow-xs transition-all hover:bg-emerald-400 active:scale-95 dark:border-emerald-400 dark:bg-emerald-500 dark:text-[#0a0a0c]"
             @click="openCreateDialog"
           >
             <Plus class="size-3.5 stroke-[2.5]" />
-            <span>Catat Cepat</span>
+            <span>{{ __('quick_log') }}</span>
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
+            class="inline-flex h-9 items-center justify-center gap-1.5 rounded-none border border-border bg-secondary/50 px-3 font-mono text-xs font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
+            :title="__('transfer_balance')"
             @click="openTransferDialog"
           >
-            <ArrowRightLeft class="size-3.5 text-zinc-400" />
-            <span class="hidden sm:inline">Pindah Saldo</span>
+            <ArrowRightLeft class="size-3.5 text-muted-foreground" />
+            <span class="hidden sm:inline">{{ __('transfer_balance') }}</span>
           </button>
           <button
             type="button"
-            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
-            title="Catat Banyak"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-none border border-border bg-secondary/50 text-foreground transition-all hover:bg-secondary active:scale-95"
+            :title="__('bulk_create')"
             @click="openBulkCreateDialog"
           >
             <ListPlus class="size-4" />
           </button>
           <button
             type="button"
-            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
-            title="Export CSV"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-none border border-border bg-secondary/50 text-foreground transition-all hover:bg-secondary active:scale-95"
+            :title="__('export_csv')"
             @click="exportCsv"
           >
             <Download class="size-4" />
@@ -289,8 +290,11 @@ const rowActions = (t: Transaction) => [
         </div>
       </div>
 
-      <div class="flex flex-col items-center gap-4 lg:flex-row lg:items-end">
-        <div class="flex w-full items-center gap-2 lg:max-w-md">
+      <!-- Filters: Search, Mobile Filter Sheet Trigger, & Tabs -->
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex w-full items-center gap-2 sm:max-w-md">
           <div class="w-full">
             <SearchInput
               v-model="search"
@@ -300,7 +304,7 @@ const rowActions = (t: Transaction) => [
           <Button
             variant="outline"
             size="icon"
-            class="relative h-10 w-10 shrink-0 border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100 lg:hidden"
+            class="relative h-9 w-9 shrink-0 cursor-pointer rounded-none border-border bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground lg:hidden"
             :aria-label="__('filter_transactions')"
             @click="filterSheetOpen = true"
           >
@@ -308,104 +312,103 @@ const rowActions = (t: Transaction) => [
             <Badge
               v-if="activeCount > 0"
               variant="secondary"
-              class="absolute -top-1 -right-1 size-4 bg-emerald-500 p-0 font-mono text-[9px] font-bold text-[#0a0a0c]"
+              class="absolute -top-1 -right-1 size-4 rounded-none bg-emerald-500 p-0 font-mono text-[9px] font-bold text-black dark:text-[#0a0a0c]"
             >
               {{ activeCount }}
             </Badge>
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            class="h-10 w-10 shrink-0 border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100"
-            :aria-label="__('export_transactions')"
-            :title="__('export_transactions')"
-            @click="exportCsv"
-          >
-            <Download class="size-4" />
-          </Button>
         </div>
 
-        <!-- Segmented [ Transactions | Recurring ] — visible at every
-             breakpoint; the old control was mobile-only. -->
-        <TransactionTabs class="lg:hidden" viewMode="transactions" />
+        <div class="w-full sm:w-auto sm:min-w-[280px]">
+          <TransactionTabs viewMode="transactions" />
+        </div>
+      </div>
 
-        <!-- Desktop: inline filter controls (lg+) -->
-        <div class="hidden w-full gap-4 lg:flex lg:w-auto">
-          <div class="space-y-2">
-            <Select v-model="balanceFilter">
-              <SelectTrigger>
-                <WalletIcon />
-                <SelectValue :placeholder="__('balance')" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  {{ __('all_data', { data: __('balances') }) }}
-                </SelectItem>
+      <!-- Desktop: inline filter controls (lg+) -->
+      <div class="hidden w-full flex-wrap items-center gap-3 lg:flex">
+        <div class="w-48">
+          <Select v-model="balanceFilter">
+            <SelectTrigger
+              class="h-9 rounded-none border-border bg-card font-mono text-xs"
+            >
+              <WalletIcon class="size-3.5" />
+              <SelectValue :placeholder="__('balance')" />
+            </SelectTrigger>
+            <SelectContent class="rounded-none">
+              <SelectItem value="all">
+                {{ __('all_data', { data: __('balances') }) }}
+              </SelectItem>
+              <SelectItem
+                v-for="b in balances"
+                :key="b.id"
+                :value="b.id.toString()"
+              >
+                {{ b.name }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="w-48">
+          <Select v-model="categoryFilter">
+            <SelectTrigger
+              class="h-9 rounded-none border-border bg-card font-mono text-xs"
+            >
+              <ListTodoIcon class="size-3.5" />
+              <span v-if="currentCategory?.type" class="text-muted-foreground">
+                {{ __(currentCategory.type) }}
+              </span>
+              <SelectValue :placeholder="__('category')" />
+            </SelectTrigger>
+            <SelectContent class="rounded-none">
+              <SelectItem value="all">
+                {{ __('all_data', { data: __('categories') }) }}
+              </SelectItem>
+              <SelectGroup v-if="groupedCategories.expense.length > 0">
+                <SelectLabel>{{ __('expense') }}</SelectLabel>
                 <SelectItem
-                  v-for="b in balances"
-                  :key="b.id"
-                  :value="b.id.toString()"
+                  v-for="c in groupedCategories.expense"
+                  :key="c.id"
+                  :value="c.id.toString()"
                 >
-                  {{ b.name }}
+                  {{ c.name }}
                 </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div class="space-y-2">
-            <Select v-model="categoryFilter">
-              <SelectTrigger>
-                <ListTodoIcon />
-                <span
-                  v-if="currentCategory?.type"
-                  class="text-muted-foreground"
+              </SelectGroup>
+              <SelectGroup v-if="groupedCategories.income.length > 0">
+                <SelectLabel>{{ __('income') }}</SelectLabel>
+                <SelectItem
+                  v-for="c in groupedCategories.income"
+                  :key="c.id"
+                  :value="c.id.toString()"
                 >
-                  {{ __(currentCategory.type) }}
-                </span>
-                <SelectValue :placeholder="__('category')" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  {{ __('all_data', { data: __('categories') }) }}
+                  {{ c.name }}
                 </SelectItem>
-                <SelectGroup v-if="groupedCategories.expense.length > 0">
-                  <SelectLabel>{{ __('expense') }}</SelectLabel>
-                  <SelectItem
-                    v-for="c in groupedCategories.expense"
-                    :key="c.id"
-                    :value="c.id.toString()"
-                  >
-                    {{ c.name }}
-                  </SelectItem>
-                </SelectGroup>
-                <SelectGroup v-if="groupedCategories.income.length > 0">
-                  <SelectLabel>{{ __('income') }}</SelectLabel>
-                  <SelectItem
-                    v-for="c in groupedCategories.income"
-                    :key="c.id"
-                    :value="c.id.toString()"
-                  >
-                    {{ c.name }}
-                  </SelectItem>
-                </SelectGroup>
-                <div
-                  v-if="
-                    groupedCategories.income.length === 0 &&
-                    groupedCategories.expense.length === 0
-                  "
-                  class="p-4 text-center text-sm text-muted-foreground"
-                >
-                  {{ __('no_data_found', { data: __('category') }) }}
-                </div>
-              </SelectContent>
-            </Select>
-          </div>
+              </SelectGroup>
+              <div
+                v-if="
+                  groupedCategories.income.length === 0 &&
+                  groupedCategories.expense.length === 0
+                "
+                class="p-4 text-center text-sm text-muted-foreground"
+              >
+                {{ __('no_data_found', { data: __('category') }) }}
+              </div>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div class="flex items-center gap-2">
-            <Input type="date" v-model="dateFromFilter" />
-            <MinusIcon />
-            <Input type="date" v-model="dateToFilter" />
-          </div>
+        <div class="flex items-center gap-2">
+          <Input
+            type="date"
+            v-model="dateFromFilter"
+            class="h-9 rounded-none border-border bg-card font-mono text-xs"
+          />
+          <MinusIcon class="size-3.5 text-muted-foreground" />
+          <Input
+            type="date"
+            v-model="dateToFilter"
+            class="h-9 rounded-none border-border bg-card font-mono text-xs"
+          />
         </div>
       </div>
 

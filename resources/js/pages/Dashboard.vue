@@ -78,19 +78,21 @@ const hasActiveBudget = computed(
       <aside
         v-if="canInstall"
         aria-label="Install app"
-        class="flex items-center justify-between gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-xs shadow-lg"
+        class="flex items-center justify-between gap-3 border border-emerald-500/40 bg-card p-4 text-xs shadow-sm"
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.4)]"
+            class="flex size-9 shrink-0 items-center justify-center border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 shadow-[0_0_10px_rgba(16,185,129,0.2)] dark:text-emerald-400"
           >
             <Download class="size-4" />
           </div>
           <div>
-            <p class="font-mono font-bold text-zinc-100">
+            <p
+              class="font-mono font-bold tracking-wider text-foreground uppercase"
+            >
               {{ __('install_app') || 'Install Expense Tracker' }}
             </p>
-            <p class="font-mono text-[11px] text-zinc-500">
+            <p class="font-mono text-[11px] text-muted-foreground">
               {{
                 __('install_app_description') ||
                 'Add to home screen for instant, offline access.'
@@ -101,14 +103,14 @@ const hasActiveBudget = computed(
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="h-8 rounded-xl bg-emerald-500 px-3 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400"
+            class="h-8 border border-emerald-500/50 bg-emerald-600 px-3 font-mono text-xs font-bold tracking-wider text-white uppercase shadow-[0_0_12px_rgba(16,185,129,0.25)] transition-all hover:bg-emerald-500"
             @click="promptInstall"
           >
             {{ __('install') || 'Install' }}
           </button>
           <button
             type="button"
-            class="flex size-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:text-zinc-200"
+            class="flex size-8 items-center justify-center border border-border text-muted-foreground transition-colors hover:text-foreground"
             @click="dismissInstall"
           >
             <X class="size-4" />

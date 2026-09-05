@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3'
-import { LogOut, Settings, Tags } from 'lucide-vue-next'
+import { Languages, LogOut, Settings, Tags } from 'lucide-vue-next'
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -19,7 +19,7 @@ type Props = {
 
 defineProps<Props>()
 
-const { __ } = useLang()
+const { __, currentLocale, setLocale } = useLang()
 
 const handleLogout = () => {
   router.post('logout')
@@ -52,6 +52,47 @@ const handleLogout = () => {
       </Link>
     </DropdownMenuItem>
   </DropdownMenuGroup>
+  <DropdownMenuSeparator />
+  <!-- Language Switcher Section -->
+  <div class="px-2 py-1.5">
+    <div
+      class="mb-1.5 flex items-center justify-between font-mono text-[11px] text-muted-foreground"
+    >
+      <span class="flex items-center gap-1.5">
+        <Languages class="size-3.5" />
+        {{ __('language') }}
+      </span>
+      <span class="font-bold text-emerald-500 uppercase dark:text-emerald-400">
+        [{{ currentLocale }}]
+      </span>
+    </div>
+    <div class="grid grid-cols-2 gap-1 font-mono text-xs">
+      <button
+        type="button"
+        class="flex cursor-pointer items-center justify-center border px-2 py-1 transition-colors"
+        :class="
+          currentLocale === 'id'
+            ? 'border-emerald-500 bg-emerald-500/15 font-bold text-emerald-500 dark:border-emerald-400 dark:text-emerald-400'
+            : 'border-border bg-secondary/50 text-muted-foreground hover:bg-accent hover:text-foreground'
+        "
+        @click.stop="setLocale('id')"
+      >
+        ID
+      </button>
+      <button
+        type="button"
+        class="flex cursor-pointer items-center justify-center border px-2 py-1 transition-colors"
+        :class="
+          currentLocale === 'en'
+            ? 'border-emerald-500 bg-emerald-500/15 font-bold text-emerald-500 dark:border-emerald-400 dark:text-emerald-400'
+            : 'border-border bg-secondary/50 text-muted-foreground hover:bg-accent hover:text-foreground'
+        "
+        @click.stop="setLocale('en')"
+      >
+        EN
+      </button>
+    </div>
+  </div>
   <DropdownMenuSeparator />
   <DropdownMenuItem :as-child="true">
     <Link

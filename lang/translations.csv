@@ -1,4 +1,5 @@
 key,en,id
+account_details,"Account Details","Detail Akun"
 accumulated,Accumulated,Terkumpul
 action_warning,"Please proceed with caution, this cannot be undone","Harap berhati-hati, tindakan ini tidak dapat dibatalkan."
 actions,Actions,Aksi
@@ -16,6 +17,7 @@ appearance_settings_description,"Update your account's appearance settings","Per
 appearance_settings_title,"Appearance Settings","Pengaturan Tampilan"
 apply,Apply,Terapkan
 april,April,April
+architecture_overview,"Architecture Overview","Ringkasan Arsitektur"
 august,August,Agustus
 auto_contribution,"Auto contribution","Kontribusi otomatis"
 auto_contribution_hint,"Leave empty to auto-calculate","Kosongkan untuk hitung otomatis"
@@ -40,6 +42,7 @@ budget_progress_description,"Track how much of your budget has been used and how
 budget_status,"Budget Pacing","Status Anggaran"
 budget_update_description,"Update and adjust your monthly budget plans","Perbarui dan sesuaikan perencanaan anggaran bulanan Anda"
 budgets,Budgets,Anggaran
+bulk_create,"Bulk Create","Catat Banyak"
 cadence,Cadence,Kadens
 cancel,Cancel,Batal
 cannot_delete_active_budget,"Cannot delete active budget.","Tidak dapat menghapus anggaran aktif."
@@ -48,6 +51,7 @@ carry_over,"Carry over unused budget","Bawa sisa anggaran"
 carry_over_description,"Start this budget with the unused amount from the previous cycle added to each category.","Mulai anggaran ini dengan sisa dari siklus sebelumnya ditambahkan ke setiap kategori."
 carry_over_no_previous,"No previous budget found — nothing to carry over yet.","Belum ada anggaran sebelumnya — belum ada sisa yang bisa dibawa."
 carry_over_preview,"Rp :amount from the previous cycle will roll into this budget.","Rp :amount dari siklus sebelumnya akan masuk ke anggaran ini."
+catat,Log,Catat
 categories,Categories,Kategori
 category,Category,Kategori
 category_create_description,"Create a new budget category","Buat kategori anggaran baru"
@@ -96,6 +100,7 @@ diff,Diff,Diff
 discord_webhook_url,"Discord webhook URL","URL webhook Discord"
 discord_webhook_url_description,"Receive a Discord notification when a budget category reaches 80% or 100% of its planned amount.","Dapatkan notifikasi Discord saat kategori anggaran mencapai 80% atau 100% dari jumlah yang direncanakan."
 discord_webhook_url_placeholder,https://discord.com/api/webhooks/...,https://discord.com/api/webhooks/...
+drift_detected,"Drift Detected","Selisih Terdeteksi"
 drift_flagged,"Drift flagged","Selisih terdeteksi"
 drift_ok,"Within tolerance","Dalam toleransi"
 due_in,"Due in","Jatuh tempo dalam"
@@ -105,10 +110,12 @@ edit,Edit,Ubah
 edit_data,"Edit :data","Ubah :data"
 email_address,"Email Address","Alamat Email"
 end_date,"End Date","Tanggal Selesai"
+enter_terminal,"Enter Terminal","Masuk Terminal"
 expense,Expense,Pengeluaran
 expense_breakdown,"Expense Breakdown","Proporsi Pengeluaran"
 expense_breakdown_description,"Analyze which categories contribute the most to your expenses.","Analisis kategori yang paling banyak menyumbang pengeluaran Anda."
 expenses,Expenses,Pengeluaran
+export_csv,"Export CSV","Ekspor CSV"
 export_transactions,"Export transactions (CSV)","Ekspor transaksi (CSV)"
 failed_to_load,"Failed to load.","Failed to load."
 february,February,Februari
@@ -117,6 +124,7 @@ filter_by_category,"Filter by Category","Filter berdasarkan Kategori"
 filter_transactions,"Filter Transactions","Filter Transaksi"
 final_amount,"Final Amount","Saldo Akhir"
 free_after,"Free after","Free after"
+free_cash,"Free Cash","Kas Bebas"
 frequency,Frequency,Frekuensi
 from_account,"From Account","Dari Akun"
 full_name,"Full Name","Nama Lengkap"
@@ -133,6 +141,7 @@ fund_update_description,"Update the fund target, cadence, or next due date","Per
 fund_withdrawal,Withdrawal,Penarikan
 funded,funded,terdanai
 funds,Funds,Dana
+get_started,"Get Started","Mulai Sekarang"
 go_to_next_page,"Go to next page","Ke halaman berikutnya"
 go_to_previous_page,"Go to previous page","Ke halaman sebelumnya"
 impending_drains,"Impending drains","Impending drains"
@@ -157,15 +166,38 @@ item,Item,Item
 january,January,Januari
 july,July,Juli
 june,June,Juni
+keluar_bln,"OUTFLOW (MO)","KELUAR (BLN)"
+landing_badge,"SYSTEM PROTOCOL // V2.5.0","PROTOKOL SISTEM // V2.5.0"
+landing_drift_status,"ZERO DRIFT","NOL SELISIH"
+landing_feature_1_desc,"Distinguish gross bank ledger from actual spendable cash after sinking fund reservations.","Bedakan saldo buku kotor dari kas riil yang aman dibelanjakan setelah alokasi pos dana."
+landing_feature_1_title,"Dual-Balance Engine","Mesin Saldo Ganda"
+landing_feature_2_desc,"Eliminate mystery leaks by verifying your physical bank statements against your digital ledger.","Cegah kebocoran saldo tak terlacak dengan mencocokkan rekening koran fisik dan buku besar."
+landing_feature_2_title,"Strict Reconciliation","Rekonsiliasi Ketat"
+landing_feature_3_desc,"Monitor monthly spending velocity with daily spending limits and burn-rate warnings.","Pantau kecepatan pengeluaran bulanan dengan batas harian dan peringatan laju pemakaian."
+landing_feature_3_title,"Budget Pacing Gauge","Indikator Pacing Anggaran"
+landing_feature_4_desc,"Installable standalone web app with rapid numpad capture and offline-ready persistence.","Aplikasi standalone yang dapat diinstal dengan papan angka kilat dan dukungan offline."
+landing_feature_4_title,"Android PWA & Quick Log","PWA Android & Catat Kilat"
+landing_preview_status,"TELEMETRY: NOMINAL","TELEMETRI: NORMAL"
+landing_real_spendable,"REAL SPENDABLE","SALDO BEBAS RIIL"
+landing_sinking_funds,"SINKING FUNDS","ALOKASI POS DANA"
+landing_terminal_sub,"Local Network // Zero Tracking // Pure Performance","Jaringan Lokal // Bebas Pelacak // Performa Murni"
+language,Language,Bahasa
+language_en,English,"Bahasa Inggris"
+language_id,Indonesian,"Bahasa Indonesia"
+last_reconciled,"Last Reconciled","Terakhir Rekon"
 last_set_aside,"Last set aside","Terakhir menyisihkan"
 last_updated_at,"Last Updated At","Terakhir Diperbarui"
+ledger_balance,"Ledger Balance","Saldo Buku"
 limit,Limit,Batas
 list,List,List
 loading,Loading,Memuat
 log_out,"Log Out",Keluar
+login,"Log In",Masuk
 main_navigation,"Main Navigation","Navigasi Utama"
 march,March,Maret
+masuk_bln,"INFLOW (MO)","MASUK (BLN)"
 may,May,Mei
+menu,Menu,Menu
 month,Month,Bulan
 monthly,Monthly,Bulanan
 monthly_expenses,"Monthly Expenses","Pengeluaran Bulanan"
@@ -176,6 +208,7 @@ more,More,Lainnya
 multiple_transactions,"Multiple Transactions","Banyak Transaksi"
 name,Name,Nama
 needs_data,"needs :data","butuh :data"
+net_cash_flow,"Net Cash Flow","Arus Kas Bersih"
 new_password,"New Password","Kata Sandi Baru"
 new_version_available,"New version available","Versi baru tersedia"
 new_version_reload,Reload,"Muat ulang"
@@ -196,6 +229,7 @@ november,November,November
 october,October,Oktober
 of,of,dari
 offline,"You're offline","Anda sedang offline"
+offline_first,"Offline First","Offline Pertama"
 on_track,"On track","Sesuai rencana"
 optional,Optional,Opsional
 others,Others,Lainnya
@@ -210,6 +244,8 @@ period,Period,Periode
 period_end,"Period End","Periode Akhir"
 period_start,"Period Start","Periode Awal"
 periods,Periods,Periode
+personal_financial_terminal,"Personal Financial Terminal","Terminal Keuangan Pribadi"
+pindah,Transfer,Pindah
 planned,Planned,Direncanakan
 platform,Platform,Platform
 primary,Primary,Utama
@@ -217,12 +253,16 @@ profile,Profile,Profil
 profile_settings,"Profile Settings","Pengaturan Profil"
 profile_update_description,"Update your name and email address","Perbarui nama dan alamat email anda"
 profile_update_title,"Profile Information","Informasi Profil"
+quick_log,"Quick Log","Catat Cepat"
 real_balance,"Real Balance","Real Balance"
+real_balance,"Real Balance","Saldo Riil"
 received,Received,Diterima
 recent_transactions,"Recent Transactions","Transaksi Terakhir"
 recent_transactions_description,"Quickly review your latest financial activities and transactions.","Lihat aktivitas dan transaksi keuangan terbaru Anda dengan cepat."
 reconcile_balance,"Reconcile balance","Rekonsiliasi saldo"
 reconcile_balance_description,"Enter the actual amount from your bank or wallet to compare with the computed balance and flag any drift.","Masukkan jumlah aktual dari bank atau dompet Anda untuk membandingkan dengan saldo terhitung dan menandai selisih."
+reconcile_now,"Reconcile Now","Rekonsiliasi Sekarang"
+reconciled,Reconciled,Terekonsiliasi
 reconciled_amount,"Reconciled amount","Jumlah rekonsiliasi"
 reconciled_at,"Reconciled on","Tanggal rekonsiliasi"
 recurring,Recurring,Recurring
@@ -231,10 +271,13 @@ recurring_transactions,"Recurring Transactions","Transaksi Berulang"
 recurring_transactions_create_description,"Create a recurring transaction that repeats automatically","Buat transaksi berulang yang berulang secara otomatis"
 recurring_transactions_description,"Manage automatic recurring income and expenses","Kelola pemasukan dan pengeluaran berulang otomatis"
 recurring_transactions_update_description,"Update the recurring transaction schedule","Perbarui jadwal transaksi berulang"
+register,Register,Daftar
+rekon,Reconcile,Rekon
 remaining,Remaining,Sisa
 remaining_budget,"Remaining Budget","Sisa Anggaran"
 remove_item,"Remove item","Hapus item"
 reserved,Reserved,Reserved
+reserved_balance,"Reserved Balance","Dana Cadangan"
 reserved_in_funds,"Reserved in Funds","Dicadangkan di Dana"
 reset,Reset,"Atur Ulang"
 resume_recurring,"Resume Recurring","Lanjutkan Berulang"
@@ -274,7 +317,10 @@ spent,Used,Terpakai
 start_date,"Start Date","Tanggal Mulai"
 status,Status,Status
 stop_recurring,"Stop Recurring","Hentikan Berulang"
+strict_reconciliation,"Strict Reconciliation","Rekonsiliasi Ketat"
 suggested_contribution,"Suggested: :amount","Disarankan: :amount"
+switch_language,"Switch Language","Ganti Bahasa"
+system_ready,"SYSTEM READY","SISTEM SIAP"
 target_amount,"Target amount","Jumlah target"
 te_description,"Create multiple transactions at once.","Buat beberapa transaksi sekaligus."
 to_account,"To Account","Ke Akun"
@@ -294,6 +340,7 @@ transaction_list_description,"View and manage your transaction history.","Lihat 
 transaction_update_description,"Update the selected transaction details.","Perbarui detail transaksi yang dipilih."
 transactions,Transactions,Transaksi
 transfer,Transfer,Transfer
+transfer_balance,"Transfer Balance","Pindah Saldo"
 transfer_description,"Transfer between accounts","Transfer antar akun"
 transfer_same_account_error,"Source and destination accounts must be different","Akun sumber dan tujuan harus berbeda"
 trend_chart_aria,"Monthly income and expense trend chart","Grafik tren pemasukan dan pengeluaran bulanan"
@@ -301,6 +348,7 @@ type,Type,Jenis
 types,Types,Jenis
 underfunded,Underfunded,"Kurang dari target"
 unknown,Unknown,"Tidak diketahui"
+unreconciled,Unreconciled,"Belum Rekonsiliasi"
 update,Update,Perbarui
 update_data,"{data} Updated","{data} Diperbarui"
 updated_data,":data Updated",":data Diperbarui"
@@ -309,5 +357,8 @@ validation_error,"Validation failed. Please check the form.","Validasi gagal. Pe
 view_detail,"View Detail","Lihat Detail"
 warning,Warning,Peringatan
 weekly,Weekly,Mingguan
+welcome_subtitle,"Industrial-grade cash flow management, sinking funds allocation, and balance reconciliation in a single brutalist cockpit.","Pengelolaan arus kas, alokasi sinking funds, dan rekonsiliasi saldo tingkat instrumen industri dalam satu kokpit brutalist."
+welcome_title,"Precision Financial Terminal","Terminal Keuangan Presisi"
 year,Year,Tahun
 yearly,Yearly,Tahunan
+zero_rounding,"Zero Rounding","Nol Pembulatan"

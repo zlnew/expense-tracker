@@ -75,7 +75,7 @@ function triggerTransactionCreate() {
 
 <template>
   <div
-    class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
+    class="relative overflow-hidden rounded-none border border-border bg-card p-5 text-card-foreground shadow-sm sm:p-6"
   >
     <!-- Terminal Ambient Glow -->
     <div
@@ -93,49 +93,51 @@ function triggerTransactionCreate() {
         <div class="space-y-2">
           <div class="flex items-center gap-2">
             <span
-              class="inline-flex size-7 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+              class="inline-flex size-7 items-center justify-center rounded-none border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400"
             >
               <Wallet class="size-4" />
             </span>
             <span
-              class="font-mono text-xs font-semibold tracking-wider text-zinc-400 uppercase"
+              class="font-mono text-xs font-semibold tracking-wider text-muted-foreground uppercase"
             >
-              {{ __('real_balance') || 'Real Spendable Balance' }}
+              {{ __('real_balance') }}
             </span>
             <span
               v-if="reservedBalance > 0"
-              class="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-400"
+              class="inline-flex items-center gap-1 rounded-none border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-500 dark:text-amber-400"
             >
               <ShieldCheck class="size-3" />
               {{ formatAmount(reservedBalance) }}
-              {{ __('reserved') || 'Reserved' }}
+              {{ __('reserved') }}
             </span>
           </div>
 
           <!-- Hero Monospace Number -->
           <div class="flex items-baseline gap-1">
             <span
-              class="font-mono text-3xl font-extrabold tracking-tight text-emerald-400 tabular-nums drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] sm:text-4xl"
+              class="font-mono text-3xl font-extrabold tracking-tight text-emerald-500 tabular-nums drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] sm:text-4xl dark:text-emerald-400"
             >
               {{ masked ? '••••••••' : formatAmount(realBalance) }}
             </span>
           </div>
 
-          <p class="font-mono text-xs text-zinc-500">
-            {{ __('active') || 'Total Active' }}:
-            <span class="font-semibold text-zinc-200">
+          <p class="font-mono text-xs text-muted-foreground">
+            {{ __('active') }}:
+            <span class="font-semibold text-foreground">
               {{ masked ? '••••••' : formatAmount(ledgerBalance) }}
             </span>
-            <span v-if="reservedBalance > 0" class="mx-1.5 text-zinc-600"
+            <span
+              v-if="reservedBalance > 0"
+              class="mx-1.5 text-muted-foreground"
               >•</span
             >
             <Link
               v-if="reservedBalance > 0"
               :href="fundIndex()"
-              class="inline-flex items-center gap-1 font-mono text-xs text-amber-400/90 hover:text-amber-300 hover:underline"
+              class="inline-flex items-center gap-1 font-mono text-xs text-amber-500 hover:underline dark:text-amber-400"
             >
               <PiggyBank class="size-3.5" />
-              {{ __('sinking_funds') || 'Sinking Funds' }}
+              {{ __('sinking_funds') }}
             </Link>
           </p>
         </div>
@@ -146,22 +148,22 @@ function triggerTransactionCreate() {
         >
           <!-- Income Inflow Card -->
           <div
-            class="flex flex-col justify-between space-y-1.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
+            class="flex flex-col justify-between space-y-1.5 rounded-none border border-border bg-secondary/50 p-2.5 sm:min-w-[140px] sm:p-3"
           >
             <div class="flex items-center justify-between gap-1.5">
               <span
-                class="font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase"
+                class="font-mono text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
               >
-                MASUK (BLN)
+                {{ __('masuk_bln') }}
               </span>
               <div
-                class="flex size-5 shrink-0 items-center justify-center rounded border border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                class="flex size-5 shrink-0 items-center justify-center rounded-none border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400"
               >
                 <TrendingUp class="size-3" />
               </div>
             </div>
             <p
-              class="truncate font-mono text-xs font-bold text-emerald-400 tabular-nums sm:text-sm"
+              class="truncate font-mono text-xs font-bold text-emerald-500 tabular-nums sm:text-sm dark:text-emerald-400"
             >
               {{
                 masked
@@ -173,22 +175,22 @@ function triggerTransactionCreate() {
 
           <!-- Expense Outflow Card -->
           <div
-            class="flex flex-col justify-between space-y-1.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
+            class="flex flex-col justify-between space-y-1.5 rounded-none border border-border bg-secondary/50 p-2.5 sm:min-w-[140px] sm:p-3"
           >
             <div class="flex items-center justify-between gap-1.5">
               <span
-                class="font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase"
+                class="font-mono text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
               >
-                KELUAR (BLN)
+                {{ __('keluar_bln') }}
               </span>
               <div
-                class="flex size-5 shrink-0 items-center justify-center rounded border border-rose-500/20 bg-rose-500/10 text-rose-400"
+                class="flex size-5 shrink-0 items-center justify-center rounded-none border border-rose-500/20 bg-rose-500/10 text-rose-500 dark:text-rose-400"
               >
                 <TrendingDown class="size-3" />
               </div>
             </div>
             <p
-              class="truncate font-mono text-xs font-bold text-rose-400 tabular-nums sm:text-sm"
+              class="truncate font-mono text-xs font-bold text-rose-500 tabular-nums sm:text-sm dark:text-rose-400"
             >
               {{
                 masked
@@ -201,11 +203,11 @@ function triggerTransactionCreate() {
 
           <!-- Net Cash Flow Badge -->
           <div
-            class="col-span-2 flex items-center justify-center gap-2 rounded-xl border px-3 py-2 font-mono text-xs font-semibold sm:col-span-1"
+            class="col-span-2 flex items-center justify-center gap-2 rounded-none border px-3 py-2 font-mono text-xs font-semibold sm:col-span-1"
             :class="
               netCashFlow >= 0
-                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-                : 'border-rose-500/30 bg-rose-500/10 text-rose-400'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400'
+                : 'border-rose-500/30 bg-rose-500/10 text-rose-500 dark:text-rose-400'
             "
           >
             <component
@@ -223,25 +225,25 @@ function triggerTransactionCreate() {
       <!-- Liquidity Proportion Bar (Real vs Sinking Fund Reserves) -->
       <div
         v-if="reservedBalance > 0 && ledgerBalance > 0"
-        class="border-t border-[#1f222e] pt-4"
+        class="border-t border-border pt-4"
       >
         <div
-          class="mb-1.5 flex items-center justify-between font-mono text-[11px] text-zinc-400"
+          class="mb-1.5 flex items-center justify-between font-mono text-[11px] text-muted-foreground"
         >
           <span class="flex items-center gap-1.5 font-medium">
             <span
-              class="size-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]"
+              class="size-2 rounded-none bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)] dark:bg-emerald-400"
             />
-            {{ __('spendable') || 'Free Cash' }}: {{ realPercent }}%
+            {{ __('spendable') }}: {{ realPercent }}%
           </span>
           <span class="flex items-center gap-1.5 font-medium">
             <span
-              class="size-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.8)]"
+              class="size-2 rounded-none bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.8)] dark:bg-amber-400"
             />
-            {{ __('reserved_in_funds') || 'Reserved' }}: {{ reservedPercent }}%
+            {{ __('reserved_in_funds') }}: {{ reservedPercent }}%
           </span>
         </div>
-        <div class="flex h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+        <div class="flex h-2 w-full overflow-hidden rounded-none bg-secondary">
           <div
             class="h-full bg-emerald-500 transition-all duration-500 ease-out"
             :style="{ width: `${realPercent}%` }"
@@ -254,29 +256,29 @@ function triggerTransactionCreate() {
       </div>
 
       <!-- Quick Action Dock -->
-      <div class="border-t border-[#1f222e]/60 pt-4">
+      <div class="border-t border-border pt-4">
         <div class="grid grid-cols-3 gap-2">
           <button
             type="button"
-            class="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/15 px-1 py-2 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)] transition-all hover:bg-emerald-500/25 active:scale-95"
+            class="flex items-center justify-center gap-1.5 rounded-none border border-emerald-500/30 bg-emerald-500/15 px-1 py-2 font-mono text-xs font-bold text-emerald-500 shadow-xs transition-all hover:bg-emerald-500/25 active:scale-95 dark:text-emerald-400"
             @click="triggerTransactionCreate"
           >
             <Plus class="size-3.5" />
-            <span>Catat</span>
+            <span>{{ __('catat') }}</span>
           </button>
           <Link
             :href="balanceIndex.url()"
-            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-1 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
+            class="flex items-center justify-center gap-1.5 rounded-none border border-border bg-secondary/50 px-1 py-2 font-mono text-xs font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
           >
-            <ArrowRightLeft class="size-3.5 text-zinc-400" />
-            <span>Pindah</span>
+            <ArrowRightLeft class="size-3.5 text-muted-foreground" />
+            <span>{{ __('pindah') }}</span>
           </Link>
           <Link
             :href="balanceIndex.url()"
-            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-1 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
+            class="flex items-center justify-center gap-1.5 rounded-none border border-border bg-secondary/50 px-1 py-2 font-mono text-xs font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
           >
-            <ShieldCheck class="size-3.5 text-zinc-400" />
-            <span>Rekon</span>
+            <ShieldCheck class="size-3.5 text-muted-foreground" />
+            <span>{{ __('rekon') }}</span>
           </Link>
         </div>
       </div>
