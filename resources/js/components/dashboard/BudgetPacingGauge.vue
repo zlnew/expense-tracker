@@ -106,8 +106,7 @@ const pacingStatus = computed(() => {
     return {
       label: __('overspent') || 'Overspent',
       variant: 'destructive',
-      class:
-        'bg-rose-500/10 text-rose-400 border-rose-500/30',
+      class: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
     }
   }
 
@@ -115,8 +114,7 @@ const pacingStatus = computed(() => {
     return {
       label: `+${pacingDelta.value}% vs cycle`,
       variant: 'warning',
-      class:
-        'bg-amber-500/10 text-amber-400 border-amber-500/30',
+      class: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
     }
   }
 
@@ -130,10 +128,12 @@ const pacingStatus = computed(() => {
 
 <template>
   <div
-    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
   >
     <!-- Card Header -->
-    <div class="flex items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4">
+    <div
+      class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+    >
       <div class="space-y-0.5">
         <div class="flex items-center gap-2">
           <span
@@ -141,7 +141,9 @@ const pacingStatus = computed(() => {
           >
             <Gauge class="size-4" />
           </span>
-          <h2 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
+          <h2
+            class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('budget_status') || 'Budget Pacing' }}
           </h2>
         </div>
@@ -158,7 +160,7 @@ const pacingStatus = computed(() => {
 
       <Link v-if="hasBudget" :href="budgetIndex.url()">
         <span
-          class="inline-flex items-center gap-1 font-mono text-xs text-zinc-400 hover:text-emerald-400 transition-colors"
+          class="inline-flex items-center gap-1 font-mono text-xs text-zinc-400 transition-colors hover:text-emerald-400"
         >
           {{ __('details') || 'Details' }}
           <ChevronRight class="size-3.5" />
@@ -175,7 +177,7 @@ const pacingStatus = computed(() => {
         >
           <div class="min-w-0">
             <span
-              class="font-mono text-[10px] font-semibold text-zinc-500 uppercase tracking-wider"
+              class="font-mono text-[10px] font-semibold tracking-wider text-zinc-500 uppercase"
               >{{ __('limit') || 'Cap' }}</span
             >
             <p
@@ -186,7 +188,7 @@ const pacingStatus = computed(() => {
           </div>
           <div class="min-w-0">
             <span
-              class="font-mono text-[10px] font-semibold text-zinc-500 uppercase tracking-wider"
+              class="font-mono text-[10px] font-semibold tracking-wider text-zinc-500 uppercase"
               >{{ __('spent') }}</span
             >
             <p
@@ -197,14 +199,12 @@ const pacingStatus = computed(() => {
           </div>
           <div class="min-w-0">
             <span
-              class="font-mono text-[10px] font-semibold text-zinc-500 uppercase tracking-wider"
+              class="font-mono text-[10px] font-semibold tracking-wider text-zinc-500 uppercase"
               >{{ __('remaining') }}</span
             >
             <p
               class="truncate font-mono text-xs font-extrabold tabular-nums sm:text-sm"
-              :class="
-                isOverspent ? 'text-rose-400' : 'text-emerald-400'
-              "
+              :class="isOverspent ? 'text-rose-400' : 'text-emerald-400'"
             >
               {{
                 masked
@@ -219,7 +219,9 @@ const pacingStatus = computed(() => {
         <!-- Pacing Comparison Bar -->
         <div class="space-y-2">
           <div class="flex items-center justify-between text-xs">
-            <span class="flex items-center gap-2 font-mono font-medium text-zinc-200">
+            <span
+              class="flex items-center gap-2 font-mono font-medium text-zinc-200"
+            >
               <span>{{ spentPercent }}% {{ __('spent') }}</span>
               <span
                 class="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-bold"
@@ -286,9 +288,7 @@ const pacingStatus = computed(() => {
               class="space-y-1 text-xs"
             >
               <div class="flex items-center justify-between">
-                <span
-                  class="max-w-[180px] truncate font-medium text-zinc-300"
-                >
+                <span class="max-w-[180px] truncate font-medium text-zinc-300">
                   {{ item.category?.name || 'Category' }}
                 </span>
                 <span
@@ -298,7 +298,9 @@ const pacingStatus = computed(() => {
                   {{ formatAmount(item.planned_amount) }}
                 </span>
               </div>
-              <div class="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+              <div
+                class="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800"
+              >
                 <div
                   class="h-full rounded-full transition-all duration-300"
                   :class="
@@ -332,13 +334,14 @@ const pacingStatus = computed(() => {
             {{ __('no_active_budget') }}
           </p>
           <p class="max-w-[240px] font-mono text-xs text-zinc-500">
-            Set monthly category caps to prevent overspending and track your burn rate.
+            Set monthly category caps to prevent overspending and track your
+            burn rate.
           </p>
         </div>
         <Link :href="budgetIndex.url()">
           <button
             type="button"
-            class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-all"
+            class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20"
           >
             {{ __('create_budget') || 'Set Up Budget' }}
           </button>

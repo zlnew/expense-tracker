@@ -8,7 +8,6 @@ import FundDeleteDialog from '@/components/dialogs/FundDeleteDialog.vue'
 import FundFormDialog from '@/components/dialogs/FundFormDialog.vue'
 import FundPayDialog from '@/components/dialogs/FundPayDialog.vue'
 import FundSetAsideDialog from '@/components/dialogs/FundSetAsideDialog.vue'
-import Heading from '@/components/Heading.vue'
 import RowActions from '@/components/RowActions.vue'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
@@ -38,36 +37,6 @@ const setAsideOpen = ref(false)
 const payOpen = ref(false)
 const deleteOpen = ref(false)
 const targetData = ref<SinkingFund | null>(null)
-
-const statusVariant = (status: SinkingFund['status']) => {
-  const map: Record<
-    SinkingFund['status'],
-    'default' | 'secondary' | 'destructive' | 'outline'
-  > = {
-    on_track: 'secondary',
-    due_soon: 'destructive',
-    underfunded: 'outline',
-    overfunded: 'default',
-  }
-
-  return map[status]
-}
-
-const progressColor = (status: SinkingFund['status']) => {
-  if (status === 'overfunded') {
-    return 'bg-income'
-  }
-
-  if (status === 'due_soon') {
-    return 'bg-expense'
-  }
-
-  if (status === 'underfunded') {
-    return 'bg-amber-500'
-  }
-
-  return 'bg-reserved'
-}
 
 const openCreate = () => {
   targetData.value = null
@@ -128,12 +97,16 @@ const daysUntilDue = (fund: SinkingFund) => {
   <AppContent>
     <div class="page-container space-y-5">
       <!-- Command Bar -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="flex items-center gap-2.5">
-          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('sinking_funds') }}
           </h1>
-          <span class="stat-chip text-zinc-400 font-semibold">
+          <span class="stat-chip font-semibold text-zinc-400">
             {{ funds.length }} pos dana
           </span>
         </div>
@@ -141,7 +114,7 @@ const daysUntilDue = (fund: SinkingFund) => {
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] active:scale-95"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 active:scale-95"
             @click="openCreate"
           >
             <Plus class="size-3.5 stroke-[2.5]" />
@@ -160,7 +133,7 @@ const daysUntilDue = (fund: SinkingFund) => {
         <template #empty>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
             @click="openCreate"
           >
             <Plus class="size-4 stroke-[2.5]" />
@@ -177,25 +150,31 @@ const daysUntilDue = (fund: SinkingFund) => {
             <div>
               <!-- Header with Fund name & Actions (Tier 1) -->
               <div class="flex items-start justify-between gap-2">
-                <div class="flex items-center gap-2.5 min-w-0">
+                <div class="flex min-w-0 items-center gap-2.5">
                   <span
                     class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-400"
                   >
                     <PiggyBank class="size-4" />
                   </span>
-                  <h3 class="font-mono text-base font-bold text-zinc-100 leading-snug">
+                  <h3
+                    class="font-mono text-base leading-snug font-bold text-zinc-100"
+                  >
                     {{ fund.name }}
                   </h3>
                 </div>
                 <div class="shrink-0">
-                  <RowActions :actions="rowActions(fund)" collapse-below="md" align="right" />
+                  <RowActions
+                    :actions="rowActions(fund)"
+                    collapse-below="md"
+                    align="right"
+                  />
                 </div>
               </div>
 
               <!-- Status Badge, Category & Due Date (Tier 2) -->
               <div class="mt-2.5 flex flex-wrap items-center gap-2">
                 <span
-                  class="rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border shrink-0"
+                  class="shrink-0 rounded-lg border px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase"
                   :class="
                     fund.status === 'overfunded'
                       ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
@@ -214,33 +193,45 @@ const daysUntilDue = (fund: SinkingFund) => {
                 >
                   {{ fund.category.name }}
                 </span>
-                <span v-if="fund.next_due" class="font-mono text-[11px] text-zinc-500">
-                  {{ __('next_due') }}: {{ formatDate(fund.next_due, 'DD MMM YYYY') }}
+                <span
+                  v-if="fund.next_due"
+                  class="font-mono text-[11px] text-zinc-500"
+                >
+                  {{ __('next_due') }}:
+                  {{ formatDate(fund.next_due, 'DD MMM YYYY') }}
                 </span>
               </div>
 
-              <p class="mt-2 line-clamp-2 min-h-[18px] font-mono text-xs text-zinc-500">
+              <p
+                class="mt-2 line-clamp-2 min-h-[18px] font-mono text-xs text-zinc-500"
+              >
                 {{ fund.notes ?? '-' }}
               </p>
 
               <!-- Savings Progress Meter -->
               <div class="mt-4 space-y-2">
-                <div class="flex items-baseline justify-between font-mono text-xs">
-                  <span class="text-zinc-500 uppercase tracking-wider text-[10px]">
+                <div
+                  class="flex items-baseline justify-between font-mono text-xs"
+                >
+                  <span
+                    class="text-[10px] tracking-wider text-zinc-500 uppercase"
+                  >
                     {{ __('accumulated') }}
                   </span>
                   <div class="text-right">
                     <span class="text-sm font-bold text-zinc-100 tabular-nums">
                       {{ formatAmount(fund.accumulated) }}
                     </span>
-                    <span class="text-zinc-500 text-[11px] tabular-nums">
+                    <span class="text-[11px] text-zinc-500 tabular-nums">
                       / {{ formatAmount(fund.target_amount) }}
                     </span>
                   </div>
                 </div>
 
                 <!-- Hairline Progress Bar -->
-                <div class="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                <div
+                  class="h-2 w-full overflow-hidden rounded-full bg-zinc-800"
+                >
                   <div
                     class="h-full rounded-full transition-all duration-500"
                     :class="
@@ -259,9 +250,13 @@ const daysUntilDue = (fund: SinkingFund) => {
                 <div
                   class="flex items-center justify-between font-mono text-[11px] text-zinc-400"
                 >
-                  <span class="font-bold text-zinc-200">{{ fund.percent }}%</span>
+                  <span class="font-bold text-zinc-200"
+                    >{{ fund.percent }}%</span
+                  >
                   <span v-if="fund.contribution_amount">
-                    {{ formatAmount(fund.contribution_amount) }}/{{ __('cycle') }}
+                    {{ formatAmount(fund.contribution_amount) }}/{{
+                      __('cycle')
+                    }}
                   </span>
                   <span v-else>
                     {{
@@ -279,13 +274,18 @@ const daysUntilDue = (fund: SinkingFund) => {
                 class="mt-3 rounded-xl border border-[#1f222e] bg-[#121217] px-3 py-2 font-mono text-xs text-zinc-400"
               >
                 <template v-if="daysUntilDue(fund)! < 0">
-                  <span class="text-rose-400 font-bold">
-                    {{ __('due_in') }} {{ Math.abs(daysUntilDue(fund)!) }} {{ __('days_overdue') }}
+                  <span class="font-bold text-rose-400">
+                    {{ __('due_in') }} {{ Math.abs(daysUntilDue(fund)!) }}
+                    {{ __('days_overdue') }}
                   </span>
                 </template>
                 <template v-else>
                   <span>
-                    {{ __('due_in') }} <strong class="text-zinc-200">{{ daysUntilDue(fund) }}</strong> {{ __('days') }}
+                    {{ __('due_in') }}
+                    <strong class="text-zinc-200">{{
+                      daysUntilDue(fund)
+                    }}</strong>
+                    {{ __('days') }}
                   </span>
                 </template>
                 <template
@@ -293,23 +293,27 @@ const daysUntilDue = (fund: SinkingFund) => {
                     fund.status === 'underfunded' || fund.status === 'due_soon'
                   "
                 >
-                  <span class="text-zinc-500"> · {{ fund.percent }}% {{ __('funded') }}</span>
+                  <span class="text-zinc-500">
+                    · {{ fund.percent }}% {{ __('funded') }}</span
+                  >
                 </template>
               </div>
             </div>
 
             <!-- 2-Action Footer -->
-            <div class="mt-5 flex items-center gap-2.5 border-t border-[#1f222e]/60 pt-4">
+            <div
+              class="mt-5 flex items-center gap-2.5 border-t border-[#1f222e]/60 pt-4"
+            >
               <button
                 type="button"
-                class="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/15 py-2 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)] active:scale-95"
+                class="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/15 py-2 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)] transition-all hover:bg-emerald-500/25 active:scale-95"
                 @click="openSetAside(fund)"
               >
                 + {{ __('set_aside') }}
               </button>
               <button
                 type="button"
-                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#121217] py-2 font-mono text-xs font-semibold text-zinc-300 hover:border-zinc-700 hover:text-zinc-100 transition-all disabled:opacity-40 active:scale-95"
+                class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#121217] py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95 disabled:opacity-40"
                 :disabled="fund.accumulated <= 0"
                 @click="openPay(fund)"
               >

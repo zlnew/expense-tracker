@@ -109,28 +109,36 @@ const rowActions = (r: RecurringTransaction) => [
   <AppContent>
     <div class="page-container space-y-5">
       <!-- Command Bar -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="flex items-center gap-2.5">
-          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
             Tagihan & Langganan
           </h1>
-          <span class="stat-chip text-zinc-400 font-semibold">
+          <span class="stat-chip font-semibold text-zinc-400">
             {{ recurrings.meta?.total ?? recurrings.data.length }} jadwal
           </span>
         </div>
 
         <button
           type="button"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
           @click="createDialogOpen = true"
         >
           <Plus class="size-3.5 stroke-[2.5]" />
-          <span>{{ __('add_data', { data: __('recurring_transaction') }) }}</span>
+          <span>{{
+            __('add_data', { data: __('recurring_transaction') })
+          }}</span>
         </button>
       </div>
 
       <!-- Filters: Search & Tabs -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="w-full sm:max-w-xs">
           <SearchInput
             v-model="search"
@@ -156,7 +164,7 @@ const rowActions = (r: RecurringTransaction) => [
         <template #empty>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
             @click="createDialogOpen = true"
           >
             <Plus class="size-4 stroke-[2.5]" />
@@ -213,16 +221,24 @@ const rowActions = (r: RecurringTransaction) => [
           <template #card="{ row: r }">
             <div class="space-y-3">
               <div class="flex items-start justify-between gap-2">
-                <div class="flex items-center gap-3 min-w-0">
-                  <div 
-                    class="size-10 rounded-xl flex items-center justify-center shrink-0 border"
-                    :class="r.type === 'income' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'"
+                <div class="flex min-w-0 items-center gap-3">
+                  <div
+                    class="flex size-10 shrink-0 items-center justify-center rounded-xl border"
+                    :class="
+                      r.type === 'income'
+                        ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                        : 'border-rose-500/20 bg-rose-500/10 text-rose-400'
+                    "
                   >
                     <Repeat class="size-4" />
                   </div>
                   <div class="min-w-0">
-                    <h3 class="font-mono text-sm font-bold text-zinc-100 truncate">{{ r.description || '—' }}</h3>
-                    <p class="text-xs font-mono text-zinc-400 truncate">
+                    <h3
+                      class="truncate font-mono text-sm font-bold text-zinc-100"
+                    >
+                      {{ r.description || '—' }}
+                    </h3>
+                    <p class="truncate font-mono text-xs text-zinc-400">
                       {{ r.category?.name || 'Tanpa Kategori' }}
                     </p>
                   </div>
@@ -230,19 +246,28 @@ const rowActions = (r: RecurringTransaction) => [
                 <RowActions :actions="rowActions(r)" collapse-below="md" />
               </div>
 
-              <div class="flex items-baseline justify-between pt-1 border-t border-[#1f222e]">
+              <div
+                class="flex items-baseline justify-between border-t border-[#1f222e] pt-1"
+              >
                 <span
                   class="font-mono text-base font-bold"
-                  :class="r.type === 'income' ? 'text-emerald-400' : 'text-rose-400'"
+                  :class="
+                    r.type === 'income' ? 'text-emerald-400' : 'text-rose-400'
+                  "
                 >
-                  {{ r.type === 'income' ? '+' : '-' }}{{ formatAmount(r.amount) }}
+                  {{ r.type === 'income' ? '+' : '-'
+                  }}{{ formatAmount(r.amount) }}
                 </span>
-                <span class="inline-flex rounded px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border border-[#1f222e] bg-[#121217] text-zinc-300">
+                <span
+                  class="inline-flex rounded border border-[#1f222e] bg-[#121217] px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-zinc-300 uppercase"
+                >
                   {{ __(r.frequency) }}
                 </span>
               </div>
 
-              <div class="flex items-center justify-between pt-1 text-xs font-mono text-zinc-400">
+              <div
+                class="flex items-center justify-between pt-1 font-mono text-xs text-zinc-400"
+              >
                 <span class="text-[11px] text-zinc-500">
                   Jadwal: {{ formatDate(r.next_run_date, 'DD MMM YYYY') }}
                 </span>
@@ -257,7 +282,14 @@ const rowActions = (r: RecurringTransaction) => [
                   :aria-pressed="r.is_active"
                   @click="toggleActive(r)"
                 >
-                  <span class="size-1.5 rounded-full" :class="r.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'"></span>
+                  <span
+                    class="size-1.5 rounded-full"
+                    :class="
+                      r.is_active
+                        ? 'animate-pulse bg-emerald-400'
+                        : 'bg-zinc-600'
+                    "
+                  ></span>
                   <span>{{ r.is_active ? 'Aktif' : 'Nonaktif' }}</span>
                 </button>
               </div>
@@ -267,7 +299,7 @@ const rowActions = (r: RecurringTransaction) => [
           <!-- Desktop cells -->
           <template #cell-1="{ row: r }">
             <span
-              class="inline-flex rounded px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border"
+              class="inline-flex rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase"
               :class="
                 r.type === 'income'
                   ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
@@ -280,7 +312,9 @@ const rowActions = (r: RecurringTransaction) => [
           <template #cell-3="{ row: r }">
             <span
               class="font-mono text-sm font-bold"
-              :class="r.type === 'income' ? 'text-emerald-400' : 'text-rose-400'"
+              :class="
+                r.type === 'income' ? 'text-emerald-400' : 'text-rose-400'
+              "
             >
               {{ r.type === 'income' ? '+' : '-' }}{{ formatAmount(r.amount) }}
             </span>
@@ -297,7 +331,12 @@ const rowActions = (r: RecurringTransaction) => [
               :aria-pressed="r.is_active"
               @click="toggleActive(r)"
             >
-              <span class="size-1.5 rounded-full" :class="r.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'"></span>
+              <span
+                class="size-1.5 rounded-full"
+                :class="
+                  r.is_active ? 'animate-pulse bg-emerald-400' : 'bg-zinc-600'
+                "
+              ></span>
               <span>{{ r.is_active ? 'Aktif' : 'Nonaktif' }}</span>
             </button>
           </template>

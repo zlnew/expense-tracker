@@ -87,10 +87,12 @@ const donutTriggers = {
 
 <template>
   <div
-    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
   >
     <!-- Card Header -->
-    <div class="flex items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4">
+    <div
+      class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+    >
       <div class="space-y-0.5">
         <div class="flex items-center gap-2">
           <span
@@ -98,7 +100,9 @@ const donutTriggers = {
           >
             <PieChart class="size-4" />
           </span>
-          <h2 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
+          <h2
+            class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('expense_breakdown') }}
           </h2>
         </div>
@@ -112,7 +116,7 @@ const donutTriggers = {
     <div>
       <div
         v-if="expenseBreakdown === undefined"
-        class="h-[220px] w-full animate-pulse rounded-xl bg-[#121217] border border-[#1f222e]"
+        class="h-[220px] w-full animate-pulse rounded-xl border border-[#1f222e] bg-[#121217]"
       />
 
       <ChartEmpty
@@ -130,7 +134,7 @@ const donutTriggers = {
         <Link v-if="!hasActiveBudget" :href="budgetIndex.url()">
           <button
             type="button"
-            class="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-all"
+            class="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20"
           >
             {{ __('create_budget') }}
             <ChevronRight class="size-3.5" />
@@ -165,7 +169,9 @@ const donutTriggers = {
               class="font-mono text-[10px] font-semibold tracking-wider text-zinc-500 uppercase"
               >Total</span
             >
-            <span class="font-mono text-xs font-extrabold text-zinc-100 tabular-nums">
+            <span
+              class="font-mono text-xs font-extrabold text-zinc-100 tabular-nums"
+            >
               {{ masked ? '••••' : formatAmount(totalExpense) }}
             </span>
           </div>
@@ -194,7 +200,9 @@ const donutTriggers = {
               >
                 {{ item.percentage }}%
               </span>
-              <span class="font-mono text-xs font-bold text-zinc-100 tabular-nums">
+              <span
+                class="font-mono text-xs font-bold text-zinc-100 tabular-nums"
+              >
                 {{ masked ? '••••' : formatAmount(item.amount) }}
               </span>
             </div>

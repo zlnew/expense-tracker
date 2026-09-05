@@ -56,6 +56,7 @@ function openTransactionCreate() {
       // ignore
     }
   }
+
   window.dispatchEvent(new CustomEvent('open:transaction-create'))
 }
 </script>
@@ -64,7 +65,7 @@ function openTransactionCreate() {
   <nav
     data-testid="bottom-nav"
     :aria-label="__('main_navigation')"
-    class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-[#1f222e] bg-[#0a0a0c]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] lg:hidden"
+    class="fixed inset-x-0 bottom-0 z-bottom-nav border-t border-[#1f222e] bg-[#0a0a0c]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
   >
     <div
       class="relative mx-auto grid h-16 max-w-lg grid-cols-5 items-center px-2"
@@ -77,7 +78,7 @@ function openTransactionCreate() {
           class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-all focus-visible:outline-none"
           :class="
             item.active()
-              ? 'text-emerald-400 font-semibold'
+              ? 'font-semibold text-emerald-400'
               : 'text-zinc-500 hover:text-zinc-300'
           "
         >
@@ -85,7 +86,7 @@ function openTransactionCreate() {
           <span class="text-[10px] tracking-tight">{{ item.title }}</span>
           <span
             v-if="item.active()"
-            class="h-0.5 w-2 bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
+            class="-mt-0.5 h-0.5 w-2 bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"
           />
         </Link>
       </template>
@@ -96,7 +97,7 @@ function openTransactionCreate() {
           type="button"
           data-testid="transaction-fab"
           :aria-label="__('add_transaction')"
-          class="flex size-12 -translate-y-4 items-center justify-center bg-emerald-400 text-[#0a0a0c] shadow-[0_0_20px_rgba(16,185,129,0.6)] border border-emerald-300 ring-2 ring-[#0a0a0c] transition-all active:scale-90 hover:scale-105 hover:bg-emerald-300 cursor-pointer"
+          class="flex size-12 -translate-y-4 cursor-pointer items-center justify-center border border-emerald-300 bg-emerald-400 text-[#0a0a0c] shadow-[0_0_20px_rgba(16,185,129,0.6)] ring-2 ring-[#0a0a0c] transition-all hover:scale-105 hover:bg-emerald-300 active:scale-90"
           @click="openTransactionCreate"
         >
           <Plus class="size-6 stroke-[3]" />
@@ -111,7 +112,7 @@ function openTransactionCreate() {
           class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1 transition-all focus-visible:outline-none"
           :class="
             item.active()
-              ? 'text-emerald-400 font-semibold'
+              ? 'font-semibold text-emerald-400'
               : 'text-zinc-500 hover:text-zinc-300'
           "
         >
@@ -119,7 +120,7 @@ function openTransactionCreate() {
           <span class="text-[10px] tracking-tight">{{ item.title }}</span>
           <span
             v-if="item.active()"
-            class="h-0.5 w-2 bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
+            class="-mt-0.5 h-0.5 w-2 bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"
           />
         </Link>
       </template>

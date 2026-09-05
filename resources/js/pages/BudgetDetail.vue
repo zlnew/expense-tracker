@@ -11,7 +11,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AppContent from '@/components/AppContent.vue'
 import DataListState from '@/components/DataListState.vue'
-import Heading from '@/components/Heading.vue'
 import { useBudgetProgress } from '@/composables/useBudgetProgress'
 import { useDate } from '@/composables/useDate'
 import { useFilters } from '@/composables/useFilters'
@@ -33,12 +32,8 @@ const props = defineProps<{
 const { __ } = useLang()
 const { formatAmount } = useNumber()
 const { formatDate } = useDate()
-const {
-  getProgressPercent,
-  getProgressColor,
-  getProgressBgColor,
-  getProgressTextColor,
-} = useBudgetProgress()
+const { getProgressPercent, getProgressColor, getProgressTextColor } =
+  useBudgetProgress()
 
 setLayoutProps({
   breadcrumbs: [
@@ -307,16 +302,19 @@ const setActive = () => {
         <div class="flex items-center gap-3">
           <Link
             :href="budgetIndex.url()"
-            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors active:scale-95"
+            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white active:scale-95"
           >
             <ArrowLeft class="size-4" />
           </Link>
           <div>
-            <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-tight">
+            <h1
+              class="font-mono text-base font-bold tracking-tight text-zinc-100 uppercase"
+            >
               {{ __('detail_data', { data: __('budget') }) }}
             </h1>
             <p class="font-mono text-[11px] text-zinc-500">
-              {{ formatDate(budget.period_start, 'DD MMM') }} - {{ formatDate(budget.period_end, 'DD MMM YYYY') }}
+              {{ formatDate(budget.period_start, 'DD MMM') }} -
+              {{ formatDate(budget.period_end, 'DD MMM YYYY') }}
             </p>
           </div>
         </div>
@@ -331,9 +329,13 @@ const setActive = () => {
       </div>
 
       <!-- Budget Meta Grid -->
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-4 font-mono text-xs">
+      <div
+        class="grid grid-cols-2 gap-3 rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-4 font-mono text-xs sm:grid-cols-4"
+      >
         <div class="space-y-1">
-          <div class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ __('periods') }}</div>
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('periods') }}
+          </div>
           <div class="text-xs font-bold text-zinc-200">
             {{ formatDate(budget.period_start, 'DD MMM') }} -
             {{ formatDate(budget.period_end, 'DD MMM YYYY') }}
@@ -341,19 +343,30 @@ const setActive = () => {
         </div>
 
         <div class="space-y-1">
-          <div class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ __('cutoff_day') }}</div>
-          <div class="text-xs font-bold text-zinc-200">Tgl {{ budget.cutoff_day }}</div>
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('cutoff_day') }}
+          </div>
+          <div class="text-xs font-bold text-zinc-200">
+            Tgl {{ budget.cutoff_day }}
+          </div>
         </div>
 
         <div class="space-y-1">
-          <div class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ __('carry_over') }}</div>
-          <div class="text-xs font-bold" :class="budget.carry_over ? 'text-emerald-400' : 'text-zinc-400'">
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('carry_over') }}
+          </div>
+          <div
+            class="text-xs font-bold"
+            :class="budget.carry_over ? 'text-emerald-400' : 'text-zinc-400'"
+          >
             {{ budget.carry_over ? 'Aktif' : 'Non-aktif' }}
           </div>
         </div>
 
-        <div class="space-y-1 col-span-2 sm:col-span-1">
-          <div class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ __('notes') }}</div>
+        <div class="col-span-2 space-y-1 sm:col-span-1">
+          <div class="text-[10px] tracking-wider text-zinc-500 uppercase">
+            {{ __('notes') }}
+          </div>
           <div class="line-clamp-2 text-xs text-zinc-300">
             {{ budget.notes ?? '-' }}
           </div>
@@ -361,25 +374,40 @@ const setActive = () => {
       </div>
 
       <!-- Cycle Selector -->
-      <div class="flex items-center justify-between rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-3">
+      <div
+        class="flex items-center justify-between rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-3"
+      >
         <div class="flex items-center gap-2 font-mono text-xs text-zinc-400">
           <CalendarDays class="size-4 text-emerald-400" />
-          <span class="text-zinc-300 font-semibold uppercase tracking-wider text-[11px]">{{ __('cycle') || 'Siklus' }}:</span>
+          <span
+            class="text-[11px] font-semibold tracking-wider text-zinc-300 uppercase"
+            >{{ __('cycle') || 'Siklus' }}:</span
+          >
         </div>
         <div class="flex items-center gap-2">
           <select
             v-model="month"
-            class="rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            class="cursor-pointer rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 transition-colors focus:border-emerald-500 focus:outline-none"
           >
-            <option v-for="m in months" :key="m.value" :value="m.value" class="bg-[#12141a] text-zinc-200">
+            <option
+              v-for="m in months"
+              :key="m.value"
+              :value="m.value"
+              class="bg-[#12141a] text-zinc-200"
+            >
               {{ m.label }}
             </option>
           </select>
           <select
             v-model="year"
-            class="rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            class="cursor-pointer rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-1.5 font-mono text-xs text-zinc-200 transition-colors focus:border-emerald-500 focus:outline-none"
           >
-            <option v-for="y in years" :key="y.value" :value="y.value" class="bg-[#12141a] text-zinc-200">
+            <option
+              v-for="y in years"
+              :key="y.value"
+              :value="y.value"
+              class="bg-[#12141a] text-zinc-200"
+            >
               {{ y.label }}
             </option>
           </select>
@@ -387,11 +415,16 @@ const setActive = () => {
       </div>
 
       <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
-
         <!-- Monthly Expenses Envelopes -->
-        <div class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl">
-          <div class="flex items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4">
-            <h3 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
+        <div
+          class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
+        >
+          <div
+            class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+          >
+            <h3
+              class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+            >
               {{ __('monthly_expenses') }}
             </h3>
           </div>
@@ -445,7 +478,9 @@ const setActive = () => {
                   </div>
 
                   <!-- Progress Bar -->
-                  <div class="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                  <div
+                    class="h-2 w-full overflow-hidden rounded-full bg-zinc-800"
+                  >
                     <div
                       class="h-full rounded-full transition-all duration-500 ease-out"
                       :class="
@@ -490,20 +525,22 @@ const setActive = () => {
                   class="flex flex-col gap-1 border-t border-[#1f222e]/60 pt-4 font-mono text-xs"
                 >
                   <div class="flex items-center justify-between">
-                    <span class="text-zinc-400 font-semibold">{{ __('total') }}</span>
+                    <span class="font-semibold text-zinc-400">{{
+                      __('total')
+                    }}</span>
                     <div class="flex flex-col items-end space-y-0.5">
                       <span class="text-zinc-300">
                         {{ __('planned') }}:
                         {{ formatAmount(plannedExpenseTotal) }}
                       </span>
-                      <span class="text-rose-400 font-bold">
+                      <span class="font-bold text-rose-400">
                         {{ __('actual') }}:
                         {{ formatAmount(actualExpenseTotal) }}
                       </span>
                       <span
                         :class="
                           diffExpenseTotal < 0
-                            ? 'text-rose-400 font-bold'
+                            ? 'font-bold text-rose-400'
                             : 'text-zinc-400'
                         "
                       >
@@ -518,9 +555,15 @@ const setActive = () => {
         </div>
 
         <!-- Monthly Incomes Envelopes -->
-        <div class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl">
-          <div class="flex items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4">
-            <h3 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
+        <div
+          class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
+        >
+          <div
+            class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+          >
+            <h3
+              class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+            >
               {{ __('monthly_incomes') }}
             </h3>
           </div>
@@ -561,7 +604,9 @@ const setActive = () => {
                   </div>
 
                   <!-- Progress Bar -->
-                  <div class="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                  <div
+                    class="h-2 w-full overflow-hidden rounded-full bg-zinc-800"
+                  >
                     <div
                       class="h-full rounded-full transition-all duration-500 ease-out"
                       :class="
@@ -587,8 +632,8 @@ const setActive = () => {
                     <span
                       :class="
                         inc.diff_amount < 0
-                          ? 'text-rose-400 font-bold'
-                          : 'text-emerald-400 font-bold'
+                          ? 'font-bold text-rose-400'
+                          : 'font-bold text-emerald-400'
                       "
                     >
                       {{
@@ -606,20 +651,22 @@ const setActive = () => {
                   class="flex flex-col gap-1 border-t border-[#1f222e]/60 pt-4 font-mono text-xs"
                 >
                   <div class="flex items-center justify-between">
-                    <span class="text-zinc-400 font-semibold">{{ __('total') }}</span>
+                    <span class="font-semibold text-zinc-400">{{
+                      __('total')
+                    }}</span>
                     <div class="flex flex-col items-end space-y-0.5">
                       <span class="text-zinc-300">
                         {{ __('planned') }}:
                         {{ formatAmount(plannedIncomeTotal) }}
                       </span>
-                      <span class="text-emerald-400 font-bold">
+                      <span class="font-bold text-emerald-400">
                         {{ __('actual') }}:
                         {{ formatAmount(actualIncomeTotal) }}
                       </span>
                       <span
                         :class="
                           diffIncomeTotal < 0
-                            ? 'text-rose-400 font-bold'
+                            ? 'font-bold text-rose-400'
                             : 'text-zinc-400'
                         "
                       >
@@ -636,13 +683,11 @@ const setActive = () => {
     </div>
   </AppContent>
 
-  <div
-    class="fixed right-4 bottom-24 z-fab flex gap-2 md:right-8 md:bottom-8"
-  >
+  <div class="fixed right-4 bottom-24 z-fab flex gap-2 md:right-8 md:bottom-8">
     <button
       v-if="!budget.is_active"
       type="button"
-      class="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-[#121217] px-4 py-3 font-mono text-xs font-bold text-emerald-400 shadow-xl hover:bg-emerald-500/10 transition-all active:scale-95"
+      class="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-[#121217] px-4 py-3 font-mono text-xs font-bold text-emerald-400 shadow-xl transition-all hover:bg-emerald-500/10 active:scale-95"
       @click="setActive"
     >
       <CheckCircle2 class="size-4" />
@@ -650,7 +695,7 @@ const setActive = () => {
     </button>
     <Link
       :href="budgetEdit.url({ budget: budget })"
-      class="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] hover:bg-emerald-400 transition-all active:scale-95"
+      class="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
     >
       <SquarePen class="size-4" />
       <span>{{ __('edit') }}</span>

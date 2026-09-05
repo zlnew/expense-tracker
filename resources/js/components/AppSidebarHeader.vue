@@ -103,7 +103,7 @@ onUnmounted(() => {
       />
       <template v-else>
         <AppLogoIcon class="size-5 shrink-0 fill-current text-emerald-400" />
-        <span class="truncate text-sm font-semibold font-mono text-zinc-200">{{
+        <span class="truncate font-mono text-sm font-semibold text-zinc-200">{{
           page.props.name
         }}</span>
       </template>
@@ -111,10 +111,18 @@ onUnmounted(() => {
 
     <!-- Mobile/tablet: logo + current page title in terminal format -->
     <div class="flex min-w-0 items-center gap-2.5 lg:hidden">
-      <AppLogoIcon class="size-6 shrink-0 fill-current text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-      <div class="flex flex-col min-w-0">
-        <span class="truncate font-mono text-xs font-bold text-zinc-100 tracking-tight">{{ pageTitle }}</span>
-        <span class="text-[9px] font-mono text-emerald-500/80 font-semibold tracking-wider uppercase">Expense Terminal</span>
+      <AppLogoIcon
+        class="size-6 shrink-0 fill-current text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+      />
+      <div class="flex min-w-0 flex-col">
+        <span
+          class="truncate font-mono text-xs font-bold tracking-tight text-zinc-100"
+          >{{ pageTitle }}</span
+        >
+        <span
+          class="font-mono text-[9px] font-semibold tracking-wider text-emerald-500/80 uppercase"
+          >Expense Terminal</span
+        >
       </div>
     </div>
 

@@ -29,11 +29,11 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
 
 <template>
   <div
-    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
   >
     <!-- Header -->
     <div
-      class="flex flex-row items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4"
+      class="mb-4 flex flex-row items-center justify-between border-b border-[#1f222e]/60 pb-4"
     >
       <div class="space-y-0.5">
         <div class="flex items-center gap-2">
@@ -42,7 +42,9 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
           >
             <Receipt class="size-4" />
           </span>
-          <h2 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
+          <h2
+            class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('recent_transactions') }}
           </h2>
         </div>
@@ -53,7 +55,7 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
 
       <Link :href="transactionIndex.url()">
         <span
-          class="inline-flex items-center gap-1 font-mono text-xs text-zinc-400 hover:text-emerald-400 transition-colors"
+          class="inline-flex items-center gap-1 font-mono text-xs text-zinc-400 transition-colors hover:text-emerald-400"
         >
           {{ __('all_data', { data: __('transactions') }) }}
           <ChevronRight class="size-3.5" />
@@ -104,10 +106,7 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
               <div
                 class="flex items-center gap-1.5 font-mono text-[11px] text-zinc-500"
               >
-                <span
-                  v-if="t.category?.name"
-                  class="truncate text-zinc-300"
-                >
+                <span v-if="t.category?.name" class="truncate text-zinc-300">
                   {{ t.category.name }}
                 </span>
                 <span
@@ -126,7 +125,9 @@ const transactions = computed(() => props.recentTransactions.slice(0, 5))
           <div class="shrink-0 text-right">
             <p
               class="font-mono text-sm font-bold tabular-nums"
-              :class="t.type === 'income' ? 'text-emerald-400' : 'text-zinc-100'"
+              :class="
+                t.type === 'income' ? 'text-emerald-400' : 'text-zinc-100'
+              "
             >
               {{
                 masked

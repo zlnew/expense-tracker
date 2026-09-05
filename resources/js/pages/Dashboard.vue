@@ -90,7 +90,7 @@ const hasActiveBudget = computed(
             <p class="font-mono font-bold text-zinc-100">
               {{ __('install_app') || 'Install Expense Tracker' }}
             </p>
-            <p class="font-mono text-zinc-500 text-[11px]">
+            <p class="font-mono text-[11px] text-zinc-500">
               {{
                 __('install_app_description') ||
                 'Add to home screen for instant, offline access.'
@@ -101,14 +101,14 @@ const hasActiveBudget = computed(
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="h-8 px-3 rounded-xl bg-emerald-500 text-[#0a0a0c] font-mono text-xs font-bold hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+            class="h-8 rounded-xl bg-emerald-500 px-3 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400"
             @click="promptInstall"
           >
             {{ __('install') || 'Install' }}
           </button>
           <button
             type="button"
-            class="size-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-200 transition-colors"
+            class="flex size-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:text-zinc-200"
             @click="dismissInstall"
           >
             <X class="size-4" />

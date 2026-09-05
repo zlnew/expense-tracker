@@ -85,19 +85,23 @@ const rowActions = (c: Data) => [
   <AppContent>
     <div class="page-container space-y-5">
       <!-- Command Bar -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="flex items-center gap-2.5">
-          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('categories') }}
           </h1>
-          <span class="stat-chip text-zinc-400 font-semibold">
+          <span class="stat-chip font-semibold text-zinc-400">
             {{ categories.meta?.total ?? categories.data.length }} pos
           </span>
         </div>
 
         <button
           type="button"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
           @click="createDialogOpen = true"
         >
           <Plus class="size-3.5 stroke-[2.5]" />
@@ -114,11 +118,17 @@ const rowActions = (c: Data) => [
           />
         </div>
 
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none font-mono text-xs">
+        <div
+          class="flex scrollbar-none items-center gap-1.5 overflow-x-auto pb-1 font-mono text-xs"
+        >
           <button
             type="button"
-            class="px-3 py-1.5 rounded-xl font-medium transition-all"
-            :class="typeFilter === 'all' ? 'bg-[#181820] text-emerald-400 border border-emerald-500/30' : 'bg-[#121217] text-zinc-400 border border-[#1f222e] hover:text-zinc-200'"
+            class="rounded-xl px-3 py-1.5 font-medium transition-all"
+            :class="
+              typeFilter === 'all'
+                ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400'
+                : 'border border-[#1f222e] bg-[#121217] text-zinc-400 hover:text-zinc-200'
+            "
             @click="typeFilter = 'all'"
           >
             {{ __('all_data', { data: __('types') }) }}
@@ -127,8 +137,12 @@ const rowActions = (c: Data) => [
             v-for="value in types"
             :key="value"
             type="button"
-            class="px-3 py-1.5 rounded-xl font-medium capitalize transition-all"
-            :class="typeFilter === value ? 'bg-[#181820] text-emerald-400 border border-emerald-500/30' : 'bg-[#121217] text-zinc-400 border border-[#1f222e] hover:text-zinc-200'"
+            class="rounded-xl px-3 py-1.5 font-medium capitalize transition-all"
+            :class="
+              typeFilter === value
+                ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400'
+                : 'border border-[#1f222e] bg-[#121217] text-zinc-400 hover:text-zinc-200'
+            "
             @click="typeFilter = value"
           >
             {{ __(value) }}
@@ -147,7 +161,7 @@ const rowActions = (c: Data) => [
         <template #empty>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
             @click="createDialogOpen = true"
           >
             <Plus class="size-4 stroke-[2.5]" />
@@ -157,7 +171,11 @@ const rowActions = (c: Data) => [
 
         <ResponsiveTable
           :columns="[
-            { header: '#', cell: (row, i) => i + 1, cellClass: 'w-[60px] font-mono text-zinc-500' },
+            {
+              header: '#',
+              cell: (row, i) => i + 1,
+              cellClass: 'w-[60px] font-mono text-zinc-500',
+            },
             {
               header: __('type'),
               cell: (c) => __(c.type),
@@ -179,18 +197,24 @@ const rowActions = (c: Data) => [
           <!-- Mobile card -->
           <template #card="{ row: c }">
             <div class="flex items-center justify-between gap-3">
-              <div class="flex items-center gap-3 min-w-0 flex-1">
-                <div 
-                  class="size-10 rounded-xl flex items-center justify-center shrink-0 border"
-                  :class="c.type === 'income' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'"
+              <div class="flex min-w-0 flex-1 items-center gap-3">
+                <div
+                  class="flex size-10 shrink-0 items-center justify-center rounded-xl border"
+                  :class="
+                    c.type === 'income'
+                      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                      : 'border-rose-500/20 bg-rose-500/10 text-rose-400'
+                  "
                 >
                   <Tags class="size-4" />
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-wrap items-center gap-2">
-                    <h3 class="font-mono text-sm font-bold text-zinc-100">{{ c.name }}</h3>
+                    <h3 class="font-mono text-sm font-bold text-zinc-100">
+                      {{ c.name }}
+                    </h3>
                     <span
-                      class="inline-flex rounded px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border shrink-0"
+                      class="inline-flex shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase"
                       :class="
                         c.type === 'income'
                           ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
@@ -200,7 +224,9 @@ const rowActions = (c: Data) => [
                       {{ __(c.type) }}
                     </span>
                   </div>
-                  <span class="text-[11px] font-mono text-zinc-500">ID Pos #{{ c.id }}</span>
+                  <span class="font-mono text-[11px] text-zinc-500"
+                    >ID Pos #{{ c.id }}</span
+                  >
                 </div>
               </div>
               <RowActions :actions="rowActions(c)" collapse-below="md" />
@@ -210,7 +236,7 @@ const rowActions = (c: Data) => [
           <!-- Desktop cells -->
           <template #cell-1="{ row: c }">
             <span
-              class="inline-flex rounded px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border"
+              class="inline-flex rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase"
               :class="
                 c.type === 'income'
                   ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'

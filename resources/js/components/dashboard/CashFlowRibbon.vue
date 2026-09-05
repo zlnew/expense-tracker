@@ -75,7 +75,7 @@ function triggerTransactionCreate() {
 
 <template>
   <div
-    class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+    class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
   >
     <!-- Terminal Ambient Glow -->
     <div
@@ -115,7 +115,7 @@ function triggerTransactionCreate() {
           <!-- Hero Monospace Number -->
           <div class="flex items-baseline gap-1">
             <span
-              class="font-mono text-3xl font-extrabold tracking-tight text-emerald-400 tabular-nums sm:text-4xl drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+              class="font-mono text-3xl font-extrabold tracking-tight text-emerald-400 tabular-nums drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] sm:text-4xl"
             >
               {{ masked ? '••••••••' : formatAmount(realBalance) }}
             </span>
@@ -126,9 +126,7 @@ function triggerTransactionCreate() {
             <span class="font-semibold text-zinc-200">
               {{ masked ? '••••••' : formatAmount(ledgerBalance) }}
             </span>
-            <span
-              v-if="reservedBalance > 0"
-              class="mx-1.5 text-zinc-600"
+            <span v-if="reservedBalance > 0" class="mx-1.5 text-zinc-600"
               >•</span
             >
             <Link
@@ -148,10 +146,12 @@ function triggerTransactionCreate() {
         >
           <!-- Income Inflow Card -->
           <div
-            class="flex flex-col justify-between rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3 space-y-1.5"
+            class="flex flex-col justify-between space-y-1.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
           >
             <div class="flex items-center justify-between gap-1.5">
-              <span class="font-mono text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
+              <span
+                class="font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase"
+              >
                 MASUK (BLN)
               </span>
               <div
@@ -161,18 +161,24 @@ function triggerTransactionCreate() {
               </div>
             </div>
             <p
-              class="font-mono text-xs sm:text-sm font-bold text-emerald-400 tabular-nums truncate"
+              class="truncate font-mono text-xs font-bold text-emerald-400 tabular-nums sm:text-sm"
             >
-              {{ masked ? '••••' : (monthlyIncome > 0 ? '+' : '') + formatAmount(monthlyIncome) }}
+              {{
+                masked
+                  ? '••••'
+                  : (monthlyIncome > 0 ? '+' : '') + formatAmount(monthlyIncome)
+              }}
             </p>
           </div>
 
           <!-- Expense Outflow Card -->
           <div
-            class="flex flex-col justify-between rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3 space-y-1.5"
+            class="flex flex-col justify-between space-y-1.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
           >
             <div class="flex items-center justify-between gap-1.5">
-              <span class="font-mono text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
+              <span
+                class="font-mono text-[10px] font-semibold tracking-wider text-zinc-400 uppercase"
+              >
                 KELUAR (BLN)
               </span>
               <div
@@ -182,9 +188,14 @@ function triggerTransactionCreate() {
               </div>
             </div>
             <p
-              class="font-mono text-xs sm:text-sm font-bold text-rose-400 tabular-nums truncate"
+              class="truncate font-mono text-xs font-bold text-rose-400 tabular-nums sm:text-sm"
             >
-              {{ masked ? '••••' : (monthlyExpense > 0 ? '-' : '') + formatAmount(monthlyExpense) }}
+              {{
+                masked
+                  ? '••••'
+                  : (monthlyExpense > 0 ? '-' : '') +
+                    formatAmount(monthlyExpense)
+              }}
             </p>
           </div>
 
@@ -218,11 +229,15 @@ function triggerTransactionCreate() {
           class="mb-1.5 flex items-center justify-between font-mono text-[11px] text-zinc-400"
         >
           <span class="flex items-center gap-1.5 font-medium">
-            <span class="size-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+            <span
+              class="size-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]"
+            />
             {{ __('spendable') || 'Free Cash' }}: {{ realPercent }}%
           </span>
           <span class="flex items-center gap-1.5 font-medium">
-            <span class="size-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
+            <span
+              class="size-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.8)]"
+            />
             {{ __('reserved_in_funds') || 'Reserved' }}: {{ reservedPercent }}%
           </span>
         </div>
@@ -243,7 +258,7 @@ function triggerTransactionCreate() {
         <div class="grid grid-cols-3 gap-2">
           <button
             type="button"
-            class="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/15 py-2 px-1 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-all active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+            class="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/15 px-1 py-2 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)] transition-all hover:bg-emerald-500/25 active:scale-95"
             @click="triggerTransactionCreate"
           >
             <Plus class="size-3.5" />
@@ -251,14 +266,14 @@ function triggerTransactionCreate() {
           </button>
           <Link
             :href="balanceIndex.url()"
-            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] py-2 px-1 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-1 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
           >
             <ArrowRightLeft class="size-3.5 text-zinc-400" />
             <span>Pindah</span>
           </Link>
           <Link
             :href="balanceIndex.url()"
-            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] py-2 px-1 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+            class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-1 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
           >
             <ShieldCheck class="size-3.5 text-zinc-400" />
             <span>Rekon</span>

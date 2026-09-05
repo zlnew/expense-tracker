@@ -21,13 +21,15 @@ function visit(viewMode: 'transactions' | 'recurring') {
 </script>
 
 <template>
-  <div class="grid w-full grid-cols-2 gap-1 rounded-xl border border-[#1f222e] bg-[#0d0d12] p-1 font-mono text-xs">
+  <div
+    class="grid w-full grid-cols-2 gap-1 rounded-xl border border-[#1f222e] bg-[#0d0d12] p-1 font-mono text-xs"
+  >
     <button
       type="button"
       class="touch-target rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
       :class="
         viewMode === 'transactions'
-          ? 'bg-[#181820] text-emerald-400 border border-emerald-500/30 shadow-sm'
+          ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400 shadow-sm'
           : 'text-zinc-400 hover:text-zinc-200'
       "
       :aria-pressed="viewMode === 'transactions'"
@@ -40,7 +42,7 @@ function visit(viewMode: 'transactions' | 'recurring') {
       class="touch-target rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
       :class="
         viewMode === 'recurring'
-          ? 'bg-[#181820] text-emerald-400 border border-emerald-500/30 shadow-sm'
+          ? 'border border-emerald-500/30 bg-[#181820] text-emerald-400 shadow-sm'
           : 'text-zinc-400 hover:text-zinc-200'
       "
       :aria-pressed="viewMode === 'recurring'"

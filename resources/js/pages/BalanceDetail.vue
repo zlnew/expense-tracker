@@ -11,7 +11,6 @@ import {
 import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import DataListState from '@/components/DataListState.vue'
-import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import { useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
@@ -50,40 +49,56 @@ setLayoutProps({
         <Link
           :href="balanceIndex.url()"
           :aria-label="__('back')"
-          class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors active:scale-95"
+          class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white active:scale-95"
         >
           <ArrowLeft class="size-4" />
         </Link>
         <div class="min-w-0">
-          <h1 class="truncate font-mono text-base font-bold text-zinc-100 uppercase tracking-tight">
+          <h1
+            class="truncate font-mono text-base font-bold tracking-tight text-zinc-100 uppercase"
+          >
             {{ balance.name }}
           </h1>
           <p class="truncate font-mono text-[11px] text-zinc-500">
-            {{ balance.description || __('detail_data', { data: __('balance') }) }}
+            {{
+              balance.description || __('detail_data', { data: __('balance') })
+            }}
           </p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <!-- Initial Amount Card -->
-        <div class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg">
+        <div
+          class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg"
+        >
           <div class="flex items-center justify-between">
-            <span class="font-mono text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            <span
+              class="font-mono text-xs font-semibold tracking-wider text-zinc-500 uppercase"
+            >
               {{ __('initial_amount') }}
             </span>
-            <span class="flex size-8 items-center justify-center rounded-lg border border-[#1f222e] bg-[#12141a] text-zinc-400">
+            <span
+              class="flex size-8 items-center justify-center rounded-lg border border-[#1f222e] bg-[#12141a] text-zinc-400"
+            >
               <Wallet class="size-4" />
             </span>
           </div>
-          <div class="mt-3 font-mono text-2xl font-bold text-zinc-200 tabular-nums">
+          <div
+            class="mt-3 font-mono text-2xl font-bold text-zinc-200 tabular-nums"
+          >
             {{ formatAmount(balance.initial_amount) }}
           </div>
         </div>
 
         <!-- Final Amount Card -->
-        <div class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg">
+        <div
+          class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg"
+        >
           <div class="flex items-center justify-between">
-            <span class="font-mono text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            <span
+              class="font-mono text-xs font-semibold tracking-wider text-zinc-500 uppercase"
+            >
               {{ __('final_amount') }}
             </span>
             <span
@@ -98,10 +113,7 @@ setLayoutProps({
                 v-if="balance.final_amount >= balance.initial_amount"
                 class="size-4"
               />
-              <TrendingDown
-                v-else
-                class="size-4"
-              />
+              <TrendingDown v-else class="size-4" />
             </span>
           </div>
           <div
@@ -117,12 +129,18 @@ setLayoutProps({
         </div>
 
         <!-- Status Card -->
-        <div class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg">
+        <div
+          class="relative overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-lg"
+        >
           <div class="flex items-center justify-between">
-            <span class="font-mono text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            <span
+              class="font-mono text-xs font-semibold tracking-wider text-zinc-500 uppercase"
+            >
               {{ __('status') }}
             </span>
-            <span class="flex size-8 items-center justify-center rounded-lg border border-[#1f222e] bg-[#12141a] text-zinc-400">
+            <span
+              class="flex size-8 items-center justify-center rounded-lg border border-[#1f222e] bg-[#12141a] text-zinc-400"
+            >
               <Clock class="size-4" />
             </span>
           </div>
@@ -131,7 +149,9 @@ setLayoutProps({
               v-if="balance.is_primary"
               class="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-1 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
             >
-              <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span
+                class="size-1.5 animate-pulse rounded-full bg-emerald-400"
+              />
               {{ __('primary') }}
             </span>
             <span
@@ -145,7 +165,11 @@ setLayoutProps({
       </div>
 
       <div class="space-y-4">
-        <h3 class="font-mono text-sm font-semibold uppercase tracking-wider text-zinc-400">{{ __('transactions') }}</h3>
+        <h3
+          class="font-mono text-sm font-semibold tracking-wider text-zinc-400 uppercase"
+        >
+          {{ __('transactions') }}
+        </h3>
         <DataListState
           :is-empty="!transactions.data || transactions.data.length === 0"
           :rows="5"
@@ -177,7 +201,8 @@ setLayoutProps({
                 header: __('total'),
                 cell: (t) =>
                   `${t.type === 'income' ? '+' : '-'}${formatAmount(t.amount)}`,
-                cellClass: 'text-right font-mono text-sm font-bold tabular-nums',
+                cellClass:
+                  'text-right font-mono text-sm font-bold tabular-nums',
               },
             ]"
             :rows="transactions.data ?? []"
@@ -189,7 +214,7 @@ setLayoutProps({
                 }}</span>
                 <span
                   :class="[
-                    'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider',
+                    'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase',
                     t.type === 'income'
                       ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
                       : 'border border-rose-500/30 bg-rose-500/10 text-rose-400',
@@ -199,13 +224,13 @@ setLayoutProps({
                 </span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="font-mono text-sm font-medium text-zinc-200">{{ t.category?.name || '-' }}</span>
+                <span class="font-mono text-sm font-medium text-zinc-200">{{
+                  t.category?.name || '-'
+                }}</span>
                 <span
                   :class="[
                     'font-mono text-sm font-bold tabular-nums',
-                    t.type === 'income'
-                      ? 'text-emerald-400'
-                      : 'text-rose-400',
+                    t.type === 'income' ? 'text-emerald-400' : 'text-rose-400',
                   ]"
                 >
                   {{ t.type === 'income' ? '+' : '-'
@@ -214,7 +239,7 @@ setLayoutProps({
               </div>
               <div
                 v-if="t.description"
-                class="mt-1.5 font-mono text-xs text-zinc-500 truncate"
+                class="mt-1.5 truncate font-mono text-xs text-zinc-500"
               >
                 {{ t.description }}
               </div>
@@ -222,7 +247,7 @@ setLayoutProps({
             <template #cell-1="{ row: t }">
               <span
                 :class="[
-                  'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider',
+                  'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase',
                   t.type === 'income'
                     ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
                     : 'border border-rose-500/30 bg-rose-500/10 text-rose-400',
@@ -235,9 +260,7 @@ setLayoutProps({
               <span
                 :class="[
                   'font-mono font-bold tabular-nums',
-                  t.type === 'income'
-                    ? 'text-emerald-400'
-                    : 'text-rose-400',
+                  t.type === 'income' ? 'text-emerald-400' : 'text-rose-400',
                 ]"
               >
                 {{ t.type === 'income' ? '+' : '-'

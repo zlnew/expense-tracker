@@ -14,7 +14,6 @@ import AppContent from '@/components/AppContent.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import DataListState from '@/components/DataListState.vue'
 import BudgetDeleteDialog from '@/components/dialogs/BudgetDeleteDialog.vue'
-import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
@@ -132,20 +131,25 @@ const rowActions = (b: Budget) => {
   <AppContent>
     <div class="page-container space-y-5">
       <!-- Command Bar -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="flex items-center gap-2.5">
-          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('budgets') }}
           </h1>
-          <span class="stat-chip text-zinc-400 font-semibold">
-            {{ budgets.meta?.total ?? budgets.data.length }} {{ __('periods') || 'periode' }}
+          <span class="stat-chip font-semibold text-zinc-400">
+            {{ budgets.meta?.total ?? budgets.data.length }}
+            {{ __('periods') || 'periode' }}
           </span>
         </div>
 
         <div class="flex items-center gap-2">
           <Link
             :href="budgetCreate.url()"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] active:scale-95"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 active:scale-95"
           >
             <Plus class="size-3.5 stroke-[2.5]" />
             <span>{{ __('add_data', { data: __('budget') }) }}</span>
@@ -173,7 +177,7 @@ const rowActions = (b: Budget) => {
         <template #empty>
           <Link
             :href="budgetCreate.url()"
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
           >
             <Plus class="size-4 stroke-[2.5]" />
             {{ __('add_data', { data: __('budget') }) }}
@@ -212,7 +216,9 @@ const rowActions = (b: Budget) => {
         >
           <!-- Mobile card -->
           <template #card="{ row: b }">
-            <div class="mb-3 flex items-center justify-between border-b border-[#1f222e]/60 pb-3">
+            <div
+              class="mb-3 flex items-center justify-between border-b border-[#1f222e]/60 pb-3"
+            >
               <div class="flex items-center gap-2">
                 <span class="font-mono text-sm font-bold text-zinc-100">{{
                   formatDate(b.period_start, 'MMM YYYY')

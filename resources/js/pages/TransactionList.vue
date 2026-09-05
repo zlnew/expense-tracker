@@ -23,7 +23,6 @@ import TransactionDeleteDialog from '@/components/dialogs/TransactionDeleteDialo
 import TransactionTransferDialog from '@/components/dialogs/TransactionTransferDialog.vue'
 import TransactionUpdateDialog from '@/components/dialogs/TransactionUpdateDialog.vue'
 import FilterSheet from '@/components/FilterSheet.vue'
-import Heading from '@/components/Heading.vue'
 import ResponsiveTable from '@/components/ResponsiveTable.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
@@ -139,9 +138,11 @@ const groupedTransactions = computed(() => {
 
   list.forEach((t) => {
     const rawDate = t.date ? t.date.slice(0, 10) : 'unknown'
+
     if (!groupMap.has(rawDate)) {
       groupMap.set(rawDate, [])
     }
+
     groupMap.get(rawDate)!.push(t)
   })
 
@@ -155,6 +156,7 @@ const groupedTransactions = computed(() => {
 
   groupMap.forEach((items, rawDate) => {
     let label = formatDate(rawDate, 'DD MMMM YYYY')
+
     if (rawDate === todayStr) {
       label = 'Hari Ini'
     } else if (rawDate === yesterdayStr) {
@@ -164,8 +166,11 @@ const groupedTransactions = computed(() => {
     let inc = 0
     let exp = 0
     items.forEach((item) => {
-      if (item.type === 'income') inc += item.amount
-      else exp += item.amount
+      if (item.type === 'income') {
+        inc += item.amount
+      } else {
+        exp += item.amount
+      }
     })
 
     result.push({
@@ -234,12 +239,16 @@ const rowActions = (t: Transaction) => [
   <AppContent>
     <div class="page-container space-y-5">
       <!-- Command Bar -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="flex items-center gap-2.5">
-          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('transactions') }}
           </h1>
-          <span class="stat-chip text-zinc-400 font-semibold">
+          <span class="stat-chip font-semibold text-zinc-400">
             {{ transactions.meta?.total ?? transactions.data.length }} total
           </span>
         </div>
@@ -247,7 +256,7 @@ const rowActions = (t: Transaction) => [
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] active:scale-95"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 active:scale-95"
             @click="openCreateDialog"
           >
             <Plus class="size-3.5 stroke-[2.5]" />
@@ -255,7 +264,7 @@ const rowActions = (t: Transaction) => [
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-2 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] px-3 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
             @click="openTransferDialog"
           >
             <ArrowRightLeft class="size-3.5 text-zinc-400" />
@@ -263,7 +272,7 @@ const rowActions = (t: Transaction) => [
           </button>
           <button
             type="button"
-            class="size-9 inline-flex items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
             title="Catat Banyak"
             @click="openBulkCreateDialog"
           >
@@ -271,7 +280,7 @@ const rowActions = (t: Transaction) => [
           </button>
           <button
             type="button"
-            class="size-9 inline-flex items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
+            class="inline-flex size-9 items-center justify-center rounded-xl border border-[#1f222e] bg-[#12141a] text-zinc-400 transition-all hover:border-zinc-700 hover:text-zinc-100 active:scale-95"
             title="Export CSV"
             @click="exportCsv"
           >
@@ -291,7 +300,7 @@ const rowActions = (t: Transaction) => [
           <Button
             variant="outline"
             size="icon"
-            class="h-10 w-10 shrink-0 border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100 relative lg:hidden"
+            class="relative h-10 w-10 shrink-0 border-[#1f222e] bg-[#121217] text-zinc-300 hover:bg-[#181820] hover:text-zinc-100 lg:hidden"
             :aria-label="__('filter_transactions')"
             @click="filterSheetOpen = true"
           >
@@ -299,7 +308,7 @@ const rowActions = (t: Transaction) => [
             <Badge
               v-if="activeCount > 0"
               variant="secondary"
-              class="absolute -top-1 -right-1 size-4 p-0 text-[9px] bg-emerald-500 text-[#0a0a0c] font-mono font-bold"
+              class="absolute -top-1 -right-1 size-4 bg-emerald-500 p-0 font-mono text-[9px] font-bold text-[#0a0a0c]"
             >
               {{ activeCount }}
             </Badge>
@@ -514,29 +523,41 @@ const rowActions = (t: Transaction) => [
             class="space-y-1.5"
           >
             <!-- Date Group Header -->
-            <div class="flex items-center justify-between px-1 font-mono text-xs">
-              <span class="font-bold text-zinc-400 uppercase tracking-wider text-[11px]">
+            <div
+              class="flex items-center justify-between px-1 font-mono text-xs"
+            >
+              <span
+                class="text-[11px] font-bold tracking-wider text-zinc-400 uppercase"
+              >
                 {{ group.dateLabel }}
               </span>
               <div class="flex items-center gap-2 text-[11px] tabular-nums">
-                <span v-if="group.totalIncome > 0" class="text-emerald-400 font-bold">
+                <span
+                  v-if="group.totalIncome > 0"
+                  class="font-bold text-emerald-400"
+                >
                   +{{ formatAmount(group.totalIncome) }}
                 </span>
-                <span v-if="group.totalExpense > 0" class="text-rose-400 font-bold">
+                <span
+                  v-if="group.totalExpense > 0"
+                  class="font-bold text-rose-400"
+                >
                   -{{ formatAmount(group.totalExpense) }}
                 </span>
               </div>
             </div>
 
             <!-- Day Cards Stack -->
-            <div class="overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] divide-y divide-[#1f222e]/60 shadow-lg">
+            <div
+              class="divide-y divide-[#1f222e]/60 overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] shadow-lg"
+            >
               <div
                 v-for="t in group.items"
                 :key="t.id"
-                class="flex items-center justify-between p-3.5 hover:bg-[#12141a]/60 active:bg-[#181b24] transition-colors cursor-pointer"
+                class="flex cursor-pointer items-center justify-between p-3.5 transition-colors hover:bg-[#12141a]/60 active:bg-[#181b24]"
                 @click="openUpdateDialog(t)"
               >
-                <div class="flex items-center gap-3 min-w-0 pr-3">
+                <div class="flex min-w-0 items-center gap-3 pr-3">
                   <div
                     class="flex size-9 shrink-0 items-center justify-center rounded-xl border"
                     :class="
@@ -551,13 +572,27 @@ const rowActions = (t: Transaction) => [
                     />
                   </div>
                   <div class="min-w-0">
-                    <h3 class="truncate font-mono text-xs font-bold text-zinc-100">
-                      {{ t.description || t.category?.name || __('transaction') }}
+                    <h3
+                      class="truncate font-mono text-xs font-bold text-zinc-100"
+                    >
+                      {{
+                        t.description || t.category?.name || __('transaction')
+                      }}
                     </h3>
-                    <p class="flex items-center gap-1.5 font-mono text-[11px] text-zinc-500 mt-0.5">
-                      <span class="truncate text-zinc-400">{{ t.category?.name || __('unknown') }}</span>
-                      <span v-if="t.balance?.name" class="text-zinc-600">•</span>
-                      <span v-if="t.balance?.name" class="truncate text-zinc-400">{{ t.balance?.name }}</span>
+                    <p
+                      class="mt-0.5 flex items-center gap-1.5 font-mono text-[11px] text-zinc-500"
+                    >
+                      <span class="truncate text-zinc-400">{{
+                        t.category?.name || __('unknown')
+                      }}</span>
+                      <span v-if="t.balance?.name" class="text-zinc-600"
+                        >•</span
+                      >
+                      <span
+                        v-if="t.balance?.name"
+                        class="truncate text-zinc-400"
+                        >{{ t.balance?.name }}</span
+                      >
                     </p>
                   </div>
                 </div>
@@ -565,11 +600,14 @@ const rowActions = (t: Transaction) => [
                 <div class="shrink-0 text-right">
                   <p
                     class="font-mono text-xs font-bold tabular-nums"
-                    :class="t.type === 'income' ? 'text-emerald-400' : 'text-zinc-200'"
+                    :class="
+                      t.type === 'income' ? 'text-emerald-400' : 'text-zinc-200'
+                    "
                   >
-                    {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                    {{ t.type === 'income' ? '+' : '-'
+                    }}{{ formatAmount(t.amount) }}
                   </p>
-                  <p class="font-mono text-[10px] text-zinc-500 mt-0.5">
+                  <p class="mt-0.5 font-mono text-[10px] text-zinc-500">
                     {{ formatDate(t.date, 'HH:mm') }}
                   </p>
                 </div>
@@ -586,16 +624,30 @@ const rowActions = (t: Transaction) => [
               {
                 header: __('date'),
                 cell: (t) => formatDate(t.date),
-                cellClass: 'w-[120px] font-medium font-mono text-xs text-zinc-400',
+                cellClass:
+                  'w-[120px] font-medium font-mono text-xs text-zinc-400',
               },
-              { header: __('category'), cell: (t) => t.category?.name ?? '-', cellClass: 'font-mono text-xs text-zinc-200' },
-              { header: __('balance'), cell: (t) => t.balance?.name ?? '-', cellClass: 'font-mono text-xs text-zinc-400' },
-              { header: __('description'), cell: (t) => t.description || '-', cellClass: 'font-mono text-xs text-zinc-500' },
+              {
+                header: __('category'),
+                cell: (t) => t.category?.name ?? '-',
+                cellClass: 'font-mono text-xs text-zinc-200',
+              },
+              {
+                header: __('balance'),
+                cell: (t) => t.balance?.name ?? '-',
+                cellClass: 'font-mono text-xs text-zinc-400',
+              },
+              {
+                header: __('description'),
+                cell: (t) => t.description || '-',
+                cellClass: 'font-mono text-xs text-zinc-500',
+              },
               {
                 header: __('amount'),
                 cell: (t) =>
                   (t.type === 'income' ? '+' : '-') + formatAmount(t.amount),
-                cellClass: 'text-right font-mono text-xs font-bold tabular-nums',
+                cellClass:
+                  'text-right font-mono text-xs font-bold tabular-nums',
               },
               {
                 header: __('actions'),
@@ -609,11 +661,12 @@ const rowActions = (t: Transaction) => [
               <span
                 :class="
                   t.type === 'income'
-                    ? 'text-emerald-400 font-mono font-bold'
-                    : 'text-zinc-200 font-mono font-bold'
+                    ? 'font-mono font-bold text-emerald-400'
+                    : 'font-mono font-bold text-zinc-200'
                 "
               >
-                {{ t.type === 'income' ? '+' : '-' }}{{ formatAmount(t.amount) }}
+                {{ t.type === 'income' ? '+' : '-'
+                }}{{ formatAmount(t.amount) }}
               </span>
             </template>
             <template #cell-6="{ row: t }">

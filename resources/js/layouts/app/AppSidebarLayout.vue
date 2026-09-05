@@ -35,7 +35,7 @@ withDefaults(defineProps<Props>(), {
       id="main-content"
       tabindex="-1"
       variant="sidebar"
-      class="overflow-x-clip pb-24 md:pb-8 focus:outline-none min-h-screen bg-[#0a0a0c]"
+      class="min-h-screen overflow-x-clip bg-[#0a0a0c] pb-24 focus:outline-none md:pb-8"
     >
       <AppSidebarHeader :breadcrumbs="breadcrumbs" />
       <slot />

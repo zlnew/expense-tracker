@@ -173,14 +173,14 @@
   color-scheme: dark;
 
   /* Deep OLED Obsidian Dark Mode */
-  --background: oklch(0.10 0.015 260);
+  --background: oklch(0.1 0.015 260);
   --foreground: oklch(0.96 0.005 240);
   --card: oklch(0.135 0.018 260);
   --card-foreground: oklch(0.96 0.005 240);
-  --popover: oklch(0.17 0.020 260);
+  --popover: oklch(0.17 0.02 260);
   --popover-foreground: oklch(0.96 0.005 240);
   --primary: oklch(0.72 0.17 155);
-  --primary-foreground: oklch(0.10 0.015 260);
+  --primary-foreground: oklch(0.1 0.015 260);
   --secondary: oklch(0.18 0.018 260);
   --secondary-foreground: oklch(0.96 0.005 240);
   --muted: oklch(0.18 0.018 260);
@@ -189,8 +189,8 @@
   --accent-foreground: oklch(0.96 0.005 240);
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.24 0.020 260);
-  --input: oklch(0.24 0.020 260);
+  --border: oklch(0.24 0.02 260);
+  --input: oklch(0.24 0.02 260);
   --ring: oklch(0.72 0.17 155);
 
   /* Terminal Semantic Tokens */
@@ -222,10 +222,10 @@
   --sidebar-background: oklch(0.11 0.015 260);
   --sidebar-foreground: oklch(0.96 0.005 240);
   --sidebar-primary: #10b981;
-  --sidebar-primary-foreground: oklch(0.10 0.015 260);
+  --sidebar-primary-foreground: oklch(0.1 0.015 260);
   --sidebar-accent: oklch(0.18 0.018 260);
   --sidebar-accent-foreground: oklch(0.96 0.005 240);
-  --sidebar-border: oklch(0.24 0.020 260);
+  --sidebar-border: oklch(0.24 0.02 260);
   --sidebar-ring: #10b981;
   --sidebar: oklch(0.11 0.015 260);
 }
@@ -274,7 +274,9 @@
 
 @layer utilities {
   .font-mono-numbers {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
     font-variant-numeric: tabular-nums;
   }
 
@@ -342,7 +344,8 @@
     border: 1px solid #1f222e;
     background-color: #12141a;
     padding: 0.25rem 0.625rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.75rem;
   }
 
@@ -351,4 +354,3 @@
     border-radius: 0px !important;
   }
 }
-

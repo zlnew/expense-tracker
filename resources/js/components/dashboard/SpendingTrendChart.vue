@@ -129,11 +129,11 @@ const tickFormatY = (tick: number): string => {
 
 <template>
   <div
-    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 sm:p-6 shadow-xl"
+    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
   >
     <!-- Header -->
     <div
-      class="flex flex-row items-center justify-between pb-4 border-b border-[#1f222e]/60 mb-4"
+      class="mb-4 flex flex-row items-center justify-between border-b border-[#1f222e]/60 pb-4"
     >
       <div class="space-y-0.5">
         <div class="flex items-center gap-2">
@@ -142,7 +142,9 @@ const tickFormatY = (tick: number): string => {
           >
             <LineChart class="size-4" />
           </span>
-          <h2 class="font-mono text-sm font-bold text-zinc-100 uppercase tracking-wide">
+          <h2
+            class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('monthly_spending_trend') }}
           </h2>
         </div>
@@ -153,11 +155,15 @@ const tickFormatY = (tick: number): string => {
 
       <div class="flex items-center gap-3 font-mono text-xs font-semibold">
         <span class="flex items-center gap-1.5 text-emerald-400">
-          <span class="size-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+          <span
+            class="size-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)]"
+          />
           {{ __('income') }}
         </span>
         <span class="flex items-center gap-1.5 text-rose-400">
-          <span class="size-2 rounded-full bg-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
+          <span
+            class="size-2 rounded-full bg-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.8)]"
+          />
           {{ __('expense') }}
         </span>
       </div>
@@ -167,7 +173,7 @@ const tickFormatY = (tick: number): string => {
     <div>
       <div
         v-if="monthlySpendingTrend === undefined"
-        class="h-[200px] w-full animate-pulse rounded-xl bg-[#121217] border border-[#1f222e] sm:h-[260px]"
+        class="h-[200px] w-full animate-pulse rounded-xl border border-[#1f222e] bg-[#121217] sm:h-[260px]"
       />
 
       <ChartEmpty
@@ -183,7 +189,7 @@ const tickFormatY = (tick: number): string => {
         <Link v-if="!hasActiveBudget" :href="budgetIndex.url()">
           <button
             type="button"
-            class="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-all"
+            class="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20"
           >
             {{ __('create_budget') }}
             <ChevronRight class="size-3.5" />

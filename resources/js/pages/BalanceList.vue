@@ -17,7 +17,6 @@ import DataListState from '@/components/DataListState.vue'
 import BalanceDeleteDialog from '@/components/dialogs/BalanceDeleteDialog.vue'
 import BalanceReconcileDialog from '@/components/dialogs/BalanceReconcileDialog.vue'
 import BalanceSaveDialog from '@/components/dialogs/BalanceSaveDialog.vue'
-import Heading from '@/components/Heading.vue'
 import RowActions from '@/components/RowActions.vue'
 import SearchInput from '@/components/SearchInput.vue'
 import { useFilters } from '@/composables/useFilters'
@@ -128,20 +127,25 @@ const rowActions = (b: Balance) => [
   <AppContent>
     <div class="page-container space-y-5">
       <!-- Command Bar -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="flex items-center gap-2.5">
-          <h1 class="font-mono text-base font-bold text-zinc-100 uppercase tracking-wide">
+          <h1
+            class="font-mono text-base font-bold tracking-wide text-zinc-100 uppercase"
+          >
             {{ __('balances') }}
           </h1>
-          <span class="stat-chip text-zinc-400 font-semibold">
-            {{ balances.meta?.total ?? balances.data.length }} {{ __('balances').toLowerCase() }}
+          <span class="stat-chip font-semibold text-zinc-400">
+            {{ balances.meta?.total ?? balances.data.length }}
+            {{ __('balances').toLowerCase() }}
           </span>
         </div>
 
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] active:scale-95"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-3.5 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 active:scale-95"
             @click="openCreateDialog"
           >
             <Plus class="size-3.5 stroke-[2.5]" />
@@ -170,7 +174,7 @@ const rowActions = (b: Balance) => [
         <template #empty>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.35)] active:scale-95"
+            class="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-bold text-[#0a0a0c] shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all hover:bg-emerald-400 active:scale-95"
             @click="openCreateDialog"
           >
             <Plus class="size-4 stroke-[2.5]" />
@@ -211,11 +215,13 @@ const rowActions = (b: Balance) => [
                 <div class="min-w-0">
                   <Link
                     :href="balanceShow.url({ balance: b })"
-                    class="truncate font-mono text-base font-bold text-zinc-100 hover:text-emerald-400 transition-colors"
+                    class="truncate font-mono text-base font-bold text-zinc-100 transition-colors hover:text-emerald-400"
                   >
                     {{ b.name }}
                   </Link>
-                  <p class="line-clamp-2 font-mono text-xs text-zinc-400 mt-0.5">
+                  <p
+                    class="mt-0.5 line-clamp-2 font-mono text-xs text-zinc-400"
+                  >
                     {{ b.description ?? '-' }}
                   </p>
                 </div>
@@ -224,15 +230,21 @@ const rowActions = (b: Balance) => [
               <!-- Main Amount Display -->
               <div class="mt-5 space-y-3.5">
                 <div class="flex items-end justify-between">
-                  <span class="font-mono text-xs text-zinc-500 uppercase tracking-wider">
+                  <span
+                    class="font-mono text-xs tracking-wider text-zinc-500 uppercase"
+                  >
                     {{ __('active') || 'Stored Active' }}
                   </span>
-                  <span class="font-mono text-2xl font-extrabold text-zinc-100 tabular-nums">
+                  <span
+                    class="font-mono text-2xl font-extrabold text-zinc-100 tabular-nums"
+                  >
                     {{ formatAmount(b.final_amount) }}
                   </span>
                 </div>
 
-                <div class="space-y-2 border-t border-[#1f222e]/60 pt-3 text-xs">
+                <div
+                  class="space-y-2 border-t border-[#1f222e]/60 pt-3 text-xs"
+                >
                   <div class="flex items-center justify-between font-mono">
                     <span class="text-zinc-500">{{ __('real_balance') }}</span>
                     <span class="font-bold text-emerald-400 tabular-nums">
@@ -247,9 +259,13 @@ const rowActions = (b: Balance) => [
                     </span>
                   </div>
 
-                  <div class="flex items-center justify-between font-mono text-zinc-500">
+                  <div
+                    class="flex items-center justify-between font-mono text-zinc-500"
+                  >
                     <span>{{ __('initial_amount') }}</span>
-                    <span class="tabular-nums">{{ formatAmount(b.initial_amount) }}</span>
+                    <span class="tabular-nums">{{
+                      formatAmount(b.initial_amount)
+                    }}</span>
                   </div>
                 </div>
 
@@ -257,7 +273,7 @@ const rowActions = (b: Balance) => [
                 <div
                   v-if="b.reconciled_amount !== null && b.drift !== null"
                   :data-testid="`balance-drift-${String(b.id)}`"
-                  class="flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-mono"
+                  class="flex items-center justify-between rounded-xl border px-3 py-2 font-mono text-xs"
                   :class="
                     b.is_drift_flagged
                       ? 'border-rose-500/40 bg-rose-500/10 text-rose-400'
@@ -269,14 +285,19 @@ const rowActions = (b: Balance) => [
                       v-if="b.is_drift_flagged"
                       class="size-3.5 shrink-0 text-rose-400"
                     />
-                    <Scale v-else class="size-3.5 shrink-0 opacity-60 text-emerald-400" />
+                    <Scale
+                      v-else
+                      class="size-3.5 shrink-0 text-emerald-400 opacity-60"
+                    />
                     {{
                       b.is_drift_flagged ? __('drift_flagged') : __('drift_ok')
                     }}
                   </span>
                   <span
                     class="font-bold tabular-nums"
-                    :class="b.is_drift_flagged ? 'text-rose-400' : 'text-zinc-200'"
+                    :class="
+                      b.is_drift_flagged ? 'text-rose-400' : 'text-zinc-200'
+                    "
                   >
                     {{ formatAmount(b.drift) }}
                   </span>
@@ -298,7 +319,7 @@ const rowActions = (b: Balance) => [
             >
               <button
                 type="button"
-                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 py-2 px-3 font-mono text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 transition-all active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 font-mono text-xs font-bold text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)] transition-all hover:bg-emerald-500/20 active:scale-95"
                 @click="openReconcileDialog(b)"
               >
                 <Scale class="size-3.5" />

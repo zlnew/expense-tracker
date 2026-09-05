@@ -27,20 +27,22 @@ const props = defineProps<Props>()
     class="hidden overflow-x-auto rounded-2xl border border-[#1f222e] bg-[#0a0a0c] shadow-xl md:block"
     :class="props.class"
   >
-    <table class="w-full text-left border-collapse">
+    <table class="w-full border-collapse text-left">
       <thead class="sticky top-0 z-10 border-b border-[#1f222e] bg-[#121217]">
         <tr>
           <th
             v-for="(col, i) in props.columns"
             :key="i"
-            class="px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-400"
+            class="px-4 py-3 font-mono text-[11px] font-semibold tracking-wider text-zinc-400 uppercase"
             :class="col.headerClass"
           >
             {{ col.header }}
           </th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[#1f222e]/60 font-mono text-xs text-zinc-200">
+      <tbody
+        class="divide-y divide-[#1f222e]/60 font-mono text-xs text-zinc-200"
+      >
         <tr
           v-for="(row, i) in props.rows"
           :key="i"
@@ -69,7 +71,11 @@ const props = defineProps<Props>()
       class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-4 text-zinc-100 shadow-lg"
     >
       <slot name="card" :row="row" :index="i">
-        <div v-for="(col, j) in props.columns" :key="j" class="mb-1 font-mono text-xs">
+        <div
+          v-for="(col, j) in props.columns"
+          :key="j"
+          class="mb-1 font-mono text-xs"
+        >
           <slot :name="`cell-${j}`" :row="row" :index="i">
             {{ col.cell(row, i) }}
           </slot>
