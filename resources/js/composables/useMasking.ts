@@ -6,14 +6,16 @@ export const MASKED_VALUE = 'Rp ••••••'
 
 function loadInitialMasked(): boolean {
   if (typeof window === 'undefined') {
-    return false
+    return true
   }
 
   try {
-    return window.localStorage.getItem(MASKING_STORAGE_KEY) === 'true'
+    const item = window.localStorage.getItem(MASKING_STORAGE_KEY)
+
+    return item === null ? true : item === 'true'
   } catch {
-    // localStorage unavailable (private mode, blocked storage) — default to visible.
-    return false
+    // localStorage unavailable (private mode, blocked storage) — default to masked.
+    return true
   }
 }
 

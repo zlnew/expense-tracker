@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
 import {
   ArrowLeftRight,
   CircleDollarSign,
@@ -7,6 +8,7 @@ import {
   PiggyBank,
   Wallet,
 } from 'lucide-vue-next'
+import { watch } from 'vue'
 import AppLogo from '@/components/AppLogo.vue'
 import NavFooter from '@/components/NavFooter.vue'
 import NavMainWithSub from '@/components/NavMainWithSub.vue'
@@ -20,6 +22,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { useSidebar } from '@/components/ui/sidebar/utils'
 import { useLang } from '@/composables/useLang'
 import { dashboard } from '@/routes'
 import balances from '@/routes/balances'
@@ -31,6 +34,15 @@ import transactions from '@/routes/transactions'
 import type { NavGroup, NavItem } from '@/types'
 
 const { __ } = useLang()
+const page = usePage()
+const { setOpenMobile } = useSidebar()
+
+watch(
+  () => page.url,
+  () => {
+    setOpenMobile(false)
+  },
+)
 
 const mainNavItems: NavGroup[] = [
   {
@@ -73,15 +85,14 @@ const mainNavItems: NavGroup[] = [
     href: funds.index(),
     icon: PiggyBank,
   },
-]
-
-const footerNavItems: NavItem[] = [
   {
     title: __('balances'),
     href: balances.index(),
     icon: Wallet,
   },
 ]
+
+const footerNavItems: NavItem[] = []
 </script>
 
 <template>

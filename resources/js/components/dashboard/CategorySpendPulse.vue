@@ -87,26 +87,26 @@ const donutTriggers = {
 
 <template>
   <div
-    class="rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl sm:p-6"
+    class="rounded-none border border-border bg-card p-5 text-card-foreground shadow-sm sm:p-6"
   >
     <!-- Card Header -->
     <div
-      class="mb-4 flex items-center justify-between border-b border-[#1f222e]/60 pb-4"
+      class="mb-4 flex items-center justify-between border-b border-border pb-4"
     >
       <div class="space-y-0.5">
         <div class="flex items-center gap-2">
           <span
-            class="inline-flex size-7 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-400"
+            class="inline-flex size-7 items-center justify-center rounded-none border border-purple-500/30 bg-purple-500/10 text-purple-500 dark:text-purple-400"
           >
             <PieChart class="size-4" />
           </span>
           <h2
-            class="font-mono text-sm font-bold tracking-wide text-zinc-100 uppercase"
+            class="font-mono text-sm font-bold tracking-wide text-foreground uppercase"
           >
             {{ __('expense_breakdown') }}
           </h2>
         </div>
-        <p class="font-mono text-[11px] text-zinc-500">
+        <p class="font-mono text-[11px] text-muted-foreground">
           {{ __('expense_breakdown_description') }}
         </p>
       </div>
@@ -116,7 +116,7 @@ const donutTriggers = {
     <div>
       <div
         v-if="expenseBreakdown === undefined"
-        class="h-[220px] w-full animate-pulse rounded-xl border border-[#1f222e] bg-[#121217]"
+        class="h-[220px] w-full animate-pulse rounded-none border border-border bg-secondary/50"
       />
 
       <ChartEmpty
@@ -134,7 +134,7 @@ const donutTriggers = {
         <Link v-if="!hasActiveBudget" :href="budgetIndex.url()">
           <button
             type="button"
-            class="mt-2 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20"
+            class="mt-2 inline-flex items-center gap-1.5 rounded-none border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-semibold text-emerald-500 transition-all hover:bg-emerald-500/20 dark:text-emerald-400"
           >
             {{ __('create_budget') }}
             <ChevronRight class="size-3.5" />
@@ -166,11 +166,11 @@ const donutTriggers = {
             class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center"
           >
             <span
-              class="font-mono text-[10px] font-semibold tracking-wider text-zinc-500 uppercase"
+              class="font-mono text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
               >Total</span
             >
             <span
-              class="font-mono text-xs font-extrabold text-zinc-100 tabular-nums"
+              class="font-mono text-xs font-extrabold text-foreground tabular-nums"
             >
               {{ masked ? '••••' : formatAmount(totalExpense) }}
             </span>
@@ -182,26 +182,26 @@ const donutTriggers = {
           <div
             v-for="(item, i) in breakdownItems"
             :key="item.category"
-            class="flex items-center justify-between rounded-xl border border-transparent bg-[#121217]/60 px-3 py-2 text-xs transition-colors hover:border-[#1f222e]"
+            class="flex items-center justify-between rounded-none border border-border bg-secondary/40 px-3 py-2 text-xs transition-colors hover:bg-secondary"
           >
             <div class="flex items-center gap-2 truncate pr-2">
               <span
-                class="size-2 shrink-0 rounded-full"
+                class="size-2 shrink-0 rounded-none"
                 :style="{ backgroundColor: getCategoryColor(i) }"
               />
-              <span class="truncate font-medium text-zinc-200">
+              <span class="truncate font-medium text-foreground">
                 {{ item.category }}
               </span>
             </div>
 
             <div class="flex shrink-0 items-center gap-2.5">
               <span
-                class="font-mono text-[11px] font-bold text-zinc-400 tabular-nums"
+                class="font-mono text-[11px] font-bold text-muted-foreground tabular-nums"
               >
                 {{ item.percentage }}%
               </span>
               <span
-                class="font-mono text-xs font-bold text-zinc-100 tabular-nums"
+                class="font-mono text-xs font-bold text-foreground tabular-nums"
               >
                 {{ masked ? '••••' : formatAmount(item.amount) }}
               </span>
