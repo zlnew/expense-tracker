@@ -3,6 +3,7 @@ import { Head, setLayoutProps } from '@inertiajs/vue3'
 import {
   ArrowRightLeft,
   Download,
+  Ellipsis,
   Filter,
   ListPlus,
   ListTodoIcon,
@@ -29,6 +30,12 @@ import SearchInput from '@/components/SearchInput.vue'
 import TransactionTabs from '@/components/TransactionTabs.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -552,7 +559,7 @@ const rowActions = (t: Transaction) => [
 
             <!-- Day Cards Stack -->
             <div
-              class="divide-y divide-[#1f222e]/60 overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] shadow-lg"
+              class="divide-y divide-[#1f222e]/60 overflow-hidden rounded-none border border-[#1f222e] bg-[#0a0a0c] shadow-lg"
             >
               <div
                 v-for="t in group.items"
@@ -560,9 +567,9 @@ const rowActions = (t: Transaction) => [
                 class="flex cursor-pointer items-center justify-between p-3.5 transition-colors hover:bg-[#12141a]/60 active:bg-[#181b24]"
                 @click="openUpdateDialog(t)"
               >
-                <div class="flex min-w-0 items-center gap-3 pr-3">
+                <div class="flex min-w-0 items-center gap-3 pr-2">
                   <div
-                    class="flex size-9 shrink-0 items-center justify-center rounded-xl border"
+                    class="flex size-9 shrink-0 items-center justify-center rounded-none border"
                     :class="
                       t.type === 'income'
                         ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
@@ -600,19 +607,56 @@ const rowActions = (t: Transaction) => [
                   </div>
                 </div>
 
-                <div class="shrink-0 text-right">
-                  <p
-                    class="font-mono text-xs font-bold tabular-nums"
-                    :class="
-                      t.type === 'income' ? 'text-emerald-400' : 'text-zinc-200'
-                    "
-                  >
-                    {{ t.type === 'income' ? '+' : '-'
-                    }}{{ formatAmount(t.amount) }}
-                  </p>
-                  <p class="mt-0.5 font-mono text-[10px] text-zinc-500">
-                    {{ formatDate(t.date, 'HH:mm') }}
-                  </p>
+                <div class="flex shrink-0 items-center gap-2">
+                  <div class="text-right">
+                    <p
+                      class="font-mono text-xs font-bold tabular-nums"
+                      :class="
+                        t.type === 'income'
+                          ? 'text-emerald-400'
+                          : 'text-zinc-200'
+                      "
+                    >
+                      {{ t.type === 'income' ? '+' : '-'
+                      }}{{ formatAmount(t.amount) }}
+                    </p>
+                    <p class="mt-0.5 font-mono text-[10px] text-zinc-500">
+                      {{ formatDate(t.date, 'HH:mm') }}
+                    </p>
+                  </div>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        class="size-8 rounded-none text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-100"
+                        @click.stop
+                      >
+                        <Ellipsis class="size-4" />
+                        <span class="sr-only">{{ __('actions') }}</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      class="rounded-none border-border bg-card"
+                    >
+                      <DropdownMenuItem
+                        class="cursor-pointer gap-2 font-mono text-xs"
+                        @click.stop="openUpdateDialog(t)"
+                      >
+                        <SquarePen class="size-3.5" />
+                        {{ __('edit') }}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        class="cursor-pointer gap-2 font-mono text-xs text-destructive focus:text-destructive"
+                        @click.stop="openDeleteDialog(t)"
+                      >
+                        <Trash2 class="size-3.5" />
+                        {{ __('delete') }}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -695,6 +739,7 @@ const rowActions = (t: Transaction) => [
     :balances="balances"
     :budgets="budgets"
     :categories="categories"
+    @delete="openDeleteDialog"
   />
   <TransactionBulkCreateDialog
     v-model:open="bulkCreateDialogOpen"

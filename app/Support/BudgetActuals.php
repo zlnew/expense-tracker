@@ -89,24 +89,35 @@ final class BudgetActuals
         $payoutIds = self::payoutTransactionIds($user);
 
         $spent = Transaction::query()
-            ->selectRaw('budget_item_id, SUM(amount) as total_amount')
-            ->where('user_id', $user->id)
-            ->where('budget_id', $budget->id)
-            ->whereBetween('date', [$start, $end])
-            ->when($payoutIds !== [], fn ($query) => $query->whereNotIn('id', $payoutIds))
-            ->groupBy('budget_item_id')
-            ->pluck('total_amount', 'budget_item_id')
+            ->leftJoin('budget_items', function ($join) use ($budget) {
+                $join->on('budget_items.category_id', '=', 'transactions.category_id')
+                    ->where('budget_items.budget_id', '=', $budget->id);
+            })
+            ->selectRaw('COALESCE(transactions.budget_item_id, budget_items.id) as resolved_item_id, SUM(transactions.amount) as total_amount')
+            ->where('transactions.user_id', $user->id)
+            ->where(function ($q) use ($budget) {
+                $q->where('transactions.budget_id', $budget->id)
+                    ->orWhereNull('transactions.budget_id');
+            })
+            ->whereBetween('transactions.date', [$start, $end])
+            ->excludeInternalTransfers()
+            ->when($payoutIds !== [], fn ($query) => $query->whereNotIn('transactions.id', $payoutIds))
+            ->groupBy('resolved_item_id')
+            ->pluck('total_amount', 'resolved_item_id')
             ->map(fn ($value) => (int) $value)
             ->all();
 
         $reserved = self::reservedPerItem($user, $budget, $start, $end);
 
-        $itemIds = array_unique(array_merge(array_keys($spent), array_keys($reserved)));
+        $itemIds = array_filter(
+            array_unique(array_merge(array_keys($spent), array_keys($reserved))),
+            fn ($id) => ! empty($id)
+        );
 
         $actuals = [];
 
         foreach ($itemIds as $itemId) {
-            $actuals[$itemId] = ($spent[$itemId] ?? 0) + ($reserved[$itemId] ?? 0);
+            $actuals[(int) $itemId] = ($spent[$itemId] ?? 0) + ($reserved[$itemId] ?? 0);
         }
 
         return $actuals;

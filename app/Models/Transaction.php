@@ -82,8 +82,8 @@ class Transaction extends Model
     public function scopeExcludeInternalTransfers(Builder $query): Builder
     {
         return $query->where(function (Builder $q) {
-            $q->whereNull('transfer_group_id')
-                ->orWhereNotNull('category_id');
+            $q->whereNull('transactions.transfer_group_id')
+                ->orWhereNotNull('transactions.category_id');
         });
     }
 
