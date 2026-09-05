@@ -5,7 +5,6 @@ import {
   TrendingUp,
   TrendingDown,
   ShieldCheck,
-  ChevronRight,
   PiggyBank,
   ArrowUpRight,
   ArrowDownRight,
@@ -207,16 +206,6 @@ function triggerTransactionCreate() {
               }}{{ masked ? '••••' : formatAmount(netCashFlow) }}
             </span>
           </div>
-
-          <!-- Manage Balances Link -->
-          <Link :href="balanceIndex.url()">
-            <span
-              class="inline-flex size-9 items-center justify-center rounded-lg border border-[#1f222e] bg-[#121217] text-zinc-400 transition-colors hover:border-emerald-500/40 hover:text-emerald-400"
-              title="Manage Balances"
-            >
-              <ChevronRight class="size-4" />
-            </span>
-          </Link>
         </div>
       </div>
 

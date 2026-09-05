@@ -16,28 +16,55 @@ defineProps<Props>()
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 32 32"
+    fill="none"
     :class="className"
     v-bind="$attrs"
   >
-    <!-- Outer Precision Vault Hex-Ring -->
+    <!-- Isometric Vault Outer Hexagon (Sharp 90/60deg chamfers) -->
     <path
-      fill="currentColor"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-      d="M16 2L29.5 9.8V22.2L16 30L2.5 22.2V9.8L16 2ZM5.5 11.5V20.5L16 26.6L26.5 20.5V11.5L16 5.4L5.5 11.5Z"
+      d="M16 2.5L28.5 9.5V22.5L16 29.5L3.5 22.5V9.5L16 2.5Z"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linejoin="miter"
+      class="opacity-40"
     />
-    <!-- Inflow Delta Arrow (Financial Growth) -->
+    <!-- Isometric Vault Inner Chamber -->
     <path
-      fill="currentColor"
-      d="M16 7.5L23.5 14H18.5V19.5H13.5V14H8.5L16 7.5Z"
+      d="M16 7L24.5 11.8V20.2L16 25L7.5 20.2V11.8L16 7Z"
+      stroke="currentColor"
+      stroke-width="1.25"
+      stroke-linejoin="miter"
+      class="opacity-60"
     />
-    <!-- Base Reserve Balance Bar -->
-    <rect
-      x="10.5"
-      y="22"
-      width="11"
-      height="2.5"
-      rx="1.25"
+    <!-- Isometric Core Axis & Combination Dial -->
+    <circle
+      cx="16"
+      cy="16"
+      r="3.5"
+      stroke="currentColor"
+      stroke-width="1.5"
+      class="opacity-80"
+    />
+    <circle
+      cx="16"
+      cy="16"
+      r="1.25"
+      fill="currentColor"
+    />
+    <!-- Safe Hinge Blocks -->
+    <rect x="2" y="11" width="2" height="3" fill="currentColor" class="opacity-60" />
+    <rect x="2" y="18" width="2" height="3" fill="currentColor" class="opacity-60" />
+    <!-- Dynamic Breakthrough Trend Arrow (Banana Concept B) -->
+    <path
+      d="M4.5 22L12 15.5L17 19.5L27 6"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="square"
+      stroke-linejoin="miter"
+    />
+    <!-- Arrowhead Head Point -->
+    <polygon
+      points="28.5,4 28,10.5 22,6.5"
       fill="currentColor"
     />
   </svg>

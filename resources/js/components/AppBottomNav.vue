@@ -85,7 +85,7 @@ function openTransactionCreate() {
           <span class="text-[10px] tracking-tight">{{ item.title }}</span>
           <span
             v-if="item.active()"
-            class="h-1 w-1 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
+            class="h-0.5 w-2 bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
           />
         </Link>
       </template>
@@ -96,10 +96,10 @@ function openTransactionCreate() {
           type="button"
           data-testid="transaction-fab"
           :aria-label="__('add_transaction')"
-          class="flex size-14 -translate-y-5 items-center justify-center rounded-full bg-emerald-500 text-[#0a0a0c] shadow-[0_0_22px_rgba(16,185,129,0.5)] ring-4 ring-[#0a0a0c] transition-all active:scale-90 hover:scale-105 hover:bg-emerald-400"
+          class="flex size-12 -translate-y-4 items-center justify-center bg-emerald-400 text-[#0a0a0c] shadow-[0_0_20px_rgba(16,185,129,0.6)] border border-emerald-300 ring-2 ring-[#0a0a0c] transition-all active:scale-90 hover:scale-105 hover:bg-emerald-300 cursor-pointer"
           @click="openTransactionCreate"
         >
-          <Plus class="size-6 stroke-[2.5]" />
+          <Plus class="size-6 stroke-[3]" />
         </button>
       </div>
 
@@ -119,7 +119,7 @@ function openTransactionCreate() {
           <span class="text-[10px] tracking-tight">{{ item.title }}</span>
           <span
             v-if="item.active()"
-            class="h-1 w-1 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
+            class="h-0.5 w-2 bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] -mt-0.5"
           />
         </Link>
       </template>

@@ -16,9 +16,15 @@
     Instrument Sans, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius: 0px;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -74,7 +80,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --radius-xl: calc(var(--radius) + 4px);
 
   --z-index-sticky: 20;
   --z-index-header: 30;
@@ -151,7 +156,7 @@
   --budget-pacing: oklch(0.65 0.21 285);
   --budget-pacing-muted: oklch(0.65 0.21 285 / 16%);
 
-  --radius: 0.75rem;
+  --radius: 0px;
   --bottom-nav-height: calc(4.25rem + env(safe-area-inset-bottom, 0px));
   --sidebar-background: oklch(0.985 0.005 240);
   --sidebar-foreground: oklch(0.18 0.015 260);
@@ -276,7 +281,7 @@
   .terminal-card {
     background-color: var(--color-card);
     border: 1px solid var(--color-border);
-    border-radius: 0.875rem;
+    border-radius: 0px;
   }
 
   .terminal-glow-emerald {
@@ -318,7 +323,7 @@
   .card-terminal {
     background-color: #0a0a0c;
     border: 1px solid #1f222e;
-    border-radius: 1rem;
+    border-radius: 0px;
     padding: 1rem;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
   }
@@ -333,12 +338,17 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    border-radius: 0.5rem;
+    border-radius: 0px;
     border: 1px solid #1f222e;
     background-color: #12141a;
     padding: 0.25rem 0.625rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.75rem;
+  }
+
+  /* Enforce sharp 90-degree brutalist financial terminal geometry */
+  [class*='rounded'] {
+    border-radius: 0px !important;
   }
 }
 
