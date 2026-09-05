@@ -352,9 +352,9 @@ const setActive = () => {
           </div>
         </div>
 
-        <div class="space-y-1">
+        <div class="space-y-1 col-span-2 sm:col-span-1">
           <div class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ __('notes') }}</div>
-          <div class="truncate text-xs text-zinc-300">
+          <div class="line-clamp-2 text-xs text-zinc-300">
             {{ budget.notes ?? '-' }}
           </div>
         </div>

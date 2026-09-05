@@ -215,7 +215,7 @@ const rowActions = (b: Balance) => [
                   >
                     {{ b.name }}
                   </Link>
-                  <p class="truncate font-mono text-xs text-zinc-500">
+                  <p class="line-clamp-2 font-mono text-xs text-zinc-400 mt-0.5">
                     {{ b.description ?? '-' }}
                   </p>
                 </div>

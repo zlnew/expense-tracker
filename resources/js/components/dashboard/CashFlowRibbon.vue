@@ -149,48 +149,44 @@ function triggerTransactionCreate() {
         >
           <!-- Income Inflow Card -->
           <div
-            class="flex items-center gap-2.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
+            class="flex flex-col justify-between rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3 space-y-1.5"
           >
-            <div
-              class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 sm:size-9"
+            <div class="flex items-center justify-between gap-1.5">
+              <span class="font-mono text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
+                MASUK (BLN)
+              </span>
+              <div
+                class="flex size-5 shrink-0 items-center justify-center rounded border border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+              >
+                <TrendingUp class="size-3" />
+              </div>
+            </div>
+            <p
+              class="font-mono text-xs sm:text-sm font-bold text-emerald-400 tabular-nums truncate"
             >
-              <TrendingUp class="size-4 sm:size-4.5" />
-            </div>
-            <div class="min-w-0">
-              <p
-                class="truncate font-mono text-[10px] text-zinc-500 uppercase sm:text-[11px]"
-              >
-                {{ __('current_month_incomes') || 'Income' }}
-              </p>
-              <p
-                class="truncate font-mono text-xs font-bold text-zinc-100 tabular-nums sm:text-sm"
-              >
-                {{ masked ? '••••' : formatAmount(monthlyIncome) }}
-              </p>
-            </div>
+              {{ masked ? '••••' : (monthlyIncome > 0 ? '+' : '') + formatAmount(monthlyIncome) }}
+            </p>
           </div>
 
           <!-- Expense Outflow Card -->
           <div
-            class="flex items-center gap-2.5 rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3"
+            class="flex flex-col justify-between rounded-xl border border-[#1f222e] bg-[#121217] p-2.5 sm:min-w-[140px] sm:p-3 space-y-1.5"
           >
-            <div
-              class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-400 sm:size-9"
+            <div class="flex items-center justify-between gap-1.5">
+              <span class="font-mono text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
+                KELUAR (BLN)
+              </span>
+              <div
+                class="flex size-5 shrink-0 items-center justify-center rounded border border-rose-500/20 bg-rose-500/10 text-rose-400"
+              >
+                <TrendingDown class="size-3" />
+              </div>
+            </div>
+            <p
+              class="font-mono text-xs sm:text-sm font-bold text-rose-400 tabular-nums truncate"
             >
-              <TrendingDown class="size-4 sm:size-4.5" />
-            </div>
-            <div class="min-w-0">
-              <p
-                class="truncate font-mono text-[10px] text-zinc-500 uppercase sm:text-[11px]"
-              >
-                {{ __('current_month_expenses') || 'Expense' }}
-              </p>
-              <p
-                class="truncate font-mono text-xs font-bold text-zinc-100 tabular-nums sm:text-sm"
-              >
-                {{ masked ? '••••' : formatAmount(monthlyExpense) }}
-              </p>
-            </div>
+              {{ masked ? '••••' : (monthlyExpense > 0 ? '-' : '') + formatAmount(monthlyExpense) }}
+            </p>
           </div>
 
           <!-- Net Cash Flow Badge -->
@@ -262,21 +258,21 @@ function triggerTransactionCreate() {
             @click="triggerTransactionCreate"
           >
             <Plus class="size-3.5" />
-            <span class="truncate">Catat Cepat</span>
+            <span>Catat</span>
           </button>
           <Link
             :href="balanceIndex.url()"
             class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] py-2 px-1 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
           >
             <ArrowRightLeft class="size-3.5 text-zinc-400" />
-            <span class="truncate">Pindah Saldo</span>
+            <span>Pindah</span>
           </Link>
           <Link
             :href="balanceIndex.url()"
             class="flex items-center justify-center gap-1.5 rounded-xl border border-[#1f222e] bg-[#12141a] py-2 px-1 font-mono text-xs font-semibold text-zinc-300 hover:text-zinc-100 hover:border-zinc-700 transition-all active:scale-95"
           >
             <ShieldCheck class="size-3.5 text-zinc-400" />
-            <span class="truncate">Rekonsiliasi</span>
+            <span>Rekon</span>
           </Link>
         </div>
       </div>

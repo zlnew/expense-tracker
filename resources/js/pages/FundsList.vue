@@ -175,57 +175,53 @@ const daysUntilDue = (fund: SinkingFund) => {
             class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#1f222e] bg-[#0a0a0c] p-5 shadow-xl transition-all hover:border-zinc-700"
           >
             <div>
-              <!-- Header with Fund name & Status pill & Actions -->
+              <!-- Header with Fund name & Actions (Tier 1) -->
               <div class="flex items-start justify-between gap-2">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span
-                      class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-400"
-                    >
-                      <PiggyBank class="size-4" />
-                    </span>
-                    <h3 class="truncate font-mono text-base font-bold text-zinc-100">
-                      {{ fund.name }}
-                    </h3>
-                  </div>
-                  <p class="mt-1 line-clamp-2 min-h-[18px] font-mono text-xs text-zinc-500">
-                    {{ fund.notes ?? '-' }}
-                  </p>
-                </div>
-                <div class="flex items-center gap-1.5 shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
                   <span
-                    class="rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border"
-                    :class="
-                      fund.status === 'overfunded'
-                        ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
-                        : fund.status === 'due_soon'
-                          ? 'border-rose-500/30 bg-rose-500/15 text-rose-400'
-                          : fund.status === 'underfunded'
-                            ? 'border-amber-500/30 bg-amber-500/15 text-amber-400'
-                            : 'border-purple-500/30 bg-purple-500/15 text-purple-400'
-                    "
+                    class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-400"
                   >
-                    {{ __(fund.status) }}
+                    <PiggyBank class="size-4" />
                   </span>
+                  <h3 class="font-mono text-base font-bold text-zinc-100 leading-snug">
+                    {{ fund.name }}
+                  </h3>
+                </div>
+                <div class="shrink-0">
                   <RowActions :actions="rowActions(fund)" collapse-below="md" align="right" />
                 </div>
               </div>
 
-              <!-- Category & Due Date Tag -->
-              <div
-                v-if="fund.category || fund.next_due"
-                class="mt-3 flex items-center gap-2 font-mono text-xs text-zinc-400"
-              >
+              <!-- Status Badge, Category & Due Date (Tier 2) -->
+              <div class="mt-2.5 flex flex-wrap items-center gap-2">
+                <span
+                  class="rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider border shrink-0"
+                  :class="
+                    fund.status === 'overfunded'
+                      ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
+                      : fund.status === 'due_soon'
+                        ? 'border-rose-500/30 bg-rose-500/15 text-rose-400'
+                        : fund.status === 'underfunded'
+                          ? 'border-amber-500/30 bg-amber-500/15 text-amber-400'
+                          : 'border-purple-500/30 bg-purple-500/15 text-purple-400'
+                  "
+                >
+                  {{ __(fund.status) }}
+                </span>
                 <span
                   v-if="fund.category"
-                  class="rounded-md border border-[#1f222e] bg-[#121217] px-2 py-0.5 text-[11px]"
+                  class="rounded-md border border-[#1f222e] bg-[#121217] px-2 py-0.5 font-mono text-[11px] text-zinc-400"
                 >
                   {{ fund.category.name }}
                 </span>
-                <span v-if="fund.next_due" class="text-[11px] text-zinc-500">
+                <span v-if="fund.next_due" class="font-mono text-[11px] text-zinc-500">
                   {{ __('next_due') }}: {{ formatDate(fund.next_due, 'DD MMM YYYY') }}
                 </span>
               </div>
+
+              <p class="mt-2 line-clamp-2 min-h-[18px] font-mono text-xs text-zinc-500">
+                {{ fund.notes ?? '-' }}
+              </p>
 
               <!-- Savings Progress Meter -->
               <div class="mt-4 space-y-2">

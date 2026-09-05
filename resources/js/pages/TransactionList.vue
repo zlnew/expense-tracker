@@ -552,12 +552,12 @@ const rowActions = (t: Transaction) => [
                   </div>
                   <div class="min-w-0">
                     <h3 class="truncate font-mono text-xs font-bold text-zinc-100">
-                      {{ t.category?.name || __('unknown') }}
+                      {{ t.description || t.category?.name || __('transaction') }}
                     </h3>
-                    <p class="truncate font-mono text-[11px] text-zinc-500 mt-0.5">
-                      <span class="text-zinc-400">{{ t.balance?.name }}</span>
-                      <span v-if="t.description" class="text-zinc-600"> • </span>
-                      <span v-if="t.description" class="truncate text-zinc-400">{{ t.description }}</span>
+                    <p class="flex items-center gap-1.5 font-mono text-[11px] text-zinc-500 mt-0.5">
+                      <span class="truncate text-zinc-400">{{ t.category?.name || __('unknown') }}</span>
+                      <span v-if="t.balance?.name" class="text-zinc-600">•</span>
+                      <span v-if="t.balance?.name" class="truncate text-zinc-400">{{ t.balance?.name }}</span>
                     </p>
                   </div>
                 </div>
