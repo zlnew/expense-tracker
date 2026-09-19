@@ -118,7 +118,7 @@ test('all 14 mcp tool definitions export valid json schema properties as object 
     ]);
 
     $tools = $response['result']['tools'];
-    expect($tools)->toHaveCount(14);
+    expect($tools)->toHaveCount(15);
 
     foreach ($tools as $tool) {
         $name = $tool['name'];
@@ -178,7 +178,7 @@ test('mcp api controller handles json-rpc 2.0 batch requests', function () {
     // Tools list response
     expect($data[1]['jsonrpc'])->toBe('2.0')
         ->and($data[1]['id'])->toBe(102)
-        ->and($data[1]['result']['tools'])->toHaveCount(14);
+        ->and($data[1]['result']['tools'])->toHaveCount(15);
 });
 
 test('gemini public pkce token exchange succeeds without client secret', function () {

@@ -22,6 +22,7 @@ return [
     'april' => 'April',
     'architecture_overview' => 'Architecture Overview',
     'august' => 'August',
+    'auto_adjust_reconcile_help' => 'Automatically create an adjustment transaction if there is a discrepancy',
     'auto_contribution' => 'Auto contribution',
     'auto_contribution_hint' => 'Leave empty to auto-calculate',
     'available_reserve' => 'Available reserve: :amount',

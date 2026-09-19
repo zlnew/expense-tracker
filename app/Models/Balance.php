@@ -59,7 +59,7 @@ class Balance extends Model
             'final_amount' => 'integer',
             'is_primary' => 'boolean',
             'reconciled_amount' => 'integer',
-            'reconciled_at' => 'date',
+            'reconciled_at' => 'datetime',
         ];
     }
 
@@ -96,11 +96,21 @@ class Balance extends Model
             return (int) $this->final_amount - (int) $this->reconciled_amount;
         }
 
-        $reconciledDate = CarbonImmutable::parse($this->reconciled_at)->endOfDay()->toDateString();
+        $reconciledAt = CarbonImmutable::parse($this->reconciled_at);
+        $reconciledDate = $reconciledAt->toDateString();
 
         $afterTotals = Transaction::query()
             ->where('balance_id', $this->id)
-            ->whereDate('date', '>', $reconciledDate)
+            ->where(function ($query) use ($reconciledDate, $reconciledAt) {
+                $query->whereDate('date', '>', $reconciledDate);
+
+                if ($reconciledAt->format('H:i:s') !== '23:59:59') {
+                    $query->orWhere(function ($q) use ($reconciledDate, $reconciledAt) {
+                        $q->whereDate('date', '=', $reconciledDate)
+                            ->where('created_at', '>', $reconciledAt);
+                    });
+                }
+            })
             ->selectRaw('
                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS incomes,
                 COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS expenses

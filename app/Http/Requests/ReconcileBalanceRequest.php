@@ -15,6 +15,7 @@ class ReconcileBalanceRequest extends FormRequest
         return [
             'reconciled_amount' => ['required', 'integer'],
             'reconciled_at' => ['required', 'date'],
+            'auto_adjust' => ['sometimes', 'boolean'],
         ];
     }
 }

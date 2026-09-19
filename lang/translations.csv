@@ -20,6 +20,7 @@ apply,Apply,Terapkan
 april,April,April
 architecture_overview,"Architecture Overview","Ringkasan Arsitektur"
 august,August,Agustus
+auto_adjust_reconcile_help,"Automatically create an adjustment transaction if there is a discrepancy","Otomatis buat transaksi penyesuaian jika ada selisih"
 auto_contribution,"Auto contribution","Kontribusi otomatis"
 auto_contribution_hint,"Leave empty to auto-calculate","Kosongkan untuk hitung otomatis"
 available_reserve,"Available reserve: :amount","Saldo tersedia: :amount"
