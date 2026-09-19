@@ -1,5 +1,13 @@
 import { useDateFormat } from '@vueuse/core'
 
+export const getLocalDateString = (d: Date = new Date()): string => {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 export function useDate() {
   const formatDate = (
     date: Date | number | string | null = null,
@@ -9,7 +17,14 @@ export function useDate() {
       return ''
     }
 
-    const formatted = useDateFormat(date, format, {
+    let dateObj: Date | number | string = date
+
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      const [y, m, d] = date.split('-').map(Number)
+      dateObj = new Date(y, m - 1, d)
+    }
+
+    const formatted = useDateFormat(dateObj, format, {
       locales: 'id-ID',
     })
 
@@ -17,7 +32,7 @@ export function useDate() {
   }
 
   const formatTime = (time: string, format = 'HH:mm') => {
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     const date = new Date(`${today}T${time}`)
 
     return formatDate(date, format)
@@ -26,5 +41,6 @@ export function useDate() {
   return {
     formatDate,
     formatTime,
+    getLocalDateString,
   }
 }

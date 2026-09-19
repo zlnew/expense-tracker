@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
+import { getLocalDateString } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useQuickLogPrefs } from '@/composables/useQuickLogPrefs'
 import { parseQuickLogClient } from '@/lib/parseQuickLogClient'
@@ -100,7 +101,7 @@ const form = useForm({
   budget_item_id: 0 as number,
   category_id: 0 as number,
   type: '' as string,
-  date: new Date().toISOString().split('T')[0],
+  date: getLocalDateString(),
   amount: 0 as number,
   description: '' as string,
 })
@@ -157,7 +158,7 @@ const submit = () => {
     link.type || (props.categories.find((c) => c.id === categoryId)?.type ?? '')
   form.amount = amount
   form.description = note
-  form.date = new Date().toISOString().split('T')[0]
+  form.date = getLocalDateString()
 
   form.post(storeTransaction.url(), {
     preserveScroll: true,
@@ -171,7 +172,7 @@ const submit = () => {
       amountOverride.value = null
       form.reset()
       form.clearErrors()
-      form.date = new Date().toISOString().split('T')[0]
+      form.date = getLocalDateString()
     },
   })
 }

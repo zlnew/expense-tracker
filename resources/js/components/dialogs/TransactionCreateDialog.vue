@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
-import { useDate } from '@/composables/useDate'
+import { getLocalDateString, useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useQuickLogPrefs } from '@/composables/useQuickLogPrefs'
 import { parseQuickLogClient } from '@/lib/parseQuickLogClient'
@@ -125,7 +125,7 @@ const submitQuick = () => {
   form.category_id = categoryId
   form.amount = amount
   form.description = quickParsed.value.note || quickText.value.trim()
-  form.date = new Date().toISOString().split('T')[0]
+  form.date = getLocalDateString()
   form.post(storeTransaction.url(), {
     preserveScroll: true,
     onSuccess: (res) => {
@@ -146,7 +146,7 @@ const submitQuick = () => {
         form.budget_id = props.activeBudgetId
       }
 
-      form.date = new Date().toISOString().split('T')[0]
+      form.date = getLocalDateString()
       nextTick(() => {
         const el =
           firstFieldRef.value?.querySelector<HTMLElement>('#quick-log-input')
@@ -162,7 +162,7 @@ const form = useForm({
   budget_item_id: 0,
   category_id: 0,
   type: '',
-  date: new Date().toISOString().split('T')[0],
+  date: getLocalDateString(),
   amount: 0,
   description: '',
 })
@@ -243,7 +243,7 @@ watch(
         quickPickedCategoryId.value = null
       }
 
-      form.date = new Date().toISOString().split('T')[0]
+      form.date = getLocalDateString()
     }
   },
 )

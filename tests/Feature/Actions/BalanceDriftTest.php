@@ -1,7 +1,12 @@
 <?php
 
+use App\Actions\SaveTransaction;
+use App\DTO\TransactionData;
+use App\Enums\CategoryType;
 use App\Models\Balance;
+use App\Models\Transaction;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
@@ -188,4 +193,39 @@ test('a drifted balance clears its flag after reconciling to the real amount', f
     $listItem = $this->getJson('/api/balances')->json('0');
     expect($listItem['is_drift_flagged'])->toBeFalse();
     expect($listItem['drift'])->toBe(0);
+});
+
+test('transactions after reconciled_at do not trigger false drift', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create([
+        'initial_amount' => 1_000_000,
+        'final_amount' => 1_000_000,
+    ]);
+
+    Sanctum::actingAs($user, ['balances:read', 'balances:write']);
+
+    // Reconcile on 2026-08-20 with exact match
+    $this->postJson("/api/balances/{$balance->id}/reconcile", [
+        'reconciled_amount' => 1_000_000,
+        'reconciled_at' => '2026-08-20',
+    ])->assertOk();
+
+    expect($balance->fresh()->drift)->toBe(0);
+    expect($balance->fresh()->is_drift_flagged)->toBeFalse();
+
+    // Now log an expense on 2026-08-21 (after reconciliation date)
+    SaveTransaction::run(new Transaction, TransactionData::from([
+        'user_id' => $user->id,
+        'balance_id' => $balance->id,
+        'type' => CategoryType::EXPENSE->value,
+        'date' => CarbonImmutable::parse('2026-08-21'),
+        'amount' => 50_000,
+        'description' => 'Normal post-reconcile expense',
+    ]));
+
+    $fresh = $balance->fresh();
+    expect($fresh->final_amount)->toBe(950_000);
+    // Point-in-time drift remains 0, NOT -50_000!
+    expect($fresh->drift)->toBe(0);
+    expect($fresh->is_drift_flagged)->toBeFalse();
 });

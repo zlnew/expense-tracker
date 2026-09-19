@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import AlertError from '@/components/AlertError.vue'
 import { Button } from '@/components/ui/button'
@@ -15,7 +15,9 @@ import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
+import { getLocalDateString } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
+import { useNumber } from '@/composables/useNumber'
 import { reconcile as reconcileRoute } from '@/routes/balances'
 import type { Balance } from '@/types'
 
@@ -23,11 +25,26 @@ const props = defineProps<{ balance: Balance | null }>()
 const open = defineModel<boolean>('open', { required: true })
 
 const { __ } = useLang()
+const { formatAmount } = useNumber()
 
 const amount = ref<string>('')
 const reconcileDate = ref<string>('')
 const submitting = ref(false)
 const firstFieldRef = ref<HTMLElement | null>(null)
+
+const liveDrift = computed(() => {
+  if (!props.balance || amount.value === '') {
+    return null
+  }
+
+  const inputVal = Number(amount.value)
+
+  if (Number.isNaN(inputVal)) {
+    return null
+  }
+
+  return (props.balance.final_amount ?? 0) - inputVal
+})
 
 const errors = ref<Record<string, string>>({})
 
@@ -38,8 +55,7 @@ function resetForm(balance: Balance | null) {
       : balance != null
         ? String(balance.final_amount)
         : '0'
-  reconcileDate.value =
-    balance?.reconciled_at ?? new Date().toISOString().slice(0, 10)
+  reconcileDate.value = balance?.reconciled_at ?? getLocalDateString()
   errors.value = {}
 }
 
@@ -174,6 +190,51 @@ function onOpenAutoFocus() {
               type="date"
               :disabled="submitting"
             />
+          </div>
+
+          <!-- Live Drift & Ledger Preview -->
+          <div
+            v-if="props.balance"
+            class="space-y-2 rounded-none border border-border bg-secondary/30 p-3 font-mono text-xs"
+          >
+            <div
+              class="flex items-center justify-between text-muted-foreground"
+            >
+              <span>{{ __('recorded_balance') }}</span>
+              <span class="font-bold text-foreground">
+                {{ formatAmount(props.balance.final_amount ?? 0) }}
+              </span>
+            </div>
+            <div
+              v-if="liveDrift !== null"
+              class="flex items-center justify-between border-t border-border/50 pt-1"
+            >
+              <span>{{ __('drift') }}</span>
+              <span
+                class="font-bold tabular-nums"
+                :class="
+                  Math.abs(liveDrift) > 500
+                    ? 'text-rose-400'
+                    : 'text-emerald-400'
+                "
+              >
+                {{
+                  Math.abs(liveDrift) <= 500
+                    ? '✅ ' + (liveDrift === 0 ? '0' : formatAmount(liveDrift))
+                    : '⚠️ ' + formatAmount(liveDrift)
+                }}
+              </span>
+            </div>
+            <p
+              v-if="liveDrift !== null && Math.abs(liveDrift) > 500"
+              class="text-[11px] text-rose-400/90"
+            >
+              {{
+                liveDrift > 0
+                  ? __('drift_under_explanation')
+                  : __('drift_over_explanation')
+              }}
+            </p>
           </div>
         </div>
 

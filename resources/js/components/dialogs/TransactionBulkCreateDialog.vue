@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { useDate } from '@/composables/useDate'
+import { getLocalDateString, useDate } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import { bulkStore as storeTransactions } from '@/routes/transactions'
@@ -57,7 +57,7 @@ const form = useForm({
       budget_item_id: '',
       category_id: '',
       type: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getLocalDateString(),
       amount: 0,
       description: '',
     },
@@ -84,7 +84,7 @@ const addItem = () => {
     budget_item_id: '',
     category_id: '',
     type: '',
-    date: lastItem?.date || new Date().toISOString().split('T')[0],
+    date: lastItem?.date || getLocalDateString(),
     amount: 0,
     description: '',
   })
@@ -186,7 +186,7 @@ watch(
           budget_item_id: '',
           category_id: '',
           type: '',
-          date: new Date().toISOString().split('T')[0],
+          date: getLocalDateString(),
           amount: 0,
           description: '',
         },

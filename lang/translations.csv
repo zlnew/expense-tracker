@@ -103,9 +103,12 @@ diff,Diff,Diff
 discord_webhook_url,"Discord webhook URL","URL webhook Discord"
 discord_webhook_url_description,"Receive a Discord notification when a budget category reaches 80% or 100% of its planned amount.","Dapatkan notifikasi Discord saat kategori anggaran mencapai 80% atau 100% dari jumlah yang direncanakan."
 discord_webhook_url_placeholder,https://discord.com/api/webhooks/...,https://discord.com/api/webhooks/...
+drift,"Discrepancy (Drift)","Selisih (Drift)"
 drift_detected,"Drift Detected","Selisih Terdeteksi"
 drift_flagged,"Drift flagged","Selisih terdeteksi"
 drift_ok,"Within tolerance","Dalam toleransi"
+drift_over_explanation,"Bank balance is higher than recorded (there may be unrecorded incomes).","Saldo mutasi bank lebih tinggi dari pencatatan (mungkin ada pemasukan belum dicatat)."
+drift_under_explanation,"Bank balance is lower than recorded (there may be unrecorded expenses).","Saldo mutasi bank lebih rendah dari pencatatan (mungkin ada pengeluaran belum dicatat)."
 due_in,"Due in","Jatuh tempo dalam"
 due_interval_months,"Due interval (months)","Interval jatuh tempo (bulan)"
 due_soon,"Due soon","Segera jatuh tempo"
@@ -272,6 +275,7 @@ reconcile_now,"Reconcile Now","Rekonsiliasi Sekarang"
 reconciled,Reconciled,Terekonsiliasi
 reconciled_amount,"Reconciled amount","Jumlah rekonsiliasi"
 reconciled_at,"Reconciled on","Tanggal rekonsiliasi"
+recorded_balance,"Recorded Ledger Balance","Saldo Buku Tercatat"
 recurring,Recurring,Recurring
 recurring_transaction,"Recurring Transaction","Transaksi Berulang"
 recurring_transactions,"Recurring Transactions","Transaksi Berulang"
