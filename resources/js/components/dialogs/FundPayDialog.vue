@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
+import { getLocalDateString } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import funds from '@/routes/funds'
@@ -45,7 +46,7 @@ const { formatAmount } = useNumber()
 const form = useForm({
   amount: 0,
   balance_id: 0,
-  date: new Date().toISOString().split('T')[0],
+  date: getLocalDateString(),
   description: '',
 })
 
@@ -77,7 +78,7 @@ watch(
     form.clearErrors()
     form.amount = props.fund.accumulated
     form.balance_id = primaryBalanceId.value
-    form.date = new Date().toISOString().split('T')[0]
+    form.date = getLocalDateString()
   },
 )
 

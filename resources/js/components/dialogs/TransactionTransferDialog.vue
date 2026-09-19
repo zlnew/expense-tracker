@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
+import { getLocalDateString } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { transferBetweenAccounts } from '@/routes/transactions'
 import type { Balance } from '@/types'
@@ -43,7 +44,7 @@ const { __ } = useLang()
 const form = useForm({
   from_account_id: '',
   to_account_id: '',
-  date: new Date().toISOString().split('T')[0],
+  date: getLocalDateString(),
   amount: 0,
   description: '',
 })
@@ -66,7 +67,7 @@ watch(
     if (isOpen) {
       form.reset()
       form.clearErrors()
-      form.date = new Date().toISOString().split('T')[0]
+      form.date = getLocalDateString()
     }
   },
 )

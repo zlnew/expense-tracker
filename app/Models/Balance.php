@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Actions\GetBalanceInsight;
+use App\Enums\CategoryType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
@@ -83,11 +84,33 @@ class Balance extends Model
 
     public function getDriftAttribute(): ?int
     {
+        if (array_key_exists('drift', $this->attributes)) {
+            return $this->attributes['drift'] !== null ? (int) $this->attributes['drift'] : null;
+        }
+
         if ($this->reconciled_amount === null) {
             return null;
         }
 
-        return (int) $this->final_amount - (int) $this->reconciled_amount;
+        if ($this->reconciled_at === null) {
+            return (int) $this->final_amount - (int) $this->reconciled_amount;
+        }
+
+        $reconciledDate = CarbonImmutable::parse($this->reconciled_at)->endOfDay()->toDateString();
+
+        $afterTotals = Transaction::query()
+            ->where('balance_id', $this->id)
+            ->whereDate('date', '>', $reconciledDate)
+            ->selectRaw('
+                COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS incomes,
+                COALESCE(SUM(CASE WHEN type = ? THEN amount ELSE 0 END), 0) AS expenses
+            ', [CategoryType::INCOME->value, CategoryType::EXPENSE->value])
+            ->first();
+
+        $postReconcileNet = (int) ($afterTotals?->incomes ?? 0) - (int) ($afterTotals?->expenses ?? 0);
+        $ledgerOnDate = (int) $this->final_amount - $postReconcileNet;
+
+        return $ledgerOnDate - (int) $this->reconciled_amount;
     }
 
     public function getIsDriftFlaggedAttribute(): bool
