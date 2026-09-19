@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
@@ -228,4 +229,76 @@ test('transactions after reconciled_at do not trigger false drift', function () 
     // Point-in-time drift remains 0, NOT -50_000!
     expect($fresh->drift)->toBe(0);
     expect($fresh->is_drift_flagged)->toBeFalse();
+});
+
+test('transactions created on the same date as reconciled_at after reconciliation do not trigger false drift', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create([
+        'initial_amount' => 1_000_000,
+        'final_amount' => 1_000_000,
+    ]);
+
+    Sanctum::actingAs($user, ['balances:read', 'balances:write']);
+
+    // Reconcile today with exact match
+    $today = now()->toDateString();
+    $this->postJson("/api/balances/{$balance->id}/reconcile", [
+        'reconciled_amount' => 1_000_000,
+        'reconciled_at' => $today,
+    ])->assertOk();
+
+    expect($balance->fresh()->drift)->toBe(0);
+    expect($balance->fresh()->is_drift_flagged)->toBeFalse();
+
+    // Now log an expense on the SAME date (e.g. afternoon expense after morning reconcile)
+    Carbon::setTestNow(now()->addSecond());
+
+    SaveTransaction::run(new Transaction, TransactionData::from([
+        'user_id' => $user->id,
+        'balance_id' => $balance->id,
+        'type' => CategoryType::EXPENSE->value,
+        'date' => CarbonImmutable::parse($today),
+        'amount' => 50_000,
+        'description' => 'Same-day post-reconcile expense',
+    ]));
+
+    $fresh = $balance->fresh();
+    expect($fresh->final_amount)->toBe(950_000);
+    // Point-in-time drift remains 0, NOT -50_000!
+    expect($fresh->drift)->toBe(0);
+    expect($fresh->is_drift_flagged)->toBeFalse();
+});
+
+test('api reconcile with auto_adjust creates adjustment transaction and zeroes drift', function () {
+    $user = User::factory()->create();
+    $balance = Balance::factory()->for($user)->create([
+        'initial_amount' => 1_000_000,
+        'final_amount' => 1_000_000,
+    ]);
+
+    Sanctum::actingAs($user, ['balances:read', 'balances:write']);
+
+    // Actual statement is 920_000 (drift = +80_000, ledger higher than statement)
+    $res = $this->postJson("/api/balances/{$balance->id}/reconcile", [
+        'reconciled_amount' => 920_000,
+        'reconciled_at' => now()->toDateString(),
+        'auto_adjust' => true,
+    ])->assertOk();
+
+    expect($res->json('drift'))->toBe(0);
+    expect($res->json('is_drift_flagged'))->toBeFalse();
+    expect($res->json('final_amount'))->toBe(920_000);
+
+    $fresh = $balance->fresh();
+    expect($fresh->drift)->toBe(0);
+    expect($fresh->is_drift_flagged)->toBeFalse();
+    expect($fresh->final_amount)->toBe(920_000);
+
+    $this->assertDatabaseHas('transactions', [
+        'user_id' => $user->id,
+        'balance_id' => $balance->id,
+        'amount' => 80_000,
+        'type' => 'expense',
+        'description' => 'Penyesuaian saldo rekonsiliasi',
+    ]);
 });

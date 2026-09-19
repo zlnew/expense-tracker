@@ -15,7 +15,7 @@ class ReconcileBalanceTool implements ToolInterface
 
     public function description(): string
     {
-        return 'Reconcile an account balance against real-world statement. Updates reconciled amount and detects any discrepancy (drift).';
+        return 'Reconcile an account balance against real-world statement. Updates reconciled amount, detects any discrepancy (drift), and optionally auto-adjusts ledger to match.';
     }
 
     public function schema(): array
@@ -36,6 +36,10 @@ class ReconcileBalanceTool implements ToolInterface
                     'type' => 'string',
                     'description' => 'Reconciliation date (YYYY-MM-DD, defaults to today)',
                 ],
+                'auto_adjust' => [
+                    'type' => 'boolean',
+                    'description' => 'If true and a discrepancy (drift) is detected, automatically creates an adjustment transaction (expense or income) to immediately align the ledger balance with the real-world statement.',
+                ],
             ],
         ];
     }
@@ -45,6 +49,7 @@ class ReconcileBalanceTool implements ToolInterface
         $balanceId = (int) ($arguments['balance_id'] ?? 0);
         $actualAmount = (int) ($arguments['actual_amount'] ?? 0);
         $reconciledAt = ! empty($arguments['reconciled_at']) ? $arguments['reconciled_at'] : now()->toDateString();
+        $autoAdjust = (bool) ($arguments['auto_adjust'] ?? false);
 
         $balance = Balance::query()->where('user_id', $user->id)->find($balanceId);
         if (! $balance) {
@@ -54,7 +59,7 @@ class ReconcileBalanceTool implements ToolInterface
             ];
         }
 
-        ReconcileBalance::run($balance, $actualAmount, $reconciledAt);
+        $adjustment = ReconcileBalance::run($balance, $actualAmount, $reconciledAt, $autoAdjust);
 
         $fresh = $balance->fresh();
         $drift = $fresh->drift ?? 0;
@@ -72,6 +77,11 @@ class ReconcileBalanceTool implements ToolInterface
             ."- Actual Statement Amount: {$actualFmt}\n"
             ."- Recorded Computed Amount: {$computedFmt}\n"
             ."- Drift: {$status}";
+
+        if ($adjustment) {
+            $adjAmountFmt = 'Rp '.number_format($adjustment->amount, 0, ',', '.');
+            $msg .= "\n- Auto-adjustment: Created transaction #{$adjustment->id} ({$adjustment->type->value}, {$adjAmountFmt}) to align ledger balance.";
+        }
 
         return [
             'content' => [

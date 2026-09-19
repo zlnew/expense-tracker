@@ -22,6 +22,7 @@ return [
     'april' => 'April',
     'architecture_overview' => 'Ringkasan Arsitektur',
     'august' => 'Agustus',
+    'auto_adjust_reconcile_help' => 'Otomatis buat transaksi penyesuaian jika ada selisih',
     'auto_contribution' => 'Kontribusi otomatis',
     'auto_contribution_hint' => 'Kosongkan untuk hitung otomatis',
     'available_reserve' => 'Saldo tersedia: :amount',

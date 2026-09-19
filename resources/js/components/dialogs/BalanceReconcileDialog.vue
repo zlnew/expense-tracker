@@ -29,6 +29,7 @@ const { formatAmount } = useNumber()
 
 const amount = ref<string>('')
 const reconcileDate = ref<string>('')
+const autoAdjust = ref(false)
 const submitting = ref(false)
 const firstFieldRef = ref<HTMLElement | null>(null)
 
@@ -56,6 +57,7 @@ function resetForm(balance: Balance | null) {
         ? String(balance.final_amount)
         : '0'
   reconcileDate.value = balance?.reconciled_at ?? getLocalDateString()
+  autoAdjust.value = false
   errors.value = {}
 }
 
@@ -108,6 +110,7 @@ function submit() {
     {
       reconciled_amount: reconciledAmount,
       reconciled_at: reconcileDate.value,
+      auto_adjust: autoAdjust.value,
     },
     {
       preserveScroll: true,
@@ -235,6 +238,25 @@ function onOpenAutoFocus() {
                   : __('drift_over_explanation')
               }}
             </p>
+            <!-- Auto-adjust toggle if discrepancy exists -->
+            <div
+              v-if="liveDrift !== null && Math.abs(liveDrift) > 0"
+              class="flex items-start gap-2 border-t border-border/50 pt-2"
+            >
+              <input
+                id="auto_adjust"
+                v-model="autoAdjust"
+                type="checkbox"
+                class="mt-0.5 rounded border-border"
+                :disabled="submitting"
+              />
+              <Label
+                for="auto_adjust"
+                class="cursor-pointer text-xs leading-tight font-normal text-muted-foreground"
+              >
+                {{ __('auto_adjust_reconcile_help') }}
+              </Label>
+            </div>
           </div>
         </div>
 
