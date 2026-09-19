@@ -83,40 +83,65 @@ class GetImpendingDrains extends Query
 
             $dueDate = CarbonImmutable::parse($fund->next_due)->startOfDay();
             $balanceId = (int) $fund->from_balance_id;
+            $intervalMonths = max(1, (int) ($fund->due_interval_months ?: match ($fund->cadence) {
+                'yearly' => 12,
+                'quarterly' => 3,
+                default => 1,
+            }));
 
-            $items->push([
-                'kind' => 'fund_due',
-                'id' => $fund->id,
-                'label' => $fund->name,
-                'amount' => $amount,
-                'balance_id' => $balanceId,
-                'balance_name' => $fund->sourceBalance?->name ?? (string) $balanceId,
-                'due_date' => $dueDate->toDateString(),
-                'source' => $fund->contribution_amount !== null ? 'fixed' : 'auto',
-            ]);
+            $curDue = $dueDate;
+            $anchorDay = $fund->anchor_day ?? $dueDate->day;
 
-            $impendingByBalance[$balanceId] = ($impendingByBalance[$balanceId] ?? 0) + $amount;
+            while ($curDue->lte($until)) {
+                $items->push([
+                    'kind' => 'fund_due',
+                    'id' => $fund->id,
+                    'label' => $fund->name,
+                    'amount' => $amount,
+                    'balance_id' => $balanceId,
+                    'balance_name' => $fund->sourceBalance?->name ?? (string) $balanceId,
+                    'due_date' => $curDue->toDateString(),
+                    'source' => $fund->contribution_amount !== null ? 'fixed' : 'auto',
+                ]);
+
+                $impendingByBalance[$balanceId] = ($impendingByBalance[$balanceId] ?? 0) + $amount;
+
+                // Advance by intervalMonths
+                $targetMonth = $curDue->startOfMonth()->addMonthsNoOverflow($intervalMonths);
+                $curDue = $targetMonth->setDay(min($anchorDay, $targetMonth->daysInMonth));
+            }
         }
 
         foreach ($recurrings as $r) {
             $amount = (int) $r->amount;
-            // Recurring txns of type income should not drain — but treat every
-            // recurring row as an outflow for the warning (spec says \"recurring
-            // transaction\" without filtering by type). Keep it simple: use abs.
             $balanceId = (int) $r->balance_id;
+            $curDate = CarbonImmutable::parse($r->next_run_date)->startOfDay();
 
-            $items->push([
-                'kind' => 'recurring',
-                'id' => $r->id,
-                'label' => $r->description ?? ('Recurring #'.$r->id),
-                'amount' => $amount,
-                'balance_id' => $balanceId,
-                'balance_name' => $r->balance?->name ?? (string) $balanceId,
-                'due_date' => CarbonImmutable::parse($r->next_run_date)->toDateString(),
-                'source' => 'recurring:'.$r->frequency,
-            ]);
+            while ($curDate->lte($until)) {
+                if ($r->end_date && $curDate->gt($r->end_date)) {
+                    break;
+                }
 
-            $impendingByBalance[$balanceId] = ($impendingByBalance[$balanceId] ?? 0) + $amount;
+                $items->push([
+                    'kind' => 'recurring',
+                    'id' => $r->id,
+                    'label' => $r->description ?? ('Recurring #'.$r->id),
+                    'amount' => $amount,
+                    'balance_id' => $balanceId,
+                    'balance_name' => $r->balance?->name ?? (string) $balanceId,
+                    'due_date' => $curDate->toDateString(),
+                    'source' => 'recurring:'.$r->frequency,
+                ]);
+
+                $impendingByBalance[$balanceId] = ($impendingByBalance[$balanceId] ?? 0) + $amount;
+
+                $curDate = match ($r->frequency) {
+                    'daily' => $curDate->addDay(),
+                    'weekly' => $curDate->addWeek(),
+                    'yearly' => $curDate->addYearNoOverflow(),
+                    default => $curDate->addMonthNoOverflow(),
+                };
+            }
         }
 
         $items = $items->sortBy('due_date')->values();

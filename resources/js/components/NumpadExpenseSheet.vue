@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/vue3'
 import { ChevronDown, Delete, Plus, X } from 'lucide-vue-next'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
+import { getLocalDateString } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { store as storeTransaction } from '@/routes/transactions'
 import type { Balance, Budget, Category } from '@/types'
@@ -184,7 +185,7 @@ function submit() {
     amount: numericAmount.value,
     type: type.value,
     description: description.value.trim(),
-    date: new Date().toISOString().split('T')[0],
+    date: getLocalDateString(),
   })
 
   form.post(storeTransaction.url(), {

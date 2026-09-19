@@ -68,7 +68,7 @@ const props = defineProps<{
 }>()
 
 const { __ } = useLang()
-const { formatDate } = useDate()
+const { formatDate, getLocalDateString } = useDate()
 const { formatAmount } = useNumber()
 
 setLayoutProps({
@@ -136,10 +136,10 @@ const currentCategory = computed(() =>
 
 const groupedTransactions = computed(() => {
   const list = props.transactions.data ?? []
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = getLocalDateString(new Date())
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = yesterday.toISOString().slice(0, 10)
+  const yesterdayStr = getLocalDateString(yesterday)
 
   const groupMap = new Map<string, Transaction[]>()
 
@@ -619,9 +619,6 @@ const rowActions = (t: Transaction) => [
                     >
                       {{ t.type === 'income' ? '+' : '-'
                       }}{{ formatAmount(t.amount) }}
-                    </p>
-                    <p class="mt-0.5 font-mono text-[10px] text-zinc-500">
-                      {{ formatDate(t.date, 'HH:mm') }}
                     </p>
                   </div>
 

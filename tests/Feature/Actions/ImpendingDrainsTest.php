@@ -57,19 +57,23 @@ test('combines fund dues and recurring within the window and totals correctly', 
 
     expect($result['window_days'])->toBe(60);
     expect($result['from'])->toBe($today->toDateString());
-    // Only the soon fund + soon recurring should appear (60d window)
+    // In 60d window, the monthly fund and monthly recurring fan out to 2 occurrences each (4 total)
     $ids = collect($result['items'])->pluck('id')->all();
     expect($ids)->toContain($fundDueSoon->id);
     expect($ids)->not->toContain($fundFar->id);
-    expect($result['items'])->toHaveCount(2);
-    expect($result['total_impending_outflow'])->toBe(100_000 + 75_000);
+    expect($result['items'])->toHaveCount(4);
+    expect($result['total_impending_outflow'])->toBe((100_000 * 2) + (75_000 * 2));
 
     $byBalance = collect($result['per_balance'])->keyBy('balance_id');
-    expect((int) $byBalance[$b1->id]['impending'])->toBe(100_000);
-    expect((int) $byBalance[$b2->id]['impending'])->toBe(75_000);
-    // Real = final_amount (no contributions yet), projected = Real - impending
-    expect((int) $byBalance[$b1->id]['projected_free_after'])->toBe(2_000_000 - 100_000);
+    expect((int) $byBalance[$b1->id]['impending'])->toBe(200_000);
+    expect((int) $byBalance[$b2->id]['impending'])->toBe(150_000);
+    expect((int) $byBalance[$b1->id]['projected_free_after'])->toBe(2_000_000 - 200_000);
     expect($result['has_negative_warning'])->toBeFalse();
+
+    // In 30d window, each monthly item occurs only once
+    $result30 = GetImpendingDrains::run($user->id, 30, $today);
+    expect($result30['items'])->toHaveCount(2);
+    expect($result30['total_impending_outflow'])->toBe(100_000 + 75_000);
 
     CarbonImmutable::setTestNow();
 });
@@ -117,7 +121,7 @@ test('warns when impending would push a balance negative', function () {
     expect($result['has_negative_warning'])->toBeTrue();
     $row = collect($result['per_balance'])->firstWhere('balance_id', $b->id);
     expect($row['would_go_negative'])->toBeTrue();
-    expect($row['projected_free_after'])->toBe(-20_000);
+    expect($row['projected_free_after'])->toBe(-80_000);
 
     CarbonImmutable::setTestNow();
 });
@@ -153,11 +157,11 @@ test('inactive recurrings are excluded and API scopes to authenticated user', fu
     // API: only scoped to the authenticated user, scoped by balances:read
     Sanctum::actingAs($user, ['balances:read']);
     $this->getJson('/api/impending-drains?window=60')->assertOk()
-        ->assertJsonPath('total_impending_outflow', 11_000);
+        ->assertJsonPath('total_impending_outflow', 22_000);
 
     Sanctum::actingAs($other, ['balances:read']);
     $this->getJson('/api/impending-drains?window=60')->assertOk()
-        ->assertJsonPath('total_impending_outflow', 99_000);
+        ->assertJsonPath('total_impending_outflow', 198_000);
 
     CarbonImmutable::setTestNow();
 });

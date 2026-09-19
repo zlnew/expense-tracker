@@ -16,6 +16,7 @@ import SheetDialogContent from '@/components/ui/dialog-sheet.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
+import { getLocalDateString } from '@/composables/useDate'
 import { useLang } from '@/composables/useLang'
 import { useNumber } from '@/composables/useNumber'
 import funds from '@/routes/funds'
@@ -35,7 +36,7 @@ const { formatAmount } = useNumber()
 
 const form = useForm({
   amount: 0,
-  date: new Date().toISOString().split('T')[0],
+  date: getLocalDateString(),
   description: '',
 })
 
@@ -62,7 +63,7 @@ watch(
     form.reset()
     form.clearErrors()
     form.amount = props.fund.auto_contribution || 0
-    form.date = new Date().toISOString().split('T')[0]
+    form.date = getLocalDateString()
   },
 )
 
