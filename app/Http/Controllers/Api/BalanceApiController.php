@@ -96,6 +96,7 @@ class BalanceApiController extends Controller
             $balance,
             (int) $request->validated('reconciled_amount'),
             (string) $request->validated('reconciled_at'),
+            (bool) $request->validated('auto_adjust', false),
         );
 
         return response()->json(BalanceData::from($balance->fresh()));

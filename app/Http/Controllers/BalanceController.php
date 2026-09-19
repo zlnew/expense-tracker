@@ -79,6 +79,7 @@ class BalanceController extends Controller
             $balance,
             (int) $request->validated('reconciled_amount'),
             (string) $request->validated('reconciled_at'),
+            (bool) $request->validated('auto_adjust', false),
         );
 
         return back()->with('success', __('app.updated_data', ['data' => __('app.balance')]));

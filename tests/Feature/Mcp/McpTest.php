@@ -11,6 +11,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
@@ -78,12 +79,13 @@ test('mcp server lists all available tools with valid input schemas', function (
 
     $tools = $response['result']['tools'];
     expect($tools)->toBeArray()
-        ->and(count($tools))->toBe(14);
+        ->and(count($tools))->toBe(15);
 
     $toolNames = collect($tools)->pluck('name')->all();
 
     expect($toolNames)->toContain('list_transactions')
         ->toContain('create_transaction')
+        ->toContain('update_transaction')
         ->toContain('delete_transaction')
         ->toContain('get_balance_summary')
         ->toContain('get_budget_status')
@@ -502,6 +504,137 @@ test('mcp server reconciles account and flags drift', function () {
         ],
     ]);
     expect($resDrift['result']['content'][0]['text'])->toContain('Discrepancy: Real balance is Rp 50.000 LOWER');
+});
+
+test('mcp server reconciles account with auto_adjust creating adjustment transaction and zeroes drift', function () {
+    $server = new McpServer($this->user);
+
+    // Initial final_amount is 500_000. Real statement is 460_000 (drift = +40_000).
+    $res = $server->handle([
+        'jsonrpc' => '2.0',
+        'id' => 201,
+        'method' => 'tools/call',
+        'params' => [
+            'name' => 'reconcile_balance',
+            'arguments' => [
+                'balance_id' => $this->balance->id,
+                'actual_amount' => 460000,
+                'auto_adjust' => true,
+            ],
+        ],
+    ]);
+
+    $text = $res['result']['content'][0]['text'];
+    expect($text)->toContain('Perfectly reconciled! Zero drift.')
+        ->toContain('Auto-adjustment: Created transaction')
+        ->toContain('Rp 40.000');
+
+    $fresh = $this->balance->fresh();
+    expect($fresh->final_amount)->toBe(460000)
+        ->and($fresh->drift)->toBe(0)
+        ->and($fresh->is_drift_flagged)->toBeFalse();
+
+    $this->assertDatabaseHas('transactions', [
+        'user_id' => $this->user->id,
+        'balance_id' => $this->balance->id,
+        'amount' => 40000,
+        'type' => 'expense',
+        'description' => 'Penyesuaian saldo rekonsiliasi',
+    ]);
+});
+
+test('mcp server updates transaction and resynchronizes balance', function () {
+    $txn = Transaction::factory()->create([
+        'user_id' => $this->user->id,
+        'balance_id' => $this->balance->id,
+        'category_id' => $this->category->id,
+        'amount' => 50000,
+        'type' => 'expense',
+        'date' => '2026-09-15',
+    ]);
+    $this->balance->update(['final_amount' => 450000]);
+
+    $server = new McpServer($this->user);
+
+    $response = $server->handle([
+        'jsonrpc' => '2.0',
+        'id' => 202,
+        'method' => 'tools/call',
+        'params' => [
+            'name' => 'update_transaction',
+            'arguments' => [
+                'transaction_id' => $txn->id,
+                'amount' => 70000,
+                'description' => 'Updated grocery shopping',
+            ],
+        ],
+    ]);
+
+    expect($response['result']['content'][0]['text'])->toContain('Transaction #'.$txn->id.' updated successfully')
+        ->toContain('Rp 70.000')
+        ->toContain('Updated grocery shopping');
+
+    $freshTxn = $txn->fresh();
+    expect($freshTxn->amount)->toBe(70000)
+        ->and($freshTxn->description)->toBe('Updated grocery shopping');
+
+    expect($this->balance->fresh()->final_amount)->toBe(430000);
+});
+
+test('mcp server updates transfer pair transactions atomically', function () {
+    $destBalance = Balance::factory()->create([
+        'user_id' => $this->user->id,
+        'name' => 'Savings Account',
+        'initial_amount' => 1000000,
+        'final_amount' => 1000000,
+    ]);
+
+    $groupId = (string) Str::uuid();
+    $txSource = Transaction::factory()->create([
+        'user_id' => $this->user->id,
+        'balance_id' => $this->balance->id,
+        'type' => 'expense',
+        'amount' => 100000,
+        'transfer_group_id' => $groupId,
+        'description' => 'Transfer to savings',
+    ]);
+    $txDest = Transaction::factory()->create([
+        'user_id' => $this->user->id,
+        'balance_id' => $destBalance->id,
+        'type' => 'income',
+        'amount' => 100000,
+        'transfer_group_id' => $groupId,
+        'description' => 'Transfer to savings',
+    ]);
+
+    $this->balance->update(['final_amount' => 400000]);
+    $destBalance->update(['final_amount' => 1100000]);
+
+    $server = new McpServer($this->user);
+
+    $response = $server->handle([
+        'jsonrpc' => '2.0',
+        'id' => 203,
+        'method' => 'tools/call',
+        'params' => [
+            'name' => 'update_transaction',
+            'arguments' => [
+                'transaction_id' => $txSource->id,
+                'amount' => 150000,
+                'description' => 'Increased transfer to savings',
+            ],
+        ],
+    ]);
+
+    expect($response['result']['content'][0]['text'])->toContain('updated successfully')
+        ->toContain('Transfer pair: Paired transaction leg was also updated');
+
+    expect($txSource->fresh()->amount)->toBe(150000)
+        ->and($txDest->fresh()->amount)->toBe(150000)
+        ->and($txDest->fresh()->description)->toBe('Increased transfer to savings');
+
+    expect($this->balance->fresh()->final_amount)->toBe(350000)
+        ->and($destBalance->fresh()->final_amount)->toBe(1150000);
 });
 
 test('mcp server deletes transaction and soft-deletes row', function () {

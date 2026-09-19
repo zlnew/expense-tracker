@@ -22,6 +22,7 @@ use App\Mcp\Tools\ReconcileBalanceTool;
 use App\Mcp\Tools\SyncFinancialIntegrityTool;
 use App\Mcp\Tools\ToolInterface;
 use App\Mcp\Tools\TransferBalanceTool;
+use App\Mcp\Tools\UpdateTransactionTool;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,9 +68,10 @@ class McpServer
 
     protected function registerDefaults(): void
     {
-        // 13 Tools
+        // 14 Tools
         $this->registerTool(new ListTransactionsTool);
         $this->registerTool(new CreateTransactionTool);
+        $this->registerTool(new UpdateTransactionTool);
         $this->registerTool(new DeleteTransactionTool);
         $this->registerTool(new GetBalanceSummaryTool);
         $this->registerTool(new GetBudgetStatusTool);
